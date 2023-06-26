@@ -1,0 +1,38 @@
+﻿@using Foto.Web.Client.Authorization
+@using Foto.Web.Client.ApiClients
+@inject UserApiClient Client
+@inject IJSRuntime JSRuntime
+
+<Router AppAssembly="@typeof(TodoApp).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <PageTitle>Not found</PageTitle>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <p role="alert">Sorry, there's nothing at this address.</p>
+        </LayoutView>
+    </NotFound>
+</Router>
+
+@code {
+
+    [Parameter]
+    public AuthorizedUserInfo CurrentUser { get; set; } = new("", Array.Empty<string>());
+
+    [Parameter]
+    public string[] SocialProviders { get; set; } = Array.Empty<string>();
+
+    [Inject]
+    public AuthorizationManager? AuthorizationManager { get; set; }
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        AuthorizationManager?.SetUserAuthorizationInfo(CurrentUser);
+        AuthorizationManager?.SetSocialProviders(SocialProviders);
+        await base.OnParametersSetAsync();
+    }
+
+    
+}

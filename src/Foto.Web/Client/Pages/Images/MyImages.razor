@@ -1,0 +1,29 @@
+﻿@page "/image/myimages"
+@layout MainLayout
+@using Foto.Web.Client.ApiClients
+@inherits AuthorizedBasePage
+@inject ImagesApiClient Client;
+
+<div class="container d-flex flex-column justify-content-center align-items-center">
+    <div class="row row-cols-auto align-items-center">
+        <h2>Mina uppladdade bilder</h2>
+    </div>
+</div>
+
+<ImageViewer Images="@_images" OnDeleteImage="DeleteImage "/>
+
+@code
+{
+    private IEnumerable<ImageItem>? _images { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        _images = await Client.GetImagesForUserAsync();
+    }
+    
+    private async Task DeleteImage(ImageItem imageItem)
+    {
+        await Client.DeleteImageAsync(imageItem.Id);
+        _images = await Client.GetImagesForUserAsync();
+        StateHasChanged();
+    }
+}

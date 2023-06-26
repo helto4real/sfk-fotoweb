@@ -1,0 +1,65 @@
+### Create a user
+# @password = P@ssw0rd!
+
+# POST http://localhost:5000/users
+# Content-Type: application/json
+
+# {
+#     "username": "myuser",
+#     "password": "{{password}}"
+# }
+
+# @name gettoken
+POST http://localhost:5000/api/users/token
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "password": "P@ssw0rd!",
+    "admin": "true"
+}
+
+### Get token
+@token = {{gettoken.response.body.token}}
+
+### Create a todo
+# @name createstbild
+POST http://localhost:5000/api/stbilder
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    
+    "title": "Title",
+    "location": "Sundsvall",
+    "time": "2023-05-01T00:00:00",
+    "description": "Some description",
+    "imageId": "01E92498-67B9-4112-A326-891929290479",
+    "name": "Kalle Svensson",
+    "favoriteSubject": "Fåglar",
+    "cameraBrand": "Sony så klart",
+    "favouritePhotographer": "Mig själv",
+    "favoriteSubject": "Bild på mig själv",
+    "homePage": "fotobloggarn.nu"
+
+}
+
+
+### Get st bild id
+@st-bild-ir = {{createstbild.response.body.id}}
+
+### Delete st bild
+DELETE http://localhost:5000/stbilder/{{st-bild-ir}}
+Authorization: Bearer {{token}}
+
+### Get st bild
+GET http://localhost:5000/stbilder/{{st-bild-ir}}
+Authorization: Bearer {{token}}
+
+### Get all bild
+GET http://localhost:5000/api/stbilder
+Authorization: Bearer {{token}}
+
+### Get my stbilder
+GET http://localhost:5000/api/stbilder/?useMyImages=true
+Authorization: Bearer {{token}}

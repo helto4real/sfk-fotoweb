@@ -1,0 +1,48 @@
+﻿
+
+@* Table that displays images that allows to click on a thumbnail and view the full image popup using bootstrap *@
+@if (Images?.Any() ?? false)
+{
+    <div class="container d-flex flex-column justify-content-center align-items-center">
+        <div class="row row-cols-auto align-items-center">
+            @foreach (var image in Images)
+            {
+                <div class="col card m-1 p-0 text-center" style="width: 10rem; height: 13rem;">
+                    <div class="card-header p-1">
+                    <h6 class="card-subtitle text-center mt-0 mb-0 text-body-secondary" style="font-size: 0.6em;">@(image.Title.Length > 20? image.Title.Substring(0,20) : image.Title)</h6>
+                    </div>
+                    <div class="card-body p-0 d-flex m-auto">
+                    <img class="img-thumbnail mt-2 rounded-3" src="/api/images/image/@image.Id?thumb" style="max-width: 8.2em; max-height: 8.2em; object-fit:scale-down;" alt="@image.Title" data-bs-toggle="modal" data-bs-target="#@image.Id">
+                    </div>
+                    <div class="card-footer p-0">
+                        <div class="d-flex align-items-center m-0 p-0">
+                            <input type="checkbox" class="form-check-input m-1 p-0" id="exampleCheck1">
+                            <button type="button" class="btn btn-link ms-auto m-1 p-0" @onclick="() => DeleteImage(image)">
+                                <i class="oi oi-trash" style="font-size: 16px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+            }
+        </div>
+    </div>
+}
+else
+{
+    <div><span>Inga bilder att visa!</span></div>
+}
+
+@code {
+    
+    [Parameter]
+    public EventCallback<ImageItem> OnDeleteImage { get; set; }
+    
+    private async Task DeleteImage(ImageItem image)
+    {
+        await OnDeleteImage.InvokeAsync(image);
+    }
+
+    [Parameter]
+    public IEnumerable<ImageItem>? Images { get; set; } = new List<ImageItem>();
+}

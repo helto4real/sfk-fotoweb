@@ -1,0 +1,50 @@
+### Create a user
+# @password = P@ssw0rd!
+
+# POST http://localhost:5000/users
+# Content-Type: application/json
+
+# {
+#     "username": "myuser",
+#     "password": "{{password}}"
+# }
+
+# @name gettoken
+POST http://localhost:5000/users/token
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "password": "P@ssw0rd!",
+    "admin": "true"
+}
+
+### Get token
+@token = {{gettoken.response.body.token}}
+
+
+### Create a token
+# @name temptoken
+POST http://localhost:5000/admin/token/addtokenbytype
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "UrlTokenType": "AllowAddUser"
+}
+
+### Get st bild id
+@url-token = {{temptoken.response.body.token}}
+@url-token-id = {{temptoken.response.body.id}}
+
+### Delete token
+DELETE http://localhost:5000/admin/token/{{url-token-id}}
+Authorization: Bearer {{token}}
+
+### Get token
+GET http://localhost:5000/admin/token/{{url-token}}
+Authorization: Bearer {{token}}
+
+### Get all valid tokens
+GET http://localhost:5000/admin/token/valid-tokens
+Authorization: Bearer {{token}}

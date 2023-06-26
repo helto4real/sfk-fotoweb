@@ -1,0 +1,45 @@
+﻿@page
+@model Foto.Web.Server.Pages.IndexModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SFK Fotowebb</title>
+    <base href="/" />
+    @* <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/fontawesome.min.css"> *@
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
+
+    @* Vendor css including the custom bootstrap css *@
+    <link href="assets/css/custom.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/vendor/bootstrap-icons/font/bootstrap-icons.css">
+
+    @* Application css *@
+    <link rel="stylesheet" href="assets/css/site.css">
+    <!-- If you add any scoped CSS files, uncomment the following to load them-->
+    @* <link href="Foto.Web.Client.styles.css" rel="stylesheet" />  *@
+</head>
+
+<body>
+    <component type="typeof(Foto.Web.Client.TodoApp)" 
+                param-CurrentUser="@Model.CurrentUser"
+                param-SocialProviders="@Model.ProviderNames" 
+                render-mode="WebAssembly" />
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+    <script src="_framework/blazor.webassembly.js"></script>
+    
+    @* Vendor javascript files *@
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    @* Application js file *@
+    @* <script src="assets/js/main.js"></script> *@
+</body>
+
+</html>

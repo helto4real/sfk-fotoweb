@@ -1,0 +1,187 @@
+﻿@using Foto.Web.Client.Shared;
+@using Foto.Web.Client.ApiClients
+@using Blazored.FluentValidation
+@using FluentValidation
+@using System.Globalization
+@inject ImagesApiClient Client;
+
+ <div class="container ">
+    <div class="row justify-content-center mb-3">
+        <div class="col col-8" style="max-width: 450px;" >
+            <span class="text-center">Bilden ska vara exakt 2079x1382 pixels.</span>
+        </div>
+    </div>
+    <div class="row g-3 mb-5 justify-content-center align-items-center">
+        <div class="col col-8" style="max-width: 400px;">
+            <CvEditForm id="uploadForm" EditContext="@_editContext" class="form" OnValidSubmit="@HandleValidSubmit">
+                
+                <FluentValidationValidator/>
+                
+                <div class="mb-3">
+                    <label for="imagefile" class="form-label">Ladda upp dit foto</label>
+                    @if (!_clearInputFileSelector)
+                    {
+                        <InputFile class="form-control" MaxFileSize="@Client.MaxAllowedImageSize" id="imagefile" OnChange="@HandleFileSelection" On @bind-Value="@_model.ImageName"/>
+                    }
+                    <ValidationMessage class="text-danger" For="@(() => _model.ImageFile)" />
+                </div>
+                <div class="mb-3">
+                    <label for="title" class="form-label">Rubrik: (Rubrikförslag, lämpligen tre, fyra ord)</label>
+                    <InputText id="title" type="title" class="form-control :invalid" @bind-Value="@_model.Title" />
+                    <ValidationMessage class="text-danger" For="@(() => _model.Title)" />
+                </div>
+                <div class="mb-3">
+                    <label for="name" class="form-label">Fotograf:</label>
+                    <InputText id="name" type="title" class="form-control :invalid " @bind-Value="@_model.Name" />
+                    <ValidationMessage class="text-danger" For="@(() => _model.Name)" />
+                </div>
+                <div class="mb-3">
+                    <label for="beskrivning" class="form-label">Beskrivning: (Beskriv ditt foto)</label>
+                    <InputTextArea  id="beskrivning" maxlength="300" type="title" class="form-control :invalid" @bind-Value="@_model.Description"/>
+                    <ValidationMessage class="text-danger" For="@(() => _model.Description)" />
+                </div>
+                <div class="mb-3">
+                    <label for="about" class="form-label">Om dig: (ålder, bostadsort, favoritmotiv, kameramärke, favoritfotograf, hemsida)</label>
+                    <InputTextArea  id="about" maxlength="300" type="title" class="form-control :invalid" @bind-Value="@_model.AboutThePhotograper"/>
+                    <ValidationMessage class="text-danger" For="@(() => _model.AboutThePhotograper)" />
+                </div>
+                <div class="mb-3">
+                    <label for="location" class="form-label">Vart bilden är tagen: (t.ex. plats, närmaste stad)</label>
+                    <InputText id="location" type="title" class="form-control :invalid" @bind-Value="@_model.Location" />
+                    <ValidationMessage class="text-danger" For="@(() => _model.Location)" />
+                </div>
+                <div class="mb-3">
+                    <label for="time" class="form-label">När är bilden tagen:</label>
+                    <InputDate id="time" class="form-control :invalid" @bind-Value="@_model.Time" />
+                    <ValidationMessage class="text-danger" For="@(() => _model.Time)" />
+                </div>
+                <div class="d-flex justify-content-start align-items-center">
+                    <button type="submit" class="btn btn-primary" disabled="@_isSubmitting">Ladda upp st-bild</button>
+                    <div class="spinner-border spinner-border-sm ms-1" role="status" aria-hidden="true" style="display: @(_isSubmitting? "block":"none");" >
+                        <span class="visually-hidden">Sparar ST-bild ...</span>
+                    </div>
+                </div>
+            </CvEditForm>
+        </div>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(_alertMessage))
+{
+    <div class="alert alert-danger">@_alertMessage</div>
+}
+
+@if (_uploadedImages.Any())
+{
+    <ImageViewer Images="@_uploadedImages"/>
+}
+
+@code {
+    string? _alertMessage;
+    private StBildUploadModel _model = new();
+    private List<ImageItem> _uploadedImages = new();
+    private EditContext? _editContext;
+    private bool _isSubmitting;
+    
+    protected override void OnInitialized()
+    {
+        _editContext = new(_model);
+    }
+    
+    private async Task HandleValidSubmit()
+    {
+        _isSubmitting = true;
+        StateHasChanged();
+        var (imageItem, error) = await Client.UploadImageWithMetadata(_model.ImageFile, _model.Title, _model, "st-bild");
+        _isSubmitting = false;
+        StateHasChanged();
+        if (imageItem != null)
+        {
+            _uploadedImages.Add(imageItem);
+            _model.ImageFile = null;
+            _model.ImageName = string.Empty;
+            _model.Title = string.Empty;
+            _model.Description = string.Empty;
+            _model.Location = string.Empty;
+            
+            ClearInputFile();
+            _alertMessage = null;
+        }
+        else
+        {
+            if (error is not null && error.Detail.IndexOf("wrong size", StringComparison.InvariantCultureIgnoreCase)>0)
+            {
+                _alertMessage = "Den bild du laddade upp är inte exakt 2079x1382 pixlar. Ladda upp en ny bild.";
+            }
+            else
+            {
+                _alertMessage = error?.Detail;
+            }
+        }
+    }
+    
+    private void HandleFileSelection(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        
+        var filenameWithoutExtensions = Path.GetFileNameWithoutExtension(file.Name);
+
+        _model.ImageName = file.Name;
+        _model.ImageFile = e.File;
+        
+        _editContext?.Validate();
+    }
+    
+    private bool _clearInputFileSelector;
+    /// <summary>
+    ///     This is a hack to clear the input file selector.
+    /// </summary>
+    private void ClearInputFile()
+    {
+        _clearInputFileSelector = true;
+        StateHasChanged();
+        _clearInputFileSelector = false;
+        StateHasChanged();
+    }
+
+    public class StBildUploadModel
+    {
+        public string ImageName { get; set; } = string.Empty;
+
+        public string Title { get; set; } = default!;
+        public string Name { get; set; } = default!;
+        public string Location { get; set; } = default!;
+        public DateTime Time { get; set; } = new DateTime(2023, 1, 1);
+        public string Description { get; set; } = default!;
+        public string AboutThePhotograper { get; set; } = default!;
+        public  IBrowserFile? ImageFile { get; set; }
+
+    }
+    public class LoginOrCreateUserModelValidator : AbstractValidator<StBildUploadModel> 
+    {
+        public LoginOrCreateUserModelValidator() 
+        {
+            RuleFor(x => x.Description)
+                .NotEmpty()
+                .WithMessage("Beskrivning måste anges.")
+                .MaximumLength(300)
+                .WithMessage("Beskrivningen får max vara 300 tecken");
+            RuleFor(x => x.Name)
+                .NotEmpty()
+                .WithMessage("Namn på fotograf måste anges.");
+            RuleFor(x => x.Title)
+                .NotEmpty()
+                .WithMessage("Rubrik måste anges.");
+            RuleFor(x => x.Location)
+                .NotEmpty()
+                .WithMessage("Plats måste anges.");
+            RuleFor(x => x.AboutThePhotograper)
+                .NotEmpty()
+                .WithMessage("Om fotografen måste anges.");
+            RuleFor(x => x.Time)
+                .LessThanOrEqualTo(e => DateTime.Now.AddDays(1))
+                .WithMessage("Tidpunkt kan inte vara framåt i tiden");
+        }
+    }
+
+}

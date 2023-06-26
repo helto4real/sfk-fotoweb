@@ -1,0 +1,24 @@
+﻿@using Foto.Web.Client.Authorization
+@inject AuthorizationManager AuthManager
+@inject NavigationManager NavigationManager
+
+<div>
+    @if (AuthManager?.IsAuthorized ?? false)
+    {
+        <p>User: @(AuthManager?.Username ?? "Unknown") <a class="btn btn-primary" role="button" @onclick="@Logout">Logout</a></p>
+    }
+    else
+    {
+        <a href="login">Login</a>
+    }
+</div>
+
+@code {
+
+    async Task Logout()
+    {
+        await AuthManager.Logout();
+        NavigationManager.NavigateTo("/login", true);
+    }
+
+}

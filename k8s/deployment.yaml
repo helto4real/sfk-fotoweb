@@ -1,0 +1,144 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: fotowebb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: fotowebb
+  template:
+    metadata:
+      name: fotowebb
+      labels:
+        name: fotowebb
+    spec:
+      volumes:
+        - name: nfs-fotowebb-images
+          persistentVolumeClaim:
+            claimName: nfs-fotowebb-images
+        - name: nfs-fotowebb-cert
+          persistentVolumeClaim:
+            claimName: nfs-fotowebb-cert
+        - name: nfs-fotowebb-db
+          persistentVolumeClaim:
+            claimName: nfs-fotowebb-db
+      containers:
+        
+        - name: fotowebb
+          image: 'helto4real/fotowebb'
+          env:
+            - name: Kestrel__Endpoints__Https__Certificate__Path
+              value: "/cert/keys/letsencrypt/fullchain.pem"
+            - name: Kestrel__Endpoints__Https__Certificate__KeyPath
+              value: "/cert/keys/letsencrypt/privkey.pem"
+            - name: FotoApiUrl
+              value: "https://api.sundsvallsfotoklubb.se:8001"
+            - name: Authentication__Schemes__Google__ClientId
+              valueFrom:
+                secretKeyRef:
+                  name: fotowebb
+                  key: google-client-id
+            - name: Authentication__Schemes__Google__ClientSecret
+              valueFrom:
+                secretKeyRef:
+                  name: fotowebb
+                  key: google-client-secret
+          ports:
+            - containerPort: 8002
+          volumeMounts:
+            - name: nfs-fotowebb-cert
+              mountPath: /cert
+              readOnly: true
+
+        - name: fotowebb-api
+          image: 'helto4real/fotowebbapi'
+          env:
+            - name: Kestrel__Endpoints__Https__Certificate__Path
+              value: "/cert/keys/letsencrypt/fullchain.pem"
+            - name: Kestrel__Endpoints__Https__Certificate__KeyPath
+              value: "/cert/keys/letsencrypt/privkey.pem"
+            - name: ApiSettings__PhotoWebUri
+              value: "https://fotowebb.sundsvallsfotoklubb.se"
+            - name: Jwt__Key
+              valueFrom:
+                secretKeyRef:
+                  name: fotowebb
+                  key: google-client-id            
+            - name: EmailSettings__SmtpServer
+              valueFrom:
+                secretKeyRef:
+                  name: fotowebb
+                  key: smtp-server
+            - name: EmailSettings__SmtpPort
+              value: "587"
+            - name: EmailSettings__SmtpUsername
+              valueFrom:
+                secretKeyRef:
+                  name: fotowebb
+                  key: smtp-username
+            - name: EmailSettings__SmtpPassword
+              valueFrom:
+                secretKeyRef:
+                  name: fotowebb
+                  key: smtp-password
+            - name: EmailSettings__SenderEmail
+              valueFrom:
+                secretKeyRef:
+                  name: fotowebb
+                  key: smtp-from
+            - name: EmailSettings__SenderName
+              valueFrom:
+                secretKeyRef:
+                  name: fotowebb
+                  key: smtp-fromname
+            - name: EmailSettings__UseSsl
+              value: "false"
+
+          ports:
+            - containerPort: 8001
+          volumeMounts:
+            - name: nfs-fotowebb-cert
+              mountPath: /cert
+              readOnly: true
+            - name: nfs-fotowebb-db
+              mountPath: /app/.db
+            - name: nfs-fotowebb-images
+              mountPath: /app/.images
+        - name: fotowebb-letsencrypt
+          image: 'linuxserver/swag'
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Europe/Stockholm"
+            - name: URL
+              value: "sundsvallsfotoklubb.se"
+            - name: SUBDOMAINS
+              value: "fotowebb, api"
+            - name: VALIDATION
+              value: "http"
+            - name: ONLY_SUBDOMAINS
+              value: "true"  
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: nfs-fotowebb-cert
+              mountPath: /config
+        # - name: nginx
+        #   image: 'nginx'
+        #   env:
+        #     - name: PUID
+        #       value: "1000"
+        #     - name: PGID
+        #       value: "1000"
+        #     - name: TZ
+        #       value: "Europe/Stockholm"
+        #   ports:
+        #     - containerPort: 80
+        #   volumeMounts:
+        #     - name: nfs-fotowebb-cert
+        #       mountPath: /config
+      restartPolicy: Always

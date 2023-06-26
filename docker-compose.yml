@@ -1,0 +1,23 @@
+version: '3.4'
+
+x-common-variables: &common-variables
+  #  ASPNETCORE_ENVIRONMENT: Development
+  #  ASPNETCORE_URLS: https://+:443;http://+:80
+   Kestrel__Endpoints__Https__Certificate__Path: cert.pem
+   Kestrel__Endpoints__Https__Certificate__Password: YourPasswordHere
+   Kestrel__Endpoints__Https__Certificate__KeyPath: key.pem
+
+services:
+  foto-api:
+    image: helto4real/fotowebbapi:latest
+    pull_policy: if_not_present
+    environment:
+      <<: *common-variables
+
+    ports:
+      - "5000:80"
+      - "5001:443"
+    volumes:
+      - ./FotoApi/.db:/app/.db
+    container_name: todo-api
+
