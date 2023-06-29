@@ -9,8 +9,8 @@ RUN export TARGETPLATFORM="${TARGETPLATFORM}"
 
 # Copy the source to docker container
 COPY ./src /usr/src
-RUN dotnet publish -c Release /usr/src/Foto.Web/Server/Foto.Web.Server.csproj -o "/publish"
-
+RUN dotnet publish -c Release /usr/src/Foto.WebServer/Foto.WebServer.csproj -o "/publish"
+                              
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-preview
 # RUN mkdir /app
 # Set the working directory to /app
@@ -18,4 +18,4 @@ WORKDIR /app
 
 COPY --from=builder /publish .
 # Start the application
-ENTRYPOINT ["dotnet", "Foto.Web.Server.dll"]
+ENTRYPOINT ["dotnet", "Foto.WebServer.dll"]

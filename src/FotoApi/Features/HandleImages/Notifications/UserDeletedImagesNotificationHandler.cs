@@ -1,4 +1,5 @@
 ﻿using FotoApi.Features.HandleUsers;
+using FotoApi.Features.HandleUsers.Notifications;
 using FotoApi.Infrastructure.Repositories;
 using MediatR;
 

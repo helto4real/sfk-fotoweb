@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FotoApi.Infrastructure.Security.Authorization.Commands;
 
-public class LoginExternalUserHandler : ICommandHandler<LoginExternalUserCommand, AuthorizationTokenResponse>
+public class LoginExternalUserHandler : ICommandHandler<LoginExternalUserCommand, UserAuthorizedResponse>
 {
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<Role> _roleManager;
@@ -28,7 +28,7 @@ public class LoginExternalUserHandler : ICommandHandler<LoginExternalUserCommand
         _tokenService = tokenService;
         _db = db;
     }
-    public async Task<AuthorizationTokenResponse> Handle(LoginExternalUserCommand command, CancellationToken cancellationToken)
+    public async Task<UserAuthorizedResponse> Handle(LoginExternalUserCommand command, CancellationToken cancellationToken)
     {
         var user = await _userManager.FindByLoginAsync(command.Provider, command.ProviderKey);
 
@@ -54,7 +54,15 @@ public class LoginExternalUserHandler : ICommandHandler<LoginExternalUserCommand
         {
             var userRoles = await _userManager.GetRolesAsync(user);
             var isAdmin = userRoles.Contains("Admin");
-            return new AuthorizationTokenResponse(_tokenService.GenerateToken(user.UserName!, isAdmin), isAdmin);
+            return (new UserAuthorizedResponse
+            {
+                UserName = command.UserName,
+                FirstName = "FirstName",
+                LastName = "LastName",
+                Email = user.Email!,
+                Token = _tokenService.GenerateToken(user.UserName!, isAdmin),
+                IsAdmin = isAdmin
+            });
         }
         throw new UserException(result.Errors.Select(e => e.Description));
     }

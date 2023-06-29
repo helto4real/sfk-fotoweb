@@ -1,0 +1,52 @@
+﻿@page "/login"
+@using BlazorStrap.V5
+@using BlazorStrap
+@inherits Foto.WebServer.Shared.BasePage
+@layout MainLayout
+@inject ILogger<Login> Logger;
+
+<LogInForm OnLoggedIn="@OnLoggedIn" OnCreated="@OnCreated" Token="@Token" JavaScriptRuntime="@JavaScriptRuntime"/>
+<BSModal @ref="_newUserModal" DataId="newUSerModal">
+    <Header>Ny användare har skapats!</Header>
+    <Content>En ny användare har skapats. Du behöver bekräfta din e-post adress genom att klicka i 
+                              länken som skickats till dig. Du kommer att automatiskt att flyttas till inloggningsidan.
+                               Om du inte får länken kontakta administratören</Content>
+    <Footer Context="modal">
+        <BSButton  Color="BSColor.Primary" Target="newUSerModal" OnClick="InformationModalOkClicked">Ok</BSButton>
+    </Footer>
+</BSModal>
+@code {
+    private BSModal? _newUserModal;
+    
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "token")]
+    public string Token { get; set; } = String.Empty;
+    
+    [CascadingParameter]
+    public string[] SocialProviders { get; set; } = Array.Empty<string>();
+
+    private Task OnLoggedIn()
+    {
+        Logger.LogInformation("Is logged in!");
+        NavigationManager?.NavigateTo("/", true);
+        return Task.CompletedTask;
+    }
+    private async Task OnCreated()
+    {
+        await ShowNewUserModal();
+        await Task.Delay(TimeSpan.FromSeconds(30));
+        NavigationManager?.NavigateTo("/", true);
+    }
+    
+    private async Task ShowNewUserModal()
+    {
+        if (_newUserModal is not null)
+            await _newUserModal.ShowAsync();
+    }
+
+    private void InformationModalOkClicked()
+    {
+        NavigationManager?.NavigateTo("/", true);
+    }
+
+}

@@ -1,0 +1,286 @@
+﻿@using FluentValidation
+@using Foto.WebServer.Authorization
+@using Blazored.FluentValidation
+@using BlazorStrap;
+@using BlazorStrap.V5;
+@using Foto.WebServer.Authentication
+@using Foto.WebServer.Dto
+@using Foto.WebServer.Services
+@using Microsoft.AspNetCore.Components.Authorization
+@inject IUserService UserService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ExternalProviders ExternalProviders
+<div class="container ">
+    <div class="row g-3 mb-1 justify-content-center align-items-center">
+        <div class="col col-8">
+            @if (HasToken)
+            {
+                <h1 class="text-center">Skapa användare</h1>
+                <p class="text-center">Skapa ett konto genom att ange uppgifter nedan eller använd ditt sociala konto från Google genom att trycka
+                    på knappen under rubriken "Skapa konto med ditt sociala konto".</p>
+            }
+            else
+            {
+                <h1 class="text-center">Logga in</h1>
+                <p class="text-center">Logga in genom att ange ditt användarnamn och lösenord nedan eller använd ditt konto grån Google genom att
+                    trycka på knappen under rubriken "Logga in med ditt sociala konto:"</p>
+            }
+        </div>
+    </div>
+    <div class="row g-3 mb-5 justify-content-center align-items-center">
+        <div class="col col-8" style="max-width: 300px;">
+            <CvEditForm Model="@_model" class="form-horizontal py-5" OnValidSubmit="@LoginOrCreate">
+                @* <DataAnnotationsValidator/> *@
+                <FluentValidationValidator Options="@(options =>{ if (HasToken) options.IncludeRuleSets("Create");})" />
+                <div class="mb-3">
+                    <label for="username" class="form-label">Användarnamn</label>
+                    <InputText id="username" class="form-control" autocomplete="username" @bind-Value="_model.Username"/>
+                    <ValidationMessage For="@(() => _model.Username)"/>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Lösenord</label>
+                    <InputText id="password" type="password" class="form-control" autocomplete="current-password" @bind-Value="_model.Password"/>
+                    <ValidationMessage For="@(() => _model.Password)"/>
+                </div>
+                @if (!String.IsNullOrEmpty(Token))
+                {
+                    <div class="mb-3">
+                        <label for="confirmPassword">Bekräfta lösenord</label>
+                        <InputText id="confirmPassword" type="password" class="form-control" @bind-Value="_model.ConfirmPassword" />
+                        <ValidationMessage For="@(() => _model.ConfirmPassword)" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="firstname" class="form-label">Förnamn</label>
+                        <InputText id="firstname" class="form-control" @bind-Value="_model.FirstName"/>
+                        <ValidationMessage For="@(() => _model.FirstName)"/>
+                    </div>
+                    <div class="mb-3">
+                        <label for="surename" class="form-label">Efternamn</label>
+                        <InputText id="surename" class="form-control" @bind-Value="_model.LastName"/>
+                        <ValidationMessage For="@(() => _model.LastName)"/>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">E-post</label>
+                        <InputText id="email" type="email" class="form-control" @bind-Value="_model.Email"/>
+                        <ValidationMessage For="@(() => _model.Email)"/>
+                    </div>
+                }
+                <div class="d-flex justify-content-start align-items-center">
+                    @if (HasToken)
+                    {
+                        <button type="submit" class="btn btn-primary" disabled="@_isSubmitting">
+                            Skapa användare
+                        </button>
+                        <div class="spinner-border spinner-border-sm ms-1" role="status" aria-hidden="true" style="display: @(_isSubmitting? "block":"none");" >
+                            <span class="visually-hidden">Sparar användare ..</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <button type="submit" class="btn btn-primary" disabled="@_isSubmitting">
+                            Login
+                        </button>
+                        <div class="spinner-border spinner-border-sm ms-1" role="status" aria-hidden="true" style="display: @(_isSubmitting? "block":"none");" >
+                            <span class="visually-hidden">Loggar in ..</span>
+                        </div>
+                    }
+                </div>
+            </CvEditForm>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col col-8" style="max-width: 300px;">
+            @if (HasToken)
+            {
+                <h6>Skapa konto med ditt sociala konto:</h6>
+            }
+            else
+            {
+                <h6>Logga in med ditt sociala konto:</h6>
+            }
+            <div class="row ">
+                @foreach (var provider in ExternalProviders.SocialProviders.Value)
+                {
+                    <div class="col">
+                        <a href="/api/auth/login/@provider?token=@EscapedToken">
+                            <button type="button" @onclick="SocialLoginClickCallback"
+                                    class="btn btn-danger btn-lg btn-block bg-secondary border-dark ">
+                                <i
+                                    class="@(GetClassFromProvider(@provider))" disabled="@_isSubmitting"></i>
+                            </button>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+   
+</div>
+
+@if (!string.IsNullOrEmpty(alertMessage))
+{
+    <div class="alert alert-danger">@alertMessage</div>
+}
+
+@code {
+    string? alertMessage;
+    
+    bool _isSubmitting = false;
+    
+    private LoginOrCreateUserModel _model = new();
+    
+    public bool HasToken => !string.IsNullOrEmpty(Token);
+    
+    [Parameter]
+    public EventCallback OnLoggedIn { get; set; }
+    [Parameter]
+    public EventCallback OnCreated { get; set; }
+
+    [Parameter]
+    public string Token { get; set; } = string.Empty;
+    
+    [Parameter]
+    public IJSRuntime? JavaScriptRuntime { get; set; }
+
+    public string EscapedToken => string.IsNullOrEmpty(Token)? String.Empty : Uri.EscapeDataString(Token);
+
+    protected override void OnInitialized()
+    {
+        _model.IsLogin = !HasToken;
+        
+        base.OnInitialized();
+    }
+
+    private void SocialLoginClickCallback()
+    {
+        _isSubmitting = true;
+        StateHasChanged();
+    }
+    
+    async Task LoginOrCreate()
+    {
+        _isSubmitting = true;
+        StateHasChanged();
+        
+        if (HasToken)
+        {
+            await Create();
+            return;
+        }
+        alertMessage = null;
+        var unEscapedToken = string.IsNullOrEmpty(Token)? string.Empty : Uri.UnescapeDataString(Token);
+        // It is impossible that Username or Password is null here, because the form is invalid if they are.
+        var user = await UserService.LoginAsync(new LoginUserInfo() { Username = _model.Username!, Password = _model.Password! });
+        if (user is not null)
+        {
+            var authStateProvider = (TokenAuthorizationProvider)AuthenticationStateProvider;
+            await authStateProvider.MarkUserAsAuthenticated(user);
+    // if (HasToken)
+            // {
+            //     await OnCreated.InvokeAsync(_model.Username);
+            // }
+            // else
+            // {
+                await OnLoggedIn.InvokeAsync(_model.Username);
+            // }
+
+        }
+        else
+        {
+            _isSubmitting = false;
+            StateHasChanged();
+            alertMessage = "Inloggning misslyckades!";
+        }
+        
+    }
+    
+    async Task Create()
+    {
+        alertMessage = null;
+        var unEscapedToken = Uri.UnescapeDataString(Token);
+        var result = await UserService.RegisterUserAsync(new NewUserInfo
+        {
+            FirstName = _model.FirstName!,
+            LastName = _model.LastName!,
+            Email = _model.Email!,
+            UserName = _model.Username!,
+            Password = _model.Password!,
+            UrlToken = unEscapedToken,
+        });
+        if (result is not null)
+        {
+            await OnLoggedIn.InvokeAsync(_model.Username);
+        }
+        else
+        {
+            alertMessage = "Kan inte skapa användare, be administratören om en ny länk.";
+        }
+    }
+
+    string GetClassFromProvider(string provider) => provider switch
+    {
+        "Google" => "bi bi-google",
+        "Facebook" => "bi bi-facebook",
+        "Twitter" => "bi bi-twitter",
+        "Microsoft" => "bi bi-microsoft",
+        _ => "bi bi-github"
+    };
+    
+    public class LoginOrCreateUserModel
+    {
+        public string? Username { get; set; }
+        public string? Password { get; set; }
+        public string? ConfirmPassword { get; set; }
+        public string? Email { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public bool IsLogin { get; set; }
+    }
+    
+    public class LoginOrCreateUserModelValidator : AbstractValidator<LoginOrCreateUserModel> 
+    {
+        public LoginOrCreateUserModelValidator() 
+        {
+            RuleSet("Create", () => 
+            {
+                RuleFor(x => x.ConfirmPassword)
+                    .NotEmpty()
+                        .WithMessage("Du måste ange lösenordet två gånger.")
+                    .Equal(x => x.Password)
+                        .WithMessage("Lösenorden måste vara lika.");
+                RuleFor(x => x.Email)
+                    .NotEmpty()
+                        .WithMessage("E-post måste anges.")
+                    .EmailAddress()
+                        .WithMessage("Ange en giltig e-postadress.");
+                RuleFor(x => x.FirstName)
+                    .NotEmpty()
+                        .WithMessage("Förnamn måste anges.");
+                RuleFor(x => x.LastName)
+                    .NotEmpty()
+                        .WithMessage("Efternamn måste anges.");
+            });
+
+            RuleFor(x => x.Username)
+                .NotEmpty()
+                    .WithMessage("Användarnamn måste anges.")
+                .MaximumLength(25)
+                    .WithMessage("Användarnamn får max vara 25 tecken")
+                .MinimumLength(5)
+                    .WithMessage("Användarnamn måste vara minst 5 tecken");
+            
+            RuleFor(x => x.Password)
+                .NotEmpty()
+                    .WithMessage("Lösenord måste anges.")
+                .MaximumLength(32)
+                .MinimumLength(6)
+                    .WithMessage("Lösenordet måste vara mellan 6 och 32 tecken.")
+                .Matches("^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z])(?=.*[^a-zA-Z\\d]).*$")
+                    .WithMessage("Lösenordet måste innehålla små och stora bokstäver, siffror samt specialtecken.");
+            
+        }
+    }
+}
+
+

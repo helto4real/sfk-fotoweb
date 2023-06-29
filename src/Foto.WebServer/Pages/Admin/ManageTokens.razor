@@ -1,0 +1,119 @@
+﻿@page "/admin/tokens"
+
+@layout MainLayout
+@using Foto.WebServer.Services
+@using Foto.WebServer.Dto
+@using Microsoft.AspNetCore.Components.Authorization
+@inherits AuthorizedBasePage
+@inject IAdminService AdminService
+
+<div class="container d-flex flex-column justify-content-center align-items-center">
+    <div class="row row-cols-auto align-items-center">
+        <h2>Hantera tokens</h2>
+    </div>
+</div>
+
+<AuthorizeView Roles="Admin">
+    <Authorizing>
+        <div class="container">
+            <div class="row g-3 mb-5 justify-content-center align-items-center">
+                <div class="col col-8" style="max-width: 300px;">
+                    <p>Authorizing user</p>
+                </div>
+            </div>
+        </div>
+    </Authorizing>
+    <Authorized>
+    <div class="container">
+        <div class="row g-3 mb-5 justify-content-center align-items-center">
+            <div class="col col-8" style="max-width: 500px;">
+                <table class="table table-striped table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col">Token</th>
+                        <th scope="col">Typ</th>
+                        <th scope="col">Upphör</th>
+                        <th scope="col"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var urlToken in _tokens)
+                    {
+                        <tr >
+                            <td>@(Uri.EscapeDataString(urlToken.Token))</td>
+                            <td>@TranslateUrlToken(urlToken.UrlTokenType)</td>
+                            <td>@urlToken.ExpirationDate.ToLocalTime()</td>
+                            <td>
+                                <button type="button" class="btn btn-link ms-auto m-1 p-0" @onclick="() => DeleteToken(urlToken.Id)">
+                                    <i class="oi oi-trash" style="font-size: 16px;"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+                <CvEditForm Model="@(this)" class="form-horizontal py-5" OnValidSubmit="@AddToken" style="max-width: 300px;" Context="authirzationContext">
+                    <DataAnnotationsValidator/>
+                    <div class="mb-3">
+                        <label for="tokentype" class="form-label">Typ av token</label>
+                        <InputSelect id="tokentype" class="form-select" @bind-Value="NewTokenTokenType">
+                            <option value="AllowAddUser">Ny användare</option>
+                            <option value="AllowAddImage">Bilduppladdning</option>
+                        </InputSelect>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-primary">Skapa token</button>
+                    </div>
+                </CvEditForm>
+            </div>
+        </div>
+    </div>
+</Authorized>
+</AuthorizeView>
+
+@code {
+    private List<UrlToken> _tokens = new();
+
+    private string NewTokenTokenType { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        var currentTokens = await AdminService.GetCurrentTokens();
+        _tokens.AddRange(currentTokens);
+        StateHasChanged();
+    }
+
+    private async Task DeleteToken(Guid tokenId)
+    {
+        await AdminService.DeleteToken(tokenId);
+        _tokens = (await AdminService.GetCurrentTokens()).ToList();
+        StateHasChanged();
+    }
+
+    private string TranslateUrlToken(UrlTokenType urlTokenUrlTokenType)
+    {
+        return urlTokenUrlTokenType switch
+        {
+            UrlTokenType.ConfirmEmail => "E-post bekräftelse",
+            UrlTokenType.ResetPassword => "Återställ lösenord",
+            UrlTokenType.AllowAddImage => "Bilduppladdning",
+            UrlTokenType.AllowAddUser => "Ny användare",
+            _ => "Okänd"
+            };
+    }
+    
+    async Task AddToken()
+    {
+        var tokenType = NewTokenTokenType switch
+        {
+            "AllowAddUser" => UrlTokenType.AllowAddUser,
+            "AllowAddImage" => UrlTokenType.AllowAddImage,
+            _ => UrlTokenType.AllowAddUser};
+        
+        var newToken = await AdminService.AddTokenByTokenType(tokenType);
+        if (newToken is not null)
+            _tokens.Add(newToken);
+    }
+
+}

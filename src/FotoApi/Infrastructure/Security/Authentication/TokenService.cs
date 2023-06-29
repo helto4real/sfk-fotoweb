@@ -21,6 +21,7 @@ public interface ITokenService
 {
     // Generate a JWT token for the specified user name and admin role
     string GenerateToken(string username, bool isAdmin = false);
+    string? GetUserIdByAccessTokenAsync(string accessToken);
 }
 
 public sealed class TokenService : ITokenService
@@ -31,6 +32,7 @@ public sealed class TokenService : ITokenService
 
     private readonly byte[] _key;
     private readonly SigningCredentials _signingCredential;
+    private readonly SymmetricSecurityKey _securityKey;
 
     public TokenService(IConfiguration config)
     {
@@ -38,8 +40,9 @@ public sealed class TokenService : ITokenService
         _audience = config["Jwt:Audience"]!;
         _key = Encoding.ASCII.GetBytes
             (config["Jwt:Key"]!);
+        _securityKey = new SymmetricSecurityKey(_key);
         _signingCredential = new SigningCredentials
-        (new SymmetricSecurityKey(_key),
+        (_securityKey,
             SecurityAlgorithms.HmacSha512Signature);
 
     }
@@ -73,6 +76,29 @@ public sealed class TokenService : ITokenService
              _signingCredential);
 
          return handler.WriteToken(jwtToken);
+    }
+    public string? GetUserIdByAccessTokenAsync(string accessToken)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var token = handler.ReadJwtToken(accessToken);
+        var tokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = _securityKey,
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+
+        var principle = handler.ValidateToken(accessToken, tokenValidationParameters, out var securityToken);
+
+        JwtSecurityToken jwtSecurityToken = securityToken as JwtSecurityToken ?? throw new InvalidOperationException("Invalid JWT token");
+        
+        if (jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha512, StringComparison.InvariantCultureIgnoreCase))
+        {
+            return principle.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        }
+
+        return null;
     }
 }
 // public sealed class TokenService : ITokenService

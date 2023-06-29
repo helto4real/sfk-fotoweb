@@ -7,5 +7,5 @@ public record LoginExternalUserCommand(
     string UserName, 
     string Provider, 
     string ProviderKey, 
-    string UrlToken) : ICommand<AuthorizationTokenResponse>;
+    string UrlToken) : ICommand<UserAuthorizedResponse>;
 

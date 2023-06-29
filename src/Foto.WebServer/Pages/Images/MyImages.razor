@@ -1,0 +1,30 @@
+﻿@page "/image/myimages"
+@layout MainLayout
+@using Foto.WebServer.Services
+@using Foto.WebServer.Dto
+@inherits AuthorizedBasePage
+@inject IImageService ImageService
+
+<div class="container d-flex flex-column justify-content-center align-items-center">
+    <div class="row row-cols-auto align-items-center">
+        <h2>Mina uppladdade bilder</h2>
+    </div>
+</div>
+
+<ImageViewer Images="@_images" OnDeleteImage="DeleteImage "/>
+
+@code
+{
+    private IEnumerable<ImageItem>? _images { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        _images = await ImageService.GetImagesForUserAsync();
+    }
+    
+    private async Task DeleteImage(ImageItem imageItem)
+    {
+        await ImageService.DeleteImageAsync(imageItem.Id);
+        _images = await ImageService.GetImagesForUserAsync();
+        StateHasChanged();
+    }
+}

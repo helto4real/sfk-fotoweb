@@ -1,4 +1,6 @@
-﻿using FotoApi.Features.HandleUsers.Dto;
+﻿using FotoApi.Features.HandleUsers.Commands;
+using FotoApi.Features.HandleUsers.Dto;
+using FotoApi.Features.Shared.Dto;
 using FotoApi.Infrastructure.ExceptionsHandling;
 using FotoApi.Infrastructure.Security.Authentication.Model;
 using FotoApi.Infrastructure.Security.Authorization.Commands;
@@ -18,6 +20,7 @@ public static class UsersApi
         group.WithTags("Users");
 
         var userMapper = new UserMapper();
+        var authMapper = new LoginMapper();
         // Creates a new user if a valid token is provided
         group.MapPost("/", async Task<Results<Ok<UserResponse>, BadRequest<ErrorDetail>>> (
             NewUserRequest request, 
@@ -26,16 +29,31 @@ public static class UsersApi
             var result = await mediator.Send(userMapper.ToCreateUserCommand(request));
             return TypedResults.Ok(result);
         });
+        
+        group.MapPost("/create", async Task<Results<Ok<UserAuthorizedResponse>, BadRequest<ErrorDetail>>> (
+            NewUserRequest request, 
+            IMediator mediator) =>
+        {
+            var result = await mediator.Send(authMapper.ToLoginAndCreateUserCommand(request));
+            return TypedResults.Ok(result);
+        });
 
-        group.MapPost("/token", async Task<Results<Ok<AuthorizationTokenResponse>, BadRequest<ErrorDetail>>> 
+        group.MapPost("/token", async Task<Results<Ok<UserAuthorizedResponse>, BadRequest<ErrorDetail>>> 
             (LoginUserRequest request, IMediator mediator) =>
         {
             var result = await mediator.Send(new LoginUserCommand(request.UserName, request.Password, request.IsAdmin));
             return TypedResults.Ok(result);
         });
+        
+        group.MapPost("/bytoken", async Task<Results<Ok<UserResponse>, BadRequest<ErrorDetail>>> 
+            (TokenRequest request, IMediator mediator) =>
+        {
+            var result = await mediator.Send(new GetUserFromTokenQuery(request.Token));
+            return TypedResults.Ok(result);
+        });
 
         group.MapPost("/token/{provider}", async Task<Results<
-            Ok<AuthorizationTokenResponse>, 
+            Ok<UserAuthorizedResponse>, 
             NotFound<ErrorDetail>,
             BadRequest<ErrorDetail>>> (
             string provider,

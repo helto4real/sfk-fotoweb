@@ -1,0 +1,46 @@
+﻿@page "/confirm-email"
+@inherits BasePage
+@using Foto.WebServer.Services
+@inject IUserService UserService
+
+<h3>ConfirmEmail</h3>
+    <div class="container">
+        <div class="row g-3 mb-5 justify-content-center align-items-center">
+            <div class="col col-8" style="max-width: 300px;">
+            @if(@IsConfirmed)  {
+                <p>Din e-post är nu konfirmerad du kommer nu automatiskt flyttas till inloggningssidan.</p>
+            }
+            else
+            {
+                <p>Din konfirmeringstoken har gått ut eller fel länk. Du kommer automatiskt komma till inloggningssidan. Logga in och följ instruktioner för att skicka konfirmeringen igen.</p>
+            }
+            </div>
+        </div>
+    </div>
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "token")]
+    public string Token { get; set; } = String.Empty;
+    
+    public bool IsConfirmed { get; set; }
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        // IsConfirmed = await Client.ConfirmEmailAsync(Token);
+        // StateHasChanged();
+        // await Task.Delay(TimeSpan.FromSeconds(5000));
+        // NavigationManager?.NavigateTo("login", true);
+        
+        await base.OnParametersSetAsync();
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        IsConfirmed = await UserService.ConfirmEmailAsync(Token);
+        StateHasChanged();
+        await Task.Delay(TimeSpan.FromSeconds(5000));
+        NavigationManager?.NavigateTo("login", true);
+        await base.OnInitializedAsync();
+    }
+}

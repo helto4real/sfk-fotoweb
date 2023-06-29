@@ -1,0 +1,162 @@
+﻿@page "/st-bild/edit/{stbildId:guid}"
+@inherits AuthorizedBasePage
+@using FluentValidation
+@using Microsoft.AspNetCore.Components.Authorization
+@using Foto.WebServer.Dto
+@using Foto.WebServer.Services
+@using Blazored.FluentValidation
+@inject IStBildService StBildService
+
+<h1>Redigera ST-bild</h1>
+<div class="container d-flex flex-column justify-content-center align-items-center">
+    <div class="row row-cols-auto align-items-center">
+        <AuthorizeView Roles="Admin">
+            <h2>Redigera och godkänn ST-bild</h2>
+        </AuthorizeView>
+        <AuthorizeView Roles="User">
+            <h2>Redigera ST-bild</h2>
+        </AuthorizeView>
+    </div>
+</div>
+<div class="container">
+    <div class="row g-3 mb-5 justify-content-center align-items-center">
+        @if (_stBild is null)
+        {
+            <p>
+                <em>Laddar sida...</em>
+            </p>
+        }
+        else
+        {
+            @if (_isReadOnly)
+            {
+                <AuthorizeView Roles="Admin">
+                    <div class="alert alert-warning" role="alert">
+                        <h4 class="alert-heading">Bilden är redan skickad till ST!</h4>
+                        <p>Bilden är redan skickad till ST och kan inte redigeras.</p>
+                    </div>
+                </AuthorizeView>
+                <AuthorizeView Roles="User">
+                    <div class="alert alert-warning" role="alert">
+                        <h4 class="alert-heading">Bilden är redan godkänd!</h4>
+                        <p>Bilden är redan godkänd och kan inte redigeras.</p>
+                    </div>
+                </AuthorizeView>
+            }
+            <CvEditForm id="uploadForm" Model="_stBild" class="form" OnValidSubmit="@HandleValidSubmit" Context="NewContext">
+
+                <FluentValidationValidator/>
+
+                <div class="mb-3">
+                    <img class="img-thumbnail mt-2" src="/api/images/image/@_stBild.ImageReference?thumb" style="max-width: 8.2em; max-height: 8.2em; object-fit:scale-down;" alt="@_stBild.Title" data-bs-toggle="modal" data-bs-target="#@_stBild.ImageReference">
+                </div>
+                <div class="modal fade" id="@_stBild.ImageReference" tabindex="-1" aria-labelledby="@(_stBild.Title)" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-fullscreen" data-bs-toggle="modal" data-bs-target="#@_stBild.ImageReference">
+                        <div class="modal-content">
+                            <div class="modal-body d-flex p-3">
+                                <img src="/api/images/image/@_stBild.ImageReference" class="img-fluid m-auto" alt="@_stBild.Title" style="max-width: 100%; max-height: 100%;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="title" class="form-label">Rubrik: (Rubrikförslag, lämpligen tre, fyra ord)</label>
+                    <InputText id="title" type="title" class="form-control :invalid" readonly="@_isReadOnly" @bind-Value="@_stBild.Title"/>
+                    <ValidationMessage class="text-danger" For="@(() => _stBild.Title)"/>
+                </div>
+                <div class="mb-3">
+                    <label for="name" class="form-label">Fotograf:</label>
+                    <InputText id="name" type="title" class="form-control :invalid " readonly="@_isReadOnly" @bind-Value="@_stBild.Name"/>
+                    <ValidationMessage class="text-danger" For="@(() => _stBild.Name)"/>
+                </div>
+                <div class="mb-3">
+                    <label for="beskrivning" class="form-label">Beskrivning: (Beskriv ditt foto)</label>
+                    <InputTextArea id="beskrivning" maxlength="300" type="title" class="form-control :invalid" readonly="@_isReadOnly" @bind-Value="@_stBild.Description"/>
+                    <ValidationMessage class="text-danger" For="@(() => _stBild.Description)"/>
+                </div>
+                <div class="mb-3">
+                    <label for="about" class="form-label">Om dig: (ålder, bostadsort, favoritmotiv, kameramärke, favoritfotograf, hemsida)</label>
+                    <InputTextArea id="about" maxlength="300" type="title" class="form-control :invalid" readonly="@_isReadOnly" @bind-Value="@_stBild.AboutThePhotograper"/>
+                    <ValidationMessage class="text-danger" For="@(() => _stBild.AboutThePhotograper)"/>
+                </div>
+                <div class="mb-3">
+                    <label for="location" class="form-label">Vart bilden är tagen: (t.ex. plats, närmaste stad)</label>
+                    <InputText id="location" type="title" class="form-control :invalid" readonly="@_isReadOnly" @bind-Value="@_stBild.Location"/>
+                    <ValidationMessage class="text-danger" For="@(() => _stBild.Location)"/>
+                </div>
+                <div class="mb-3">
+                    <label for="time" class="form-label">När är bilden tagen:</label>
+                    <InputDate id="time" class="form-control :invalid" readonly="@_isReadOnly" @bind-Value="@_stBild.Time"/>
+                    <ValidationMessage class="text-danger" For="@(() => _stBild.Time)"/>
+                </div>
+                <AuthorizeView Roles="Admin">
+                    <div class="mb-3">
+                        <label for="isaccepted" class="form-check-label">Kryssa i för att godkänna bilden:</label>
+                        <InputCheckbox id="isaccepted" class="form-check-input :invalid" @bind-Value="@_stBild.IsAccepted"/>
+                    </div>
+                </AuthorizeView>
+                <button type="submit" class="btn btn-primary mt-1" disabled="@_isReadOnly">Spara</button>
+                <button type="button" class="btn btn-secondary m-lg-1" @onclick="OnCancel">Avbryt</button>
+            </CvEditForm>
+        }
+    </div>
+</div>
+
+@code {
+
+    private StBildInfo? _stBild;
+
+    private bool _isReadOnly;
+
+    [Parameter]
+    public Guid StbildId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var claimsPrincipal = (await AuthenticationStateTask!).User;
+        _stBild = await StBildService.GetStBild(StbildId);
+        _isReadOnly = (claimsPrincipal.IsInRole("Admin") && _stBild.IsAccepted) || _stBild.IsUsed;
+        StateHasChanged();
+        await base.OnInitializedAsync();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (_stBild is not null)
+        {
+            await StBildService.UpdateStBild(_stBild);
+            // Navigate back to the StBild list page
+            NavigationManager?.NavigateTo("/st-bild/list");
+        }
+    }
+
+    public class UpdateUserModelValidator : AbstractValidator<StBildInfo>
+    {
+        public UpdateUserModelValidator()
+        {
+            RuleFor(x => x.Description)
+                .NotEmpty()
+                .WithMessage("Beskrivning måste anges.")
+                .MaximumLength(300)
+                .WithMessage("Beskrivningen får max vara 300 tecken");
+            RuleFor(x => x.Name)
+                .NotEmpty()
+                .WithMessage("Namn på fotograf måste anges.");
+            RuleFor(x => x.Location)
+                .NotEmpty()
+                .WithMessage("Plats måste anges.");
+            RuleFor(x => x.AboutThePhotograper)
+                .NotEmpty()
+                .WithMessage("Om fotografen måste anges.");
+            RuleFor(x => x.Time)
+                .LessThanOrEqualTo(e => DateTime.Now.AddDays(1))
+                .WithMessage("Tidpunkt kan inte vara framåt i tiden");
+        }
+    }
+
+    private void OnCancel()
+    {
+        NavigationManager?.NavigateTo("/st-bild/list");
+    }
+
+}

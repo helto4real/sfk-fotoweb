@@ -108,7 +108,7 @@ internal class MailSenderService : IHostedService
             _logger.LogError("SMTP client is null, cannot send email");
             return;
         }
-
+        _logger.LogInformation("Sending email to {Email}", nextEmailMessage.Email);
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress(_emailSettings.SenderName, _emailSettings.SenderEmail));
         message.To.Add(new MailboxAddress("", nextEmailMessage.Email));
@@ -119,5 +119,6 @@ internal class MailSenderService : IHostedService
             Text = nextEmailMessage.Message
         };
         await _smtpClient.SendAsync(message, _combinedCancellationToken);
+        _logger.LogInformation("Email to {Email} sent!", nextEmailMessage.Email);
     }
 }

@@ -1,0 +1,69 @@
+@using Foto.WebServer.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Foto.WebServer.Authentication
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+<div class="container-fluid d-flex align-items-center justify-content-between">
+    <a href="/" class="logo navbar-brand d-flex align-items-center  me-auto me-lg-0">
+        <!-- Uncomment the line below if you also wish to use an image logo -->
+        <img class="logo-img" src="logo.jpg" alt="">
+        <h1>SFK Fotowebb</h1>
+    </a>
+    <nav id="navbar" class="navbar">
+        <ul>
+            <li><a href="/" class="active">Hem</a></li>
+            <AuthorizeView>
+                <li class="dropdown"><a href="#"><span>Bilder</span> <i class="bi bi-chevron-down dropdown-indicator"></i></a>
+                    <ul>
+                        <li><NavLink class="nav-link" href="image/upload">Ladda upp foto</NavLink></li>
+                        <li><NavLink class="nav-link" href="image/myimages">Mina bilder</NavLink></li>
+                    </ul>
+                </li>
+            </AuthorizeView>
+            <AuthorizeView Roles="Admin">
+                <li class="dropdown"><a href="#"><span>Admin</span> <i
+                            class="bi bi-chevron-down dropdown-indicator"></i></a>
+                    <ul>
+                        <li><NavLink class="nav-link" href="admin/users/list">Hantera användare</NavLink></li>
+                        <li><NavLink class="nav-link" href="admin/tokens">Hantera tokens</NavLink></li>
+                    </ul>
+                </li>
+                <li class="dropdown"><a href="#"><span>ST-bilder</span> <i class="bi bi-chevron-down dropdown-indicator"></i></a>
+                    <ul>
+                        <li><NavLink class="nav-link" href="/st-bild/upload">Ladda upp ST-bild</NavLink></li>
+                        <li><NavLink class="nav-link" href="/st-bild/list">Visa ST-bilder</NavLink></li>
+                    </ul>
+                </li>
+            </AuthorizeView>
+            <AuthorizeView>
+                <Authorized>
+                <li class="dropdown">
+                    <a href="#"><span class="mr-3">@context.User.Identity?.Name</span>
+                        <i
+                            class="bi bi-chevron-down dropdown-indicator"></i></a>
+                    <ul>
+                        <li><NavLink class="nav-link" @onclick="@Logout">Logga ut</NavLink></li>
+                    </ul>
+                </li>
+                </Authorized>
+                <NotAuthorized>
+                    <li class="nav-item mr-3">
+                        <a class="nav-link m" href="/login">Logga in</a>
+                    </li>
+                </NotAuthorized>
+            </AuthorizeView>
+        </ul>
+    </nav><!-- .navbar -->
+    <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
+    <i class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>
+</div>
+
+@code {
+
+    async Task Logout()
+    {
+        await ((TokenAuthorizationProvider)AuthenticationStateProvider).MarkUserAsLoggedOut();
+        NavigationManager?.NavigateTo("/login");
+    }
+
+}

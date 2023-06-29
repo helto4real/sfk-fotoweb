@@ -1,6 +1,6 @@
 ﻿namespace FotoApi.Features.SendEmailNotifications;
 
-internal interface IMailSender
+public interface IMailSender
 {
     Task SendEmailAsync(MailInfo mailInfo);
 }
@@ -12,4 +12,4 @@ internal interface IMailQueue
     Task<MailInfo> GetNextFromQueue();
 }
 
-internal record MailInfo(string Email, string Subject, string Message);
+public record MailInfo(string Email, string Subject, string Message);

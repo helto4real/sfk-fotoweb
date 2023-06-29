@@ -32,8 +32,10 @@ spec:
               value: "/cert/keys/letsencrypt/fullchain.pem"
             - name: Kestrel__Endpoints__Https__Certificate__KeyPath
               value: "/cert/keys/letsencrypt/privkey.pem"
-            - name: FotoApiUrl
-              value: "https://api.sundsvallsfotoklubb.se:8001"
+            - name: AppSettings__FotoApiUrl
+              value: "https://api.sundsvallsfotoklubb.online:8001"
+            - name: AppSettings__FotoWebServerUrl
+              value: "https://sundsvallsfotoklubb.online"
             - name: Authentication__Schemes__Google__ClientId
               valueFrom:
                 secretKeyRef:
@@ -59,7 +61,7 @@ spec:
             - name: Kestrel__Endpoints__Https__Certificate__KeyPath
               value: "/cert/keys/letsencrypt/privkey.pem"
             - name: ApiSettings__PhotoWebUri
-              value: "https://fotowebb.sundsvallsfotoklubb.se"
+              value: "https://sundsvallsfotoklubb.online"
             - name: Jwt__Key
               valueFrom:
                 secretKeyRef:
@@ -115,30 +117,17 @@ spec:
             - name: TZ
               value: "Europe/Stockholm"
             - name: URL
-              value: "sundsvallsfotoklubb.se"
+              value: "sundsvallsfotoklubb.online"
             - name: SUBDOMAINS
-              value: "fotowebb, api"
+              value: "wildcard"
             - name: VALIDATION
-              value: "http"
-            - name: ONLY_SUBDOMAINS
-              value: "true"  
-          ports:
-            - containerPort: 80
+              value: "dns"
+            - name: DNSPLUGIN
+              value: "cloudflare"
+          # ports:
+          #   - containerPort: 80
           volumeMounts:
             - name: nfs-fotowebb-cert
               mountPath: /config
-        # - name: nginx
-        #   image: 'nginx'
-        #   env:
-        #     - name: PUID
-        #       value: "1000"
-        #     - name: PGID
-        #       value: "1000"
-        #     - name: TZ
-        #       value: "Europe/Stockholm"
-        #   ports:
-        #     - containerPort: 80
-        #   volumeMounts:
-        #     - name: nfs-fotowebb-cert
-        #       mountPath: /config
+
       restartPolicy: Always

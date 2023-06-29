@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace FotoApi.Infrastructure.Security.Authorization.Commands;
 
-public class LoginUserHandler : ICommandHandler<LoginUserCommand, AuthorizationTokenResponse>
+public class LoginUserHandler : ICommandHandler<LoginUserCommand, UserAuthorizedResponse>
 {
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<Role> _roleManager;
@@ -18,7 +18,7 @@ public class LoginUserHandler : ICommandHandler<LoginUserCommand, AuthorizationT
         _roleManager = roleManager;
         _tokenService = tokenService;
     }
-    public async Task<AuthorizationTokenResponse> Handle(LoginUserCommand command, CancellationToken cancellationToken)
+    public async Task<UserAuthorizedResponse> Handle(LoginUserCommand command, CancellationToken cancellationToken)
     {
         var user = await _userManager.FindByNameAsync(command.UserName);
 
@@ -27,6 +27,39 @@ public class LoginUserHandler : ICommandHandler<LoginUserCommand, AuthorizationT
 
         var userRoles = await _userManager.GetRolesAsync(user);
         var isAdmin = userRoles.Contains("Admin");
-        return (new AuthorizationTokenResponse(_tokenService.GenerateToken(user.UserName!, isAdmin), isAdmin));
+        return (new UserAuthorizedResponse
+        {
+            UserName = command.UserName,
+            FirstName = "FirstName",
+            LastName = "LastName",
+            Email = user.Email!,
+            Token = _tokenService.GenerateToken(user.UserName!, isAdmin),
+            IsAdmin = isAdmin
+        });
     }
 }
+
+// public class LoginUserHandler : ICommandHandler<LoginUserCommand, AuthorizationTokenResponse>
+// {
+//     private readonly UserManager<User> _userManager;
+//     private readonly RoleManager<Role> _roleManager;
+//     private readonly ITokenService _tokenService;
+//
+//     public LoginUserHandler(UserManager<User> userManager, RoleManager<Role> roleManager, ITokenService tokenService)
+//     {
+//         _userManager = userManager;
+//         _roleManager = roleManager;
+//         _tokenService = tokenService;
+//     }
+//     public async Task<AuthorizationTokenResponse> Handle(LoginUserCommand command, CancellationToken cancellationToken)
+//     {
+//         var user = await _userManager.FindByNameAsync(command.UserName);
+//
+//         if (user is null || !await _userManager.CheckPasswordAsync(user, command.Password))
+//             throw new LoginFailedException();
+//
+//         var userRoles = await _userManager.GetRolesAsync(user);
+//         var isAdmin = userRoles.Contains("Admin");
+//         return (new AuthorizationTokenResponse(_tokenService.GenerateToken(user.UserName!, isAdmin), isAdmin));
+//     }
+// }
