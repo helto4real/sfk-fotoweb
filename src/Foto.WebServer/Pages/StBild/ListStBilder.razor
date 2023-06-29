@@ -15,7 +15,7 @@
         </AuthorizeView>
     </div>
 </div>
-<div class="container">
+<div class="container mt-3">
     <div class="row g-3 mb-5 justify-content-center align-items-center">
         
         @if (_stBilder.Any())
@@ -58,6 +58,14 @@
                     </div>
                 </div>
             }
+        }
+        else
+        {
+            <div class="container d-flex flex-column justify-content-center align-items-center">
+                <div class="row row-cols-auto align-items-center">
+                    Du har inga bilder än. Ladda upp en bild genom att klicka på "Ladda upp ST-bild" i menyn.
+                </div>
+            </div>
         }
     </div>
 </div>

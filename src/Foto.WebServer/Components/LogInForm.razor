@@ -140,9 +140,6 @@
     [Parameter]
     public string Token { get; set; } = string.Empty;
     
-    [Parameter]
-    public IJSRuntime? JavaScriptRuntime { get; set; }
-
     public string EscapedToken => string.IsNullOrEmpty(Token)? String.Empty : Uri.EscapeDataString(Token);
 
     protected override void OnInitialized()

@@ -28,15 +28,15 @@
                         <li><NavLink class="nav-link" href="admin/tokens">Hantera tokens</NavLink></li>
                     </ul>
                 </li>
+            </AuthorizeView>
+            <AuthorizeView>
+                <Authorized>
                 <li class="dropdown"><a href="#"><span>ST-bilder</span> <i class="bi bi-chevron-down dropdown-indicator"></i></a>
                     <ul>
                         <li><NavLink class="nav-link" href="/st-bild/upload">Ladda upp ST-bild</NavLink></li>
                         <li><NavLink class="nav-link" href="/st-bild/list">Visa ST-bilder</NavLink></li>
                     </ul>
                 </li>
-            </AuthorizeView>
-            <AuthorizeView>
-                <Authorized>
                 <li class="dropdown">
                     <a href="#"><span class="mr-3">@context.User.Identity?.Name</span>
                         <i

@@ -1,4 +1,5 @@
-﻿using FotoApi.Features.HandleUsers;
+﻿using FotoApi.Features.HandleImages.Dto;
+using FotoApi.Features.HandleUsers;
 using FotoApi.Features.HandleUsers.Notifications;
 using FotoApi.Infrastructure.Repositories;
 using MediatR;
@@ -9,6 +10,7 @@ public class UserDeletedImagesNotificationHandler : INotificationHandler<UserDel
 {
     private readonly PhotoServiceDbContext _db;
     private readonly IPhotoStore _photoStore;
+    private readonly IMediator _mediator;
     private readonly ILogger<UserDeletedImagesNotificationHandler> _logger;
 
     public UserDeletedImagesNotificationHandler(
@@ -21,7 +23,7 @@ public class UserDeletedImagesNotificationHandler : INotificationHandler<UserDel
         _logger = logger;
     }
 
-    public Task Handle(UserDeletedNotification notification, CancellationToken cancellationToken)
+    public async Task Handle(UserDeletedNotification notification, CancellationToken cancellationToken)
     {
         var userImages = _db.Images.Where(i => i.OwnerReference == notification.UserName);
         if (userImages.Any())
@@ -33,6 +35,5 @@ public class UserDeletedImagesNotificationHandler : INotificationHandler<UserDel
             }
             _db.Images.RemoveRange(userImages);
         }
-        return Task.CompletedTask;
     }
 }

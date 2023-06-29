@@ -8,7 +8,7 @@ public class BasePage : ComponentBase, IAsyncDisposable
     [Inject] protected NavigationManager? NavigationManager { get; set; }
 
     [Inject] protected IJSRuntime? JavaScriptRuntime { get; set; }
-
+    
     private IJSObjectReference? _jsObjectReference;
     
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -19,8 +19,16 @@ public class BasePage : ComponentBase, IAsyncDisposable
             // Make menu work by importing the JS file when the page is first rendered
             if (JavaScriptRuntime is not null)
             {
-                _jsObjectReference = await JavaScriptRuntime.InvokeAsync<IJSObjectReference>("import",
-                    "./assets/js/main.js");
+                try
+                {
+                    _jsObjectReference = await JavaScriptRuntime.InvokeAsync<IJSObjectReference>("import",
+                        "./assets/js/main.js");
+                }
+                catch (JSDisconnectedException)
+                {
+                    // Ignore
+                    // _logger.LogInformation("Javascript error: {0}", ex.Message);
+                }
             }
         }
     }
@@ -28,7 +36,14 @@ public class BasePage : ComponentBase, IAsyncDisposable
     {
         if (_jsObjectReference is not null)
         {
-            await _jsObjectReference.DisposeAsync();
+            try
+            {
+                await _jsObjectReference.DisposeAsync();
+                _jsObjectReference = null;
+            }
+            catch (JSDisconnectedException)
+            {
+            }
         }
     }
     

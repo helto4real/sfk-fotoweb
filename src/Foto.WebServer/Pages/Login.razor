@@ -5,7 +5,7 @@
 @layout MainLayout
 @inject ILogger<Login> Logger;
 
-<LogInForm OnLoggedIn="@OnLoggedIn" OnCreated="@OnCreated" Token="@Token" JavaScriptRuntime="@JavaScriptRuntime"/>
+<LogInForm OnLoggedIn="@OnLoggedIn" OnCreated="@OnCreated" Token="@Token"/>
 <BSModal @ref="_newUserModal" DataId="newUSerModal">
     <Header>Ny användare har skapats!</Header>
     <Content>En ny användare har skapats. Du behöver bekräfta din e-post adress genom att klicka i 

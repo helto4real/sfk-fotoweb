@@ -25,8 +25,6 @@ public class ImageService : IImageService
         httpClient.DefaultRequestHeaders.Add("User-Agent", "FotoWebbServer");
     }
 
-    public int MaxAllowedImageSize => 1024 * 1024 * 10;
-    
     public async Task<(ImageItem?, ErrorDetail?)> UploadImageWithMetadata<T>(IBrowserFile? file, string title, T metadata, string metadataType) where T : class
     {
         await AddAuthorizationHeaders();
@@ -39,7 +37,7 @@ public class ImageService : IImageService
         content.Add(JsonContent.Create<T>(metadata), "metadata");
         content.Add(new StringContent(title), "title");
         content.Add(new StringContent(file.Name), "filename");
-        content.Add(new StreamContent(file.OpenReadStream(MaxAllowedImageSize)), "file", file.Name);
+        content.Add(new StreamContent(file.OpenReadStream(IImageService.MaxAllowedImageSize)), "file", file.Name);
         var response = await _httpClient.PostAsync("api/images", content);
 
         var result = await _httpHelper.HandleResponse(response);
@@ -63,7 +61,7 @@ public class ImageService : IImageService
     
         content.Add(new StringContent(file.Name), "filename");
         content.Add(new StringContent(title), "title");
-        content.Add(new StreamContent(file.OpenReadStream(MaxAllowedImageSize)), "file", file.Name);
+        content.Add(new StreamContent(file.OpenReadStream(IImageService.MaxAllowedImageSize)), "file", file.Name);
         var response = await _httpClient.PostAsync("api/images", content);
     
         var result = await _httpHelper.HandleResponse(response);
@@ -84,7 +82,7 @@ public class ImageService : IImageService
 
         var result = await _httpHelper.HandleResponse(response);
         // Todo handle error
-        if (result is not null) return null;
+        if (result is not null) return Enumerable.Empty<ImageItem>();
         
         return await response.Content.ReadFromJsonAsync<IEnumerable<ImageItem>>() ?? Enumerable.Empty<ImageItem>();
     }

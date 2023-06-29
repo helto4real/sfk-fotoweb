@@ -21,7 +21,7 @@
                     <label for="imagefile" class="form-label">Ladda upp dit foto</label>
                     @if (!_clearInputFileSelector)
                     {
-                        <InputFile class="form-control" MaxFileSize="@ImageService.MaxAllowedImageSize" id="imagefile" OnChange="@HandleFileSelection" On @bind-Value="@_model.ImageName"/>
+                        <InputFile class="form-control" MaxFileSize="@IImageService.MaxAllowedImageSize" id="imagefile" OnChange="@HandleFileSelection" On @bind-Value="@_model.ImageName"/>
                     }
                     <ValidationMessage class="text-danger" For="@(() => _model.ImageFile)" />
                 </div>

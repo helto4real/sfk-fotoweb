@@ -6,7 +6,7 @@ namespace Foto.WebServer.Services;
 
 public interface IImageService
 {
-    int MaxAllowedImageSize { get; }
+    static int MaxAllowedImageSize => 1024 * 1024 * 10; // 10 MB
 
     Task<(ImageItem?, ErrorDetail?)> UploadImageWithMetadata<T>(IBrowserFile? file, string title, T metadata,
         string metadataType) where T : class;
