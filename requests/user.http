@@ -22,13 +22,13 @@ Content-Type: application/json
 ### Get token
 @token = {{gettoken.response.body.token}}
 
-POST https://localhost:8001/api/users/bytoken/
+### Get all users
+POST https://localhost:8001/api/users/bytoken
 Content-Type: application/json
 
 {
-  "string token": "{{token}}""
+  "token": "{{token}}"
 }
-
 
 ### Get all users
 GET https://localhost:8001/api/admin/users
