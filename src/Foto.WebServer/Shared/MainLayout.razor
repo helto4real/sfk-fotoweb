@@ -1,16 +1,51 @@
 @using Foto.WebServer.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
+@using BlazorStrap.V5
+@using BlazorStrap
 @inherits LayoutComponentBase
 
 <PageTitle>SFK Fotowebb</PageTitle>
 
-<header id="header" class="header d-flex align-items-center fixed-top">
+@* fixed-top *@
+<header id="header" class="header">
     <NavMenu />
 </header>
-<main id="main" role="main">
+<main id="main" role="main" class="main">
     @Body
 </main>
+<BSModal @ref="@_acceptCookieModal" MarginTop="Margins.Auto" DataId="acceptCookieModal">
+    <Header>Cookies och GDPR</Header>
+    <Content>Vi använder cookies för att ge dig bästa möjliga upplevelse. För att kunna fortsätta att använda siten behöver du acceptera 
+        att vi lagrar cookies genom att trycka på knappen "Jag förstår".</Content>
+    <Footer Context="cookiemodal">
+        <a href="/cookie/consent"> <BSButton  Color="BSColor.Primary">Jag förstår</BSButton></a>
+        <a href="/cookiepolicy" target="_blank"><BSButton  Color="BSColor.Secondary">Läs mer...</BSButton></a>
+    </Footer>
+</BSModal>
 <footer class="fixed-bottom">
     <Footer />
 </footer>
 
+
+@code
+{
+    [CascadingParameter]
+    public bool ConsentGiven { get; set; }
+    private BSModal? _acceptCookieModal;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!ConsentGiven)
+        {
+            await ShowAcceptCookieModal();
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+    private async Task ShowAcceptCookieModal()
+    {
+        if (_acceptCookieModal is null)
+            throw new NullReferenceException("Accept cookie modal is null");
+        await _acceptCookieModal.ShowAsync();
+    }
+
+}

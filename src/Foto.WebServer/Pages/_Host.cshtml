@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Http.Features
 
 @namespace Foto.WebServer.Pages
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
@@ -9,7 +10,8 @@
 <html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="utf-8"/>
-    <meta http-equiv="Content-Security-Policy" content="block-all-mixed-content;upgrade-insecure-requests;default-src 'self';img-src 'self';script-src stackpath.bootstrapcdn.com 'sha256-34WLX60Tw3aG6hylk0plKbZZFXCuepeQ6Hu7OqRf8PI=' 'self'; style-src stackpath.bootstrapcdn.com fonts.googleapis.com 'unsafe-inline' 'self'; font-src fonts.gstatic.com 'self';">
+    <meta http-equiv="Content-Security-Policy" content="block-all-mixed-content;upgrade-insecure-requests;default-src 'self';img-src data: 'self';script-src stackpath.bootstrapcdn.com 'sha256-34WLX60Tw3aG6hylk0plKbZZFXCuepeQ6Hu7OqRf8PI=' 'self'; style-src stackpath.bootstrapcdn.com fonts.googleapis.com 'unsafe-inline' 'self'; font-src fonts.gstatic.com 'self';">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <base href="~/"/>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
     
@@ -22,7 +24,7 @@
     <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered"/>
 </head>
 <body>
-<component type="typeof(App)" render-mode="Server"/>
+<component type="typeof(App)" render-mode="Server" param-ConsentGiven = "@HttpContext.Features.Get<ITrackingConsentFeature>()!.HasConsent"/>
 <div id="blazor-error-ui">
     <environment include="Staging,Production">
         Ett fel har inträffat, prova att refresha sidan och logga in igen! Om felet uppstår kontakta administratören.
@@ -36,7 +38,7 @@
 
 <script src="_framework/blazor.server.js"></script>
 <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="_content/BlazorStrap/popper.min.js"></script>
+@* <script src="_content/BlazorStrap/popper.min.js"></script> *@
 <script src="_content/BlazorStrap/blazorstrap.js"></script>
 </body>
 </html>

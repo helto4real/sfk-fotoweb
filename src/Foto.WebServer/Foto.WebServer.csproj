@@ -27,5 +27,12 @@
       <AdditionalFiles Include="Shared\NavMenu.razor" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\css\app.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\css\custom.min.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\css\custom.min.css.map" />
+      <_ContentIncludedByDefault Remove="wwwroot\css\site.css" />
+    </ItemGroup>
+
     
 </Project>

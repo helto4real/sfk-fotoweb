@@ -30,11 +30,10 @@
     <div class="row g-3 mb-5 justify-content-center align-items-center">
         <div class="col col-8" style="max-width: 300px;">
             <CvEditForm Model="@_model" class="form-horizontal py-5" OnValidSubmit="@LoginOrCreate">
-                @* <DataAnnotationsValidator/> *@
                 <FluentValidationValidator Options="@(options =>{ if (HasToken) options.IncludeRuleSets("Create");})" />
                 <div class="mb-3">
                     <label for="username" class="form-label">Användarnamn</label>
-                    <InputText id="username" class="form-control" autocomplete="username" @bind-Value="_model.Username"/>
+                    <InputText id="username" class="form-control" autocomplete="username" @bind-Value="_model.Username" autofocus />
                     <ValidationMessage For="@(() => _model.Username)"/>
                 </div>
                 <div class="mb-3">

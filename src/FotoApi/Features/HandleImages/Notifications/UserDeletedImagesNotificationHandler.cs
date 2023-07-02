@@ -10,7 +10,6 @@ public class UserDeletedImagesNotificationHandler : INotificationHandler<UserDel
 {
     private readonly PhotoServiceDbContext _db;
     private readonly IPhotoStore _photoStore;
-    private readonly IMediator _mediator;
     private readonly ILogger<UserDeletedImagesNotificationHandler> _logger;
 
     public UserDeletedImagesNotificationHandler(
@@ -28,12 +27,13 @@ public class UserDeletedImagesNotificationHandler : INotificationHandler<UserDel
         var userImages = _db.Images.Where(i => i.OwnerReference == notification.UserName);
         if (userImages.Any())
         {
-            _logger.LogInformation($"Removing {userImages.Count()} images belonging to user {notification.UserName}");
+            _logger.LogInformation("Removing {NrOfImages} images belonging to user {User}", userImages.Count(), notification.UserName);
             foreach (var userImage in userImages)
             {
                 _photoStore.DeletePhoto(userImage.LocalFilePath);
             }
             _db.Images.RemoveRange(userImages);
+            await _db.SaveChangesAsync(cancellationToken);
         }
     }
 }

@@ -12,16 +12,18 @@ public class PhotoStore : IPhotoStore, IPhoto, IDisposable
 {
     private readonly IWebHostEnvironment _env;
     private readonly CurrentUser? _currentUser;
+    private readonly ILogger<PhotoStore> _logger;
     private Image? _image;
     private readonly string _photoUserFolderAndPath;
     private readonly string _imagePath;
 
     private const string ImageRootFolder = ".images/user_images";
     
-    public PhotoStore(IWebHostEnvironment env, CurrentUser currentUser)
+    public PhotoStore(IWebHostEnvironment env, CurrentUser currentUser, ILogger<PhotoStore> logger)
     {
         _env = env;
         _currentUser = currentUser;
+        _logger = logger;
         // We dont want to fail if no user exists here, it will be handled when saving the photo
         _photoUserFolderAndPath = GetPhotoUserFolderAndPath(_currentUser?.User?.Id ?? "nouser" );
         _imagePath =  GetPhotoFullPath(_env.ContentRootPath, _photoUserFolderAndPath);
@@ -40,11 +42,17 @@ public class PhotoStore : IPhotoStore, IPhoto, IDisposable
         _image =  await Image.LoadAsync(inputStream, CancellationToken.None);
 
         if (resize)
+        {
+            _logger.LogInformation("Image too large, resizing to {Width}x{Height}", width, height);
             ResizeImage(width, height);
+        }
         else
         {
             if (_image.Width != width || _image.Height != height)
+            {
+                _logger.LogInformation("Image uploaded is the wrong size expected {Width}x{Height} but got {ActualWidth}x{ActualHeight}", width, height, _image.Width, _image.Height);  
                 throw new WrongImageSizeException(width, height);
+            }
         }
         await using (FileStream fs = new(_imagePath, FileMode.Create))
         {

@@ -32,7 +32,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="name" class="form-label">Fotograf:</label>
-                    <InputText id="name" type="title" class="form-control :invalid " @bind-Value="@_model.Name" />
+                    <InputText id="name" type="title" class="form-control :invalid" autocomplete="name" @bind-Value="@_model.Name" />
                     <ValidationMessage class="text-danger" For="@(() => _model.Name)" />
                 </div>
                 <div class="mb-3">

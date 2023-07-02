@@ -3,60 +3,140 @@
 @using Foto.WebServer.Authentication
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
-<div class="container-fluid d-flex align-items-center justify-content-between">
-    <a href="/" class="logo navbar-brand d-flex align-items-center  me-auto me-lg-0">
-        <!-- Uncomment the line below if you also wish to use an image logo -->
-        <img class="logo-img" src="logo.jpg" alt="">
-        <h1>SFK Fotowebb</h1>
-    </a>
-    <nav id="navbar" class="navbar">
-        <ul>
-            <li><a href="/" class="active">Hem</a></li>
+@* *@
+@* <div class="container-fluid d-flex align-items-center justify-content-between"> *@
+@*     <a href="/" class="logo navbar-brand d-flex align-items-center  me-auto me-lg-0"> *@
+@*         <!-- Uncomment the line below if you also wish to use an image logo --> *@
+@*         <img class="logo-img" src="logo.jpg" alt=""> *@
+@*         <h1>SFK Fotowebb</h1> *@
+@*     </a> *@
+@*     <nav id="navbar" class="navbar"> *@
+@*         <ul> *@
+@*             <li><a href="/" class="active">Hem</a></li> *@
+@*             <AuthorizeView> *@
+@*                 <Authorized> *@
+@*                 <li class="dropdown"><a href="#"><span>Bilder</span> <i class="bi bi-chevron-down dropdown-indicator"></i></a> *@
+@*                     <ul> *@
+@*                         <li><NavLink class="nav-link" href="image/upload">Ladda upp foto</NavLink></li> *@
+@*                         <li><NavLink class="nav-link" href="image/myimages">Mina bilder</NavLink></li> *@
+@*                     </ul> *@
+@*                 </li> *@
+@*                 </Authorized> *@
+@*             </AuthorizeView> *@
+@*             <AuthorizeView Roles="Admin"> *@
+@*                 <Authorized> *@
+@*                 <li class="dropdown"> *@
+@*                     <a href="#"><span>Admin</span> *@
+@*                         <i *@
+@*                             class="bi bi-chevron-down dropdown-indicator"></i></a> *@
+@*                     <ul> *@
+@*                         <li><NavLink class="nav-link" href="admin/users/list">Hantera användare</NavLink></li> *@
+@*                         <li><NavLink class="nav-link" href="admin/tokens">Hantera tokens</NavLink></li> *@
+@*                     </ul> *@
+@*                 </li> *@
+@*                 </Authorized> *@
+@*             </AuthorizeView> *@
+@*             <AuthorizeView> *@
+@*                 <Authorized> *@
+@*                 <li class="dropdown"><a href="#"><span>ST-bilder</span> <i class="bi bi-chevron-down dropdown-indicator"></i></a> *@
+@*                     <ul> *@
+@*                         <li><NavLink class="nav-link" href="/st-bild/upload">Ladda upp ST-bild</NavLink></li> *@
+@*                         <li><NavLink class="nav-link" href="/st-bild/list">Visa ST-bilder</NavLink></li> *@
+@*                     </ul> *@
+@*                 </li> *@
+@*                 <li class="dropdown"> *@
+@*                     <a href="#"><span class="mr-3">@context.User.Identity?.Name</span> *@
+@*                         <i *@
+@*                             class="bi bi-chevron-down dropdown-indicator"></i></a> *@
+@*                     <ul> *@
+@*                         <li><NavLink class="nav-link" @onclick="@Logout">Logga ut</NavLink></li> *@
+@*                     </ul> *@
+@*                 </li> *@
+@*                 </Authorized> *@
+@*                 <NotAuthorized> *@
+@*      *@
+@*                     <li class="nav-item mr-3"> *@
+@*                         <a class="nav-link m" href="/login">Logga in</a> *@
+@*                     </li> *@
+@*                 </NotAuthorized> *@
+@*             </AuthorizeView> *@
+@*         </ul> *@
+@*     </nav><!-- .navbar --> *@
+<nav class="navbar navbar-expand-md">
+  <div class="container-fluid">
+     <a href="/" class="logo navbar-brand">
+            <!-- Uncomment the line below if you also wish to use an image logo -->
+            <img class="d-inline-block" src="logo.jpg" alt="">
+            SFK Fotowebb
+        </a>
+    @* <a class="navbar-brand" href="#">Navbar</a> *@
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+        <ul class="navbar-nav ms-auto  mb-2 mb-lg-0">
             <AuthorizeView>
-                <li class="dropdown"><a href="#"><span>Bilder</span> <i class="bi bi-chevron-down dropdown-indicator"></i></a>
-                    <ul>
-                        <li><NavLink class="nav-link" href="image/upload">Ladda upp foto</NavLink></li>
-                        <li><NavLink class="nav-link" href="image/myimages">Mina bilder</NavLink></li>
+                <Authorized>
+                <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Bilder</a>
+                    <ul  class="dropdown-menu">
+                        <li><NavLink class="dropdown-item" href="image/upload">Ladda upp foto</NavLink></li>
+                        <li><NavLink class="dropdown-item" href="image/myimages">Mina bilder</NavLink></li>
                     </ul>
                 </li>
+                </Authorized>
             </AuthorizeView>
             <AuthorizeView Roles="Admin">
-                <li class="dropdown"><a href="#"><span>Admin</span> <i
-                            class="bi bi-chevron-down dropdown-indicator"></i></a>
-                    <ul>
-                        <li><NavLink class="nav-link" href="admin/users/list">Hantera användare</NavLink></li>
-                        <li><NavLink class="nav-link" href="admin/tokens">Hantera tokens</NavLink></li>
+                <Authorized>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Admin</a>
+                    <ul class="dropdown-menu">
+                        <li><NavLink class="dropdown-item" href="admin/users/list">Hantera användare</NavLink></li>
+                        <li><NavLink class="dropdown-item" href="admin/tokens">Hantera tokens</NavLink></li>
                     </ul>
                 </li>
+                </Authorized>
             </AuthorizeView>
             <AuthorizeView>
                 <Authorized>
-                <li class="dropdown"><a href="#"><span>ST-bilder</span> <i class="bi bi-chevron-down dropdown-indicator"></i></a>
-                    <ul>
-                        <li><NavLink class="nav-link" href="/st-bild/upload">Ladda upp ST-bild</NavLink></li>
-                        <li><NavLink class="nav-link" href="/st-bild/list">Visa ST-bilder</NavLink></li>
-                    </ul>
-                </li>
-                <li class="dropdown">
-                    <a href="#"><span class="mr-3">@context.User.Identity?.Name</span>
-                        <i
-                            class="bi bi-chevron-down dropdown-indicator"></i></a>
-                    <ul>
-                        <li><NavLink class="nav-link" @onclick="@Logout">Logga ut</NavLink></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">ST-bilder</a>
+                        <ul class="dropdown-menu">
+                            <li><NavLink class="dropdown-item" href="/st-bild/upload">Ladda upp ST-bild</NavLink></li>
+                            <li><NavLink class="dropdown-item" href="/st-bild/list">Visa ST-bilder</NavLink></li>
+                        </ul>
+                    </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">@context.User.Identity?.Name</a>
+                    <ul class="dropdown-menu">
+                        <li><NavLink class="dropdown-item" @onclick="@Logout">Logga ut</NavLink></li>
                     </ul>
                 </li>
                 </Authorized>
                 <NotAuthorized>
+    
                     <li class="nav-item mr-3">
                         <a class="nav-link m" href="/login">Logga in</a>
                     </li>
                 </NotAuthorized>
             </AuthorizeView>
+            @* <li class="nav-item "> *@
+            @*     <a class="nav-link active" aria-current="page" href="#">Home</a> *@
+            @* </li> *@
+            @* <li class="nav-item"> *@
+            @*     <a class="nav-link" href="#">Link</a> *@
+            @* </li> *@
+            @* <li class="nav-item"> *@
+            @*     <a class="nav-link disabled">Disabled</a> *@
+            @* </li> *@
         </ul>
-    </nav><!-- .navbar -->
-    <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
-    <i class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>
-</div>
+      @* <form class="d-flex" role="search"> *@
+      @*   <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"> *@
+      @*   <button class="btn btn-outline-success" type="submit">Search</button> *@
+      @* </form> *@
+    </div>
+  </div>
+</nav>
+@* </div> *@
 
 @code {
 

@@ -19,6 +19,11 @@ builder.Services.Configure<JsonOptions>(o =>
 var appSettingSection = builder.Configuration.GetSection("AppSettings");
 builder.Services.Configure<AppSettings>(appSettingSection);
 
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.ConsentCookie.Name = "ConsentCookie";
+    options.CheckConsentNeeded = context => true;
+});
 // Configure auth with the front end
 builder.AddAuthentication();
 builder.Services.AddAuthorizationBuilder().AddPolicy("AdminPolicy", policy =>
@@ -71,6 +76,8 @@ app.UseAuthorization();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 app.MapAuth();
+app.MapCookieConsent();
 app.MapPhotoImages(photoApiUrl);
 // app.MapUser();
+app.UseCookiePolicy();
 app.Run();

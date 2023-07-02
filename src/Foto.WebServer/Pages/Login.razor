@@ -6,17 +6,19 @@
 @inject ILogger<Login> Logger;
 
 <LogInForm OnLoggedIn="@OnLoggedIn" OnCreated="@OnCreated" Token="@Token"/>
-<BSModal @ref="_newUserModal" DataId="newUSerModal">
+<BSModal @ref="@_newUserModal" DataId="newUSerModal">
     <Header>Ny användare har skapats!</Header>
     <Content>En ny användare har skapats. Du behöver bekräfta din e-post adress genom att klicka i 
-                              länken som skickats till dig. Du kommer att automatiskt att flyttas till inloggningsidan.
-                               Om du inte får länken kontakta administratören</Content>
+        länken som skickats till dig. Du kommer att automatiskt att flyttas till inloggningsidan.
+        Om du inte får länken kontakta administratören</Content>
     <Footer Context="modal">
         <BSButton  Color="BSColor.Primary" Target="newUSerModal" OnClick="InformationModalOkClicked">Ok</BSButton>
     </Footer>
 </BSModal>
+
 @code {
     private BSModal? _newUserModal;
+
     
     [Parameter]
     [SupplyParameterFromQuery(Name = "token")]
@@ -43,10 +45,10 @@
         if (_newUserModal is not null)
             await _newUserModal.ShowAsync();
     }
+    
 
     private void InformationModalOkClicked()
     {
         NavigationManager?.NavigateTo("/", true);
     }
-
 }
