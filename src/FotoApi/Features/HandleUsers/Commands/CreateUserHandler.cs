@@ -37,16 +37,23 @@ internal class CreateUserHandler : ICommandHandler<CreateUserCommand, UserRespon
                 e.Token == command.UrlToken && e.UrlTokenType == UrlTokenType.AllowAddUser, cancellationToken: cancellationToken))
             throw new UrlTokenNotFoundException(command.UrlToken);
 
-        var result = await _userManager.CreateAsync(new User { UserName = command.UserName, Email = command.Email },
-            command.Password);
-
-        if (!result.Succeeded)
-            throw new UserException(result.Errors.Select(e => e.Description));
-
         var user = await _userManager.FindByNameAsync(command.UserName);
+        
         if (user is null)
-            throw new UserNotFoundException(command.UserName);
+            throw new UserIsNotPreRegisteredException(command.UserName);
 
+        if (await _userManager.HasPasswordAsync(user))
+        {
+            // User already has a password, this means the user has already registered
+            throw  new UserAlreadyRegisteredException(command.UserName);
+        }
+        var pswdResult = await _userManager.AddPasswordAsync(user, command.Password);
+        if (!pswdResult.Succeeded)
+        {
+            throw new FailedToSetNewPasswordException(command.UserName);
+        }
+        // Todo: add firstname and lastname to user
+        
         // Create token for email confirmation and add data about the username
         var newToken = UrlTokenCreator.CreateUrlTokenFromUrlTokenType(UrlTokenType.ConfirmEmail);
         newToken.Data = user.Id;
@@ -54,7 +61,7 @@ internal class CreateUserHandler : ICommandHandler<CreateUserCommand, UserRespon
         await _db.SaveChangesAsync(cancellationToken);
 
         await _mediator.Publish(new UserCreatedNotification(user.Email!, urlToken.Entity.Token), cancellationToken);
-        _logger.LogInformation("Skapat användare med användarnam {UserName}", command.UserName);
+        _logger.LogInformation("Registrerat användare med användarnam {UserName}", command.UserName);
         return _userMapper.ToUserResponse(user, false);
     }
 }

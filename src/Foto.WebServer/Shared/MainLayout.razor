@@ -2,11 +2,11 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using BlazorStrap.V5
 @using BlazorStrap
+@inject NavigationManager NavigationManager
 @inherits LayoutComponentBase
 
 <PageTitle>SFK Fotowebb</PageTitle>
 
-@* fixed-top *@
 <header id="header" class="header">
     <NavMenu />
 </header>
@@ -26,16 +26,22 @@
     <Footer />
 </footer>
 
-
 @code
 {
     [CascadingParameter]
     public bool ConsentGiven { get; set; }
     private BSModal? _acceptCookieModal;
 
+    [CascadingParameter]
+    public HttpRequest? HttpRequest { get; set; }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!ConsentGiven)
+        string? id = null;
+        
+        if (NavigationManager is not null)
+            id = NavigationManager.ToBaseRelativePath(NavigationManager.Uri).Split('/').LastOrDefault();
+        
+        if (!ConsentGiven && id != "cookiepolicy")
         {
             await ShowAcceptCookieModal();
         }

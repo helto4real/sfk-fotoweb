@@ -1,5 +1,8 @@
 ﻿@using Foto.WebServer.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
+@if (isConnected)
+{
+    
 <CascadingValue Value="ConsentGiven">
     <CascadingAuthenticationState>
         <Router AppAssembly="@typeof(App).Assembly">
@@ -24,11 +27,35 @@
         </Router>
     </CascadingAuthenticationState>
 </CascadingValue>
+}
+else
+{
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
 
 
 @code {
 
     [Parameter]
     public bool ConsentGiven { get; set; }
+
+    [Parameter]
+    public HttpRequest? HttpRequest { get; set; }
+    
+    private bool isConnected;
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            isConnected = true;
+            StateHasChanged();
+        }
+        return Task.CompletedTask;
+    }
 
 }

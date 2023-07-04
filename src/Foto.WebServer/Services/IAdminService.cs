@@ -13,4 +13,5 @@ public interface IAdminService
     Task<IEnumerable<UrlToken>> GetCurrentTokens();
     ValueTask DeleteToken(Guid tokenId);
     Task<UrlToken?> AddTokenByTokenType(UrlTokenType tokenType);
+    Task<(User?, ErrorDetail?)> PreCreateUserAsync(string? email);
 }

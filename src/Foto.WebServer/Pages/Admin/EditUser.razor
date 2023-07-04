@@ -7,7 +7,11 @@
 @inject IAdminService AdminService
 @inject IJSRuntime JsRuntime
 
-<h3>Edit User</h3>
+<div class="container d-flex flex-column justify-content-center align-items-center">
+    <div class="row row-cols-auto align-items-center">
+        <h2>Redigera användare</h2>
+    </div>
+</div>
 <AuthorizeView Roles="Admin">
     <Authorizing>
         <div class="container">

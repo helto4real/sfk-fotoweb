@@ -91,6 +91,7 @@
                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Admin</a>
                     <ul class="dropdown-menu">
                         <li><NavLink class="dropdown-item" href="admin/users/list">Hantera användare</NavLink></li>
+                        <li><NavLink class="dropdown-item" href="admin/users/precreate">Lägg till användare</NavLink></li>
                         <li><NavLink class="dropdown-item" href="admin/tokens">Hantera tokens</NavLink></li>
                     </ul>
                 </li>
@@ -139,11 +140,9 @@
 @* </div> *@
 
 @code {
-
     async Task Logout()
     {
         await ((TokenAuthorizationProvider)AuthenticationStateProvider).MarkUserAsLoggedOut();
-        NavigationManager?.NavigateTo("/login");
+        NavigationManager?.NavigateTo("/signout");
     }
-
 }

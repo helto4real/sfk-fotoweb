@@ -13,11 +13,14 @@ public class AdminService : IAdminService
     private readonly ILocalStorageService _localStorageService;
     private readonly AppSettings _appSettings;
     private readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
-    public AdminService(HttpClient httpClient, IOptions<AppSettings> appSettings, ILocalStorageService localStorageService)
+    private readonly HttpHelper _httpHelper;
+
+    public AdminService(HttpClient httpClient, IOptions<AppSettings> appSettings, ILocalStorageService localStorageService, HttpHelper httpHelper)
     {
         _httpClient = httpClient;
         _localStorageService = localStorageService;
         _appSettings = appSettings.Value;
+        _httpHelper = httpHelper;
         _jsonOptions.Converters.Add(new JsonStringEnumConverter());
         httpClient.BaseAddress = new Uri(_appSettings.FotoApiUrl);
         httpClient.DefaultRequestHeaders.Add("User-Agent", "FotoWebbServer");
@@ -91,6 +94,19 @@ public class AdminService : IAdminService
         if (!response.IsSuccessStatusCode) return null;
         
         return await response.Content.ReadFromJsonAsync<UrlToken>(_jsonOptions);
+    }
+
+    public async Task<(User?, ErrorDetail?)> PreCreateUserAsync(string? email)
+    {
+        await AddAuthorizationHeaders();
+        var response = await _httpClient.PostAsJsonAsync("api/admin/users/precreate", new {email = email});
+        var result = await _httpHelper.HandleResponse(response);
+        if (result is not null)
+        {
+            return (null, result);
+        }
+        var user = await response.Content.ReadFromJsonAsync<User>();
+        return (user, null);
     }
 
     private async Task AddAuthorizationHeaders()

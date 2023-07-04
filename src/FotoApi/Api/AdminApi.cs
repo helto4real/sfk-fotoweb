@@ -46,6 +46,14 @@ public static class AdminApi
             return TypedResults.Ok();
         });
         
+        // Precreate user by providing the email address of users that are allowed to register
+        group.MapPost("users/precreate", async Task<Results<
+            Ok<UserResponse>, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> (EmailRequest request, IMediator mediator) =>
+        {
+            var result = await mediator.Send(new PreCreateUserCommand(request.Email));
+            return TypedResults.Ok(result);
+        });
+        
         group.MapGet("user/{userName}", async Task<Results<Ok<UserResponse>, BadRequest>> (string userName, IMediator mediator) =>
         {
             var result = await mediator.Send(new GetUserFromUsernameQuery(userName));

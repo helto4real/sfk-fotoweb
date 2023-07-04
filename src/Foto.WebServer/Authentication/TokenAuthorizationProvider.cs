@@ -72,14 +72,10 @@ public class TokenAuthorizationProvider : AuthenticationStateProvider
     public async Task SetTokenInformation(string token)
     {
         await _localStorageService.SetItemAsync("accessToken", token);
-        // await _localStorageService.SetI  temAsync("refreshToken", user.RefreshToken);
-
-        // NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(principal)));
     }
     
     public async Task MarkUserAsLoggedOut()
     {
-        await _localStorageService.RemoveItemAsync("refreshToken");
         await _localStorageService.RemoveItemAsync("accessToken");
 
         var identity = new ClaimsIdentity();

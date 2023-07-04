@@ -6,6 +6,8 @@ using Foto.WebServer.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Foto.WebServer.Api;
 
@@ -15,47 +17,14 @@ public static class AuthApi
     {
         var group = routes.MapGroup("/api/auth");
 
-        // group.MapPost("register", async (NewUserInfo userInfo) =>
-        // {
-        //     // Retrieve the access token given the newUser info
-        //     if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password)) return false;
-        //
-        //     var response = await _client.PostAsJsonAsync("api/auth/register",
-        //         new NewUserInfo
-        //         {
-        //             UserName = username, 
-        //             Password = password, 
-        //             FirstName = firsName,
-        //             LastName = lastName,
-        //             UrlToken = token, Email = email
-        //         });
-        //
-        //     return .IsSuccessStatusCode;
-        //
-        //     return SignIn(new LoginUserInfo(){Username = userInfo.UserName, Password = userInfo.Password, IsAdmin = userInfo.IsAdmin}, token);
-        // });
-
-        // group.MapPost("login", async (LoginUserInfo userInfo, IUserService userService) =>
-        // {
-        //     // Retrieve the access token give the newUser info
-        //     var user  = await userService.LoginAsync(userInfo);
-        //
-        //     if (user is null)
-        //     {
-        //         return null;
-        //     }
-        //
-        //     var token = await response.Content.ReadFromJsonAsync<AuthToken>();
-        //
-        //     if (token is null)
-        //     {
-        //         return Results.Unauthorized();
-        //     }
-        //
-        //     return SignIn(userInfo, token);
-        // });
-
-
+        group.MapPost("logout", (HttpContext context) =>
+        {
+            return Results.SignOut(
+                properties: new AuthenticationProperties { RedirectUri = "/login" },
+                authenticationSchemes: new[] { CookieAuthenticationDefaults.AuthenticationScheme }
+            );
+        });
+        
         // External login
         group.MapGet("login/{provider}", (string provider, HttpContext context) =>
         {

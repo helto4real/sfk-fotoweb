@@ -1,0 +1,96 @@
+﻿@page "/admin/users/precreate"
+@layout MainLayout
+@using Foto.WebServer.Services
+@using FluentValidation
+@using Blazored.FluentValidation
+@using Microsoft.AspNetCore.Components.Authorization
+@inherits AuthorizedBasePage
+@inject IAdminService AdminService
+<div class="container d-flex flex-column justify-content-center align-items-center">
+    <div class="row row-cols-auto align-items-center">
+        <h2>Lägg till användare</h2>
+    </div>
+</div>
+<AuthorizeView Roles="Admin">
+    <Authorizing>
+        <div class="container">
+            <div class="row g-3 mb-5 justify-content-center align-items-center">
+                <div class="col col-8" style="max-width: 300px;">
+                    <p>Loggar in användare</p>
+                </div>
+            </div>
+        </div>
+    </Authorizing>
+    <Authorized>
+        <div class="container">
+            <div class="row g-3 mb-5 justify-content-center align-items-center">
+                <div class="col col-8" style="max-width: 300px;">
+                    <EditForm Model="@User" OnValidSubmit="@HandleValidSubmit" Context="authirzationContext">
+                        <FluentValidationValidator/>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">E-post</label>
+                            <InputText id="email" type="email" class="form-control" @bind-Value="User.Email"/>
+                            <ValidationMessage For="@(() => User.Email)"/>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-1">
+                            <button type="submit" class="btn btn-primary">Spara</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+            @if (_addedUsers.Any())
+            {
+                <div class="row g-3 mb-5 justify-content-center align-items-center">
+                    <div class="col col-8" style="max-width: 300px;">
+                        <h5>Tillagda användare</h5>
+                        <ul class="list-group">
+                            @foreach (var user in _addedUsers)
+                            {
+                                <li class="list-group-item">@user</li>
+                            }
+                        </ul>
+                    </div>    
+                </div>
+            }
+        </div>
+    </Authorized>
+</AuthorizeView>
+
+@if (_responseHandler.HasAlert)
+{
+    <div class="alert alert-danger">@_responseHandler.Message</div>
+}
+
+@code {
+    private PreCreateUserModel User { get; set; } = new();
+    private readonly ResponseHandler _responseHandler = new();
+    private readonly List<string> _addedUsers = new();
+    private async Task HandleValidSubmit()
+    {
+        var user = _responseHandler.CheckResponse(await AdminService.PreCreateUserAsync(User.Email));
+        if (user is not null)
+        {
+            _addedUsers.Add(user.UserName);
+            // We succeeded in creating a user, so we can clear the form and allow create a new one
+            User = new();
+        }
+        StateHasChanged();
+    }
+    
+    public class PreCreateUserModel
+    {
+        public string? Email { get; set; }
+    }
+    
+    public class LoginOrCreateUserModelValidator : AbstractValidator<PreCreateUserModel> 
+    {
+        public LoginOrCreateUserModelValidator() 
+        {
+            RuleFor(x => x.Email)
+                .NotEmpty()
+                .WithMessage("E-post måste anges.")
+                .EmailAddress()
+                .WithMessage("Ange en giltig e-postadress.");
+        }
+    }
+}
