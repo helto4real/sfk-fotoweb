@@ -1,19 +1,23 @@
 ﻿@page "/signout"
-@using Foto.WebServer.Authentication
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authentication.Cookies
 @using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.AspNetCore.Identity
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IHttpContextAccessor HttpContextAccessor
+
 @functions {
+
     public async Task<IActionResult> OnGet()
     {
-        var result = await Task.FromResult( Results.SignOut(
-            properties: new AuthenticationProperties { RedirectUri = "/login" },
-            authenticationSchemes: new[] { CookieAuthenticationDefaults.AuthenticationScheme }
-            ).ExecuteAsync(HttpContextAccessor.HttpContext));
+        if (HttpContextAccessor.HttpContext is null)
+            return Redirect("/");
         
+        await Task.FromResult(Results.SignOut(
+            new AuthenticationProperties { RedirectUri = "/login" },
+            new[] { CookieAuthenticationDefaults.AuthenticationScheme }
+            ).ExecuteAsync(HttpContextAccessor.HttpContext));
+
         return Redirect("/");
     }
+
 }

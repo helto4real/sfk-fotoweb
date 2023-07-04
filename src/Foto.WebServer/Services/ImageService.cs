@@ -11,15 +11,13 @@ public class ImageService : IImageService
     private readonly HttpClient _httpClient;
     //Todo: refactor to use the AuthenticationStateProvider
     private readonly ILocalStorageService _localStorageService;
-    private readonly HttpHelper _httpHelper;
     private readonly AppSettings _appSettings;
     public ImageService(
         HttpClient httpClient, IOptions<AppSettings> appSettings,
-        ILocalStorageService localStorageService, HttpHelper httpHelper)
+        ILocalStorageService localStorageService)
     {
         _httpClient = httpClient;
         _localStorageService = localStorageService;
-        _httpHelper = httpHelper;
         _appSettings = appSettings.Value;
         httpClient.BaseAddress = new Uri(_appSettings.FotoApiUrl);
         httpClient.DefaultRequestHeaders.Add("User-Agent", "FotoWebbServer");
@@ -40,7 +38,7 @@ public class ImageService : IImageService
         content.Add(new StreamContent(file.OpenReadStream(IImageService.MaxAllowedImageSize)), "file", file.Name);
         var response = await _httpClient.PostAsync("api/images", content);
 
-        var result = await _httpHelper.HandleResponse(response);
+        var result = await HandleResponse(response);
 
         if (result is not null)
         {
@@ -64,7 +62,7 @@ public class ImageService : IImageService
         content.Add(new StreamContent(file.OpenReadStream(IImageService.MaxAllowedImageSize)), "file", file.Name);
         var response = await _httpClient.PostAsync("api/images", content);
     
-        var result = await _httpHelper.HandleResponse(response);
+        var result = await HandleResponse(response);
         if (result is not null)
         {
             return (null, result);
@@ -80,7 +78,7 @@ public class ImageService : IImageService
         await AddAuthorizationHeaders();
         var response = await _httpClient.GetAsync("api/images/user");
 
-        var result = await _httpHelper.HandleResponse(response);
+        var result = await HandleResponse(response);
         // Todo handle error
         if (result is not null) return Enumerable.Empty<ImageItem>();
         
@@ -97,5 +95,14 @@ public class ImageService : IImageService
     {
         var token = await _localStorageService.GetItemAsync<string>("accessToken");
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+    }
+    public async Task<ErrorDetail?> HandleResponse(HttpResponseMessage response)
+    {
+        if (!response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<ErrorDetail>();
+        }
+
+        return null;
     }
 }

@@ -13,14 +13,12 @@ public class AdminService : IAdminService
     private readonly ILocalStorageService _localStorageService;
     private readonly AppSettings _appSettings;
     private readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
-    private readonly HttpHelper _httpHelper;
 
-    public AdminService(HttpClient httpClient, IOptions<AppSettings> appSettings, ILocalStorageService localStorageService, HttpHelper httpHelper)
+    public AdminService(HttpClient httpClient, IOptions<AppSettings> appSettings, ILocalStorageService localStorageService)
     {
         _httpClient = httpClient;
         _localStorageService = localStorageService;
         _appSettings = appSettings.Value;
-        _httpHelper = httpHelper;
         _jsonOptions.Converters.Add(new JsonStringEnumConverter());
         httpClient.BaseAddress = new Uri(_appSettings.FotoApiUrl);
         httpClient.DefaultRequestHeaders.Add("User-Agent", "FotoWebbServer");
@@ -100,7 +98,7 @@ public class AdminService : IAdminService
     {
         await AddAuthorizationHeaders();
         var response = await _httpClient.PostAsJsonAsync("api/admin/users/precreate", new {email = email});
-        var result = await _httpHelper.HandleResponse(response);
+        var result = await HandleResponse(response);
         if (result is not null)
         {
             return (null, result);
@@ -113,5 +111,14 @@ public class AdminService : IAdminService
     {
         var token = await _localStorageService.GetItemAsync<string>("accessToken");
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+    }
+    private async Task<ErrorDetail?> HandleResponse(HttpResponseMessage response)
+    {
+        if (!response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<ErrorDetail>();
+        }
+
+        return null;
     }
 }

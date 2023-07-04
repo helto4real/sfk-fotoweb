@@ -11,6 +11,10 @@ using Microsoft.AspNetCore.Http.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddScoped<TokenAuthorizationProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<TokenAuthorizationProvider>());
+// builder.Services.AddScoped<HttpHelper>();
+
 builder.Services.Configure<JsonOptions>(o =>
 {
     o.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
@@ -46,7 +50,6 @@ builder.Services.AddHttpContextAccessor();
 // Configure the HttpClient for the backend API
 
 // Configure the HttpClient for the backend API
-builder.Services.AddScoped<HttpHelper>();
 builder.Services.AddSingleton<HttpClient>();
 builder.Services.AddHttpClient<IUserService, UserService>(client => client.BaseAddress = new(photoApiUrl));
 builder.Services.AddHttpClient<IAdminService, AdminService>(client => client.BaseAddress = new(photoApiUrl));
@@ -55,8 +58,6 @@ builder.Services.AddHttpClient<IImageService, ImageService>(client => client.Bas
 
 builder.Services.AddBlazorStrap();
 
-builder.Services.AddScoped<TokenAuthorizationProvider>();
-builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<TokenAuthorizationProvider>());
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
