@@ -143,6 +143,6 @@
     async Task Logout()
     {
         await ((TokenAuthorizationProvider)AuthenticationStateProvider).MarkUserAsLoggedOut();
-        NavigationManager?.NavigateTo("/signout");
+        NavigationManager?.NavigateTo("/signout", true);
     }
 }

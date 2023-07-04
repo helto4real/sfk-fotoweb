@@ -30,37 +30,41 @@ public class LoginExternalUserHandler : ICommandHandler<LoginExternalUserCommand
     }
     public async Task<UserAuthorizedResponse> Handle(LoginExternalUserCommand command, CancellationToken cancellationToken)
     {
-        var user = await _userManager.FindByLoginAsync(command.Provider, command.ProviderKey);
-
+        var loginUser = await _userManager.FindByLoginAsync(command.Provider, command.ProviderKey);
+        
+        // First check if user has already registered
         var result = IdentityResult.Success;
 
-        if (user is null)
+        if (loginUser is null)
         {
             // We only create a new user if the token is valid
             if (!await _db.UrlTokens.AnyAsync(e =>
                     e.Token == command.UrlToken && e.UrlTokenType == UrlTokenType.AllowAddUser))
                 throw new UrlTokenNotFoundException(command.UrlToken);
 
-            user = new User { UserName = command.UserName, Email = command.UserName, EmailConfirmed = true};
+            // Check if user has been pre-registered
+            var user = await _userManager.FindByNameAsync(command.UserName);
 
-            result = await _userManager.CreateAsync(user);
+            if (user is null)
+            {
+                throw new UserIsNotPreRegisteredException(command.UserName);
+            }
 
-            if (result.Succeeded)
-                result = await _userManager.AddLoginAsync(user,
+            result = await _userManager.AddLoginAsync(user,
                     new UserLoginInfo(command.Provider, command.ProviderKey, null));
         }
 
         if (result.Succeeded)
         {
-            var userRoles = await _userManager.GetRolesAsync(user);
+            var userRoles = await _userManager.GetRolesAsync(loginUser);
             var isAdmin = userRoles.Contains("Admin");
             return (new UserAuthorizedResponse
             {
                 UserName = command.UserName,
                 FirstName = "FirstName",
                 LastName = "LastName",
-                Email = user.Email!,
-                Token = _tokenService.GenerateToken(user.UserName!, isAdmin),
+                Email = loginUser.Email!,
+                Token = _tokenService.GenerateToken(loginUser.UserName!, isAdmin),
                 IsAdmin = isAdmin
             });
         }
