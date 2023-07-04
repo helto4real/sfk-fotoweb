@@ -1,4 +1,5 @@
-﻿using Foto.WebServer.Dto;
+﻿using Foto.WebServer.Authentication;
+using Foto.WebServer.Dto;
 using Microsoft.Extensions.Options;
 
 namespace Foto.WebServer.Services;
@@ -14,30 +15,32 @@ public class UserService : IUserService
         httpClient.BaseAddress = new Uri(_appSettings.FotoApiUrl);
         httpClient.DefaultRequestHeaders.Add("User-Agent", "FotoWebbServer");
     }
-    public async Task<User?> LoginAsync(LoginUserInfo loginInfo)
+    public async Task<(User?, ErrorDetail?)> LoginAsync(LoginUserInfo loginInfo)
     {
         var response = await _httpClient.PostAsJsonAsync("/api/users/token", loginInfo);
-        if (!response.IsSuccessStatusCode)
+        var result = await HandleResponse(response);
+        if (result is not null)
         {
-            return null;
+            return (null, result);
         }
-
+       
         var userResponse = await response.Content.ReadFromJsonAsync<User>();
-        return userResponse;
+        return (userResponse, null);
     }
 
-    public async Task<User?> RegisterUserAsync(NewUserInfo userInfo)
+    public async Task<(User?, ErrorDetail?)> RegisterUserAsync(NewUserInfo userInfo)
     {
-        if (string.IsNullOrEmpty(userInfo.UserName) || string.IsNullOrEmpty(userInfo.Password)) return null;
+        if (string.IsNullOrEmpty(userInfo.UserName) || string.IsNullOrEmpty(userInfo.Password)) return new (null, new ErrorDetail(){Title = "Invalid user data", Detail = "Username and password cannot be empty"});
 
         var response = await _httpClient.PostAsJsonAsync("/api/users/create", userInfo);
 
-        if (!response.IsSuccessStatusCode)
+        var result = await HandleResponse(response);
+        if (result is not null)
         {
-            return null;
+            return (null, result);
         }
         var userResponse = await response.Content.ReadFromJsonAsync<User>();
-        return userResponse;
+        return (userResponse, null);
     }
 
     public async Task<User?> GetOrCreateUserAsync(string provider, ExternalUserInfo userInfo)
@@ -69,5 +72,14 @@ public class UserService : IUserService
         var escapedToken = Uri.EscapeDataString(token);
         var result = await _httpClient.GetAsync($@"api/public/confirmemail/{escapedToken}");
         return result.IsSuccessStatusCode;
+    }
+    public async Task<ErrorDetail?> HandleResponse(HttpResponseMessage response)
+    {
+        if (!response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<ErrorDetail>();
+        }
+
+        return null;
     }
 }

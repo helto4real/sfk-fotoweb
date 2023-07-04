@@ -43,14 +43,14 @@ public class LoginExternalUserHandler : ICommandHandler<LoginExternalUserCommand
                 throw new UrlTokenNotFoundException(command.UrlToken);
 
             // Check if user has been pre-registered
-            var user = await _userManager.FindByNameAsync(command.UserName);
+            loginUser = await _userManager.FindByNameAsync(command.UserName);
 
-            if (user is null)
+            if (loginUser is null)
             {
                 throw new UserIsNotPreRegisteredException(command.UserName);
             }
 
-            result = await _userManager.AddLoginAsync(user,
+            result = await _userManager.AddLoginAsync(loginUser,
                     new UserLoginInfo(command.Provider, command.ProviderKey, null));
         }
 

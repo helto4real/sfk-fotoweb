@@ -95,6 +95,15 @@ public static class AuthApi
                         authenticationScheme: CookieAuthenticationDefaults.AuthenticationScheme).ExecuteAsync(context);
                     
                 }
+                else
+                {
+                    // The user is not pre-registered, so we need to move them back to the pre-registration page
+                    
+                    // Delete the external cookie
+                    await context.SignOutAsync(AuthConstants.ExternalScheme);
+                    return Results.Redirect($@"/register/?token={Uri.EscapeDataString(urlToken??string.Empty)}&success=false");
+                    
+                }
             }
 
             // Delete the external cookie

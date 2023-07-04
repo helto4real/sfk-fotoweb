@@ -50,6 +50,7 @@ internal sealed class ExceptionHandlingMiddleware : IMiddleware
             BadRequestException => StatusCodes.Status400BadRequest,
             NotFoundException => StatusCodes.Status404NotFound,
             ValidationException => StatusCodes.Status400BadRequest,
+            ForbiddenException =>StatusCodes.Status403Forbidden,
             _ => StatusCodes.Status500InternalServerError
         };
 
@@ -59,6 +60,7 @@ internal sealed class ExceptionHandlingMiddleware : IMiddleware
             NotFoundException => "Not found",
             ValidationException => "Validation error",
             BadRequestException => "Bad request",
+            ForbiddenException => "Forbidden",
             _ => "Server Error"
         };
 
