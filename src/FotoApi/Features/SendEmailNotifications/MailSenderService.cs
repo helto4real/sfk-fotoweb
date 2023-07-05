@@ -4,8 +4,8 @@ using Microsoft.Extensions.Options;
 using MimeKit;
 
 namespace FotoApi.Features.SendEmailNotifications;
-
-internal class MailSenderService : IHostedService
+public interface IMailSenderService : IHostedService { }
+internal class MailSenderService : IMailSenderService
 {
     private readonly EmailSettings _emailSettings;
 

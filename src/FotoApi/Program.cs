@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using FluentValidation;
 using Serilog;
@@ -20,7 +21,23 @@ using FotoApi.Infrastructure.Validation;
 using FotoApi.Model;
 using Microsoft.AspNetCore.Http.Json;
 
+[assembly: InternalsVisibleTo("Foto.Tests")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 var builder = WebApplication.CreateBuilder(args);
+
+
+var connectionString = builder.Configuration.GetConnectionString("FotoApi") ?? "Data Source=.db/PhotoService.db";
+builder.Services.AddSqlite<PhotoServiceDbContext>(connectionString);
+// builder.Services.Configure<PhotoServiceDbContext>(
+// s =>
+// {
+//     // s.Database.lo
+//     s.Database.EnsureDeleted();
+//     // s.Database.EnsureCreated();
+//     s.Database.Migrate();
+// });
+
+builder.Services.AddDbContext<PhotoServiceDbContext>();
 
 builder.AddPhotoApiConfiguration();
 
@@ -39,8 +56,6 @@ builder.Services.AddAuthorizationBuilder().AddAdminUserHandler();
 // Add the service to generate JWT tokens
 builder.Services.AddTokenService();
 // Configure the database
-var connectionString = builder.Configuration.GetConnectionString("FotoApi") ?? "Data Source=.db/PhotoService.db";
-builder.Services.AddSqlite<PhotoServiceDbContext>(connectionString);
 
 // Configure identity
 builder.Services.AddIdentityCore<User>(options => options.User.RequireUniqueEmail = true)
@@ -57,8 +72,14 @@ builder.Services.Configure<SwaggerGeneratorOptions>(o => o.InferSecuritySchemes 
 builder.Services.AddRateLimiting();
 
 // Configure initial data for identity database
-builder.Services.AddHostedService<DefaultAdminUserInitializerSercvice>();
-builder.Services.AddHostedService<HandleExpiredUrlTokensService>();
+builder.Services.AddSingleton<DefaultAdminUserInitializerService>();
+builder.Services.AddSingleton<IDefaultAdminUserInitializerService, DefaultAdminUserInitializerService>();
+builder.Services.AddHostedService<IDefaultAdminUserInitializerService>(s => s.GetRequiredService<IDefaultAdminUserInitializerService>());
+
+builder.Services.AddSingleton<HandleExpiredUrlTokensService>();
+builder.Services.AddSingleton<IHandleExpiredUrlTokensService, HandleExpiredUrlTokensService>();
+builder.Services.AddHostedService<IHandleExpiredUrlTokensService>(s => s.GetRequiredService<IHandleExpiredUrlTokensService>());
+
 builder.Services.AddMailSenderService();
 builder.Services.AddScoped<PhotoStore>();
 builder.Services.AddScoped<IPhotoStore>(n => n.GetRequiredService<PhotoStore>());
@@ -75,6 +96,7 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.Get
 builder.Services.AddValidatorsFromAssemblyContaining<LoginUserRequestValidator>();
 // add implementation of ExceptionHandling middleware
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();
+
 var app = builder.Build();
 
 // Add middleware to handle exceptions and return a JSON response

@@ -2,7 +2,10 @@
 
 namespace FotoApi.Features.HandleUrlTokens;
 
-public class HandleExpiredUrlTokensService : IHostedService
+public interface IHandleExpiredUrlTokensService : IHostedService
+{
+};
+public class HandleExpiredUrlTokensService : IHandleExpiredUrlTokensService
 {
     // Remove expired tokens every 5 minutes
     private const int RemoveInterval = 5;
@@ -21,6 +24,7 @@ public class HandleExpiredUrlTokensService : IHostedService
         var dbContext = _scope.ServiceProvider.GetService<PhotoServiceDbContext>();
 
         _db = dbContext ?? throw new InvalidOperationException("Failed to create db context");
+        // _db.Database.EnsureCreated();
     }
 
     public Task StartAsync(CancellationToken cancellationToken)

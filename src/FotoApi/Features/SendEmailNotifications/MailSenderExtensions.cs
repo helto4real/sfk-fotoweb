@@ -7,9 +7,9 @@ internal static class MailSenderExtensions
         services.AddSingleton<MailSender>();
         services.AddSingleton<IMailSender>(s => s.GetRequiredService<MailSender>());
         services.AddSingleton<IMailQueue>(s => s.GetRequiredService<MailSender>());
-        services.AddHostedService<MailSenderService>();
-
-        // services.Configure<MailInfo>(config.GetSection("NetDaemon"))
+        services.AddSingleton<MailSenderService>();
+        services.AddSingleton<IMailSenderService, MailSenderService>();
+        services.AddHostedService<IMailSenderService>(s => s.GetRequiredService<IMailSenderService>());
         return services;
     }
 }

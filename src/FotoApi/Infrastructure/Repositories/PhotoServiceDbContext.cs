@@ -5,7 +5,7 @@ using Image = FotoApi.Model.Image;
 
 namespace FotoApi.Infrastructure.Repositories;
 
-public class PhotoServiceDbContext(DbContextOptions<PhotoServiceDbContext> options) : 
+public class PhotoServiceDbContext(DbContextOptions<PhotoServiceDbContext> options) :
     IdentityDbContext<User, Role, string>(options)
 {
     public DbSet<UrlToken> UrlTokens => Set<UrlToken>();
@@ -27,12 +27,12 @@ public class PhotoServiceDbContext(DbContextOptions<PhotoServiceDbContext> optio
         });
 
 
-        builder.Entity<Image>(e => 
+        builder.Entity<Image>(e =>
         {
             e.HasKey(k => k.Id);
             // Do not use foreign key constraints just required fields
             e.Property(p => p.OwnerReference).IsRequired();
-            
+
             e.Property(p => p.Title).IsRequired();
             e.Property(p => p.FileName).IsRequired();
             e.Property(p => p.LocalFilePath).IsRequired();
@@ -50,8 +50,7 @@ public class PhotoServiceDbContext(DbContextOptions<PhotoServiceDbContext> optio
             e.Property(p => p.Description).IsRequired();
             e.Property(p => p.Name).IsRequired();
         });
-            
-        
         base.OnModelCreating(builder);
     }
 }
+ 

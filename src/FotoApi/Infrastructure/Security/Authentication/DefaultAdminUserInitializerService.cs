@@ -3,13 +3,14 @@ using Microsoft.AspNetCore.Identity;
 
 namespace FotoApi.Infrastructure.Security.Authentication;
 
-public class DefaultAdminUserInitializerSercvice : IHostedService
+public interface IDefaultAdminUserInitializerService : IHostedService{};
+public class DefaultAdminUserInitializerService : IDefaultAdminUserInitializerService
 {
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<Role> _roleManager;
     private readonly IServiceScope _scope;
     
-    public DefaultAdminUserInitializerSercvice(IServiceProvider serviceProvider)
+    public DefaultAdminUserInitializerService(IServiceProvider serviceProvider)
     {
         _scope = serviceProvider.CreateScope();
         _userManager = _scope.ServiceProvider.GetService<UserManager<User>>() ?? throw new InvalidOperationException("Failed to create user manager");

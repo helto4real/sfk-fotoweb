@@ -56,6 +56,7 @@
   <ItemGroup>
     <Folder Include=".images\uploaded_images\" />
     <Folder Include=".images\user_images\" />
+    <Folder Include="Infrastructure\Repositories\Migrations\" />
     <Folder Include="Repository\" />
   </ItemGroup>
   

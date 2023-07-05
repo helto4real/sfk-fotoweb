@@ -13,7 +13,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<TokenAuthorizationProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<TokenAuthorizationProvider>());
-// builder.Services.AddScoped<HttpHelper>();
 
 builder.Services.Configure<JsonOptions>(o =>
 {

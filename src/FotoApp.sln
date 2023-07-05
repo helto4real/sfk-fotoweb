@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FotoApi", "FotoApi\FotoApi.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Foto.WebServer", "Foto.WebServer\Foto.WebServer.csproj", "{ABC19D87-266A-4607-821B-49CE7E36D49E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Foto.Tests", "Foto.Tests\Foto.Tests.csproj", "{05BF63C3-8787-40FD-8F36-DA89637FE4D4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +38,10 @@ Global
 		{ABC19D87-266A-4607-821B-49CE7E36D49E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ABC19D87-266A-4607-821B-49CE7E36D49E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ABC19D87-266A-4607-821B-49CE7E36D49E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05BF63C3-8787-40FD-8F36-DA89637FE4D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05BF63C3-8787-40FD-8F36-DA89637FE4D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05BF63C3-8787-40FD-8F36-DA89637FE4D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05BF63C3-8787-40FD-8F36-DA89637FE4D4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	
 EndGlobal

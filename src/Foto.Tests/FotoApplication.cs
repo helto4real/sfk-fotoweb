@@ -1,6 +1,12 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Data;
+using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
-using FotoApi;
+using FotoApi.Features.HandleUrlTokens;
+using FotoApi.Features.SendEmailNotifications;
+using FotoApi.Infrastructure.Repositories;
+using FotoApi.Infrastructure.Security.Authentication;
+using FotoApi.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -9,26 +15,57 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Moq;
+
+
 
 namespace Foto.Tests;
 
-internal class TodoApplication : WebApplicationFactory<Program>
+internal class FotoApplication : WebApplicationFactory<Program>
 {
     private readonly SqliteConnection _sqliteConnection = new("Filename=:memory:");
-
+    public Mock<IMailSender> MailSenderMock => new();
+    public Mock<IPhotoStore> PhotoStoreMock => new();
+    public Mock<IMailQueue> MailQueue => new();
+    
     public PhotoServiceDbContext CreateTodoDbContext()
     {
         var db = Services.GetRequiredService<IDbContextFactory<PhotoServiceDbContext>>().CreateDbContext();
         db.Database.EnsureCreated();
+        // db.Database.Migrate();
         return db;
     }
 
     public async Task CreateUserAsync(string username, string? password = null)
     {
         using var scope = Services.CreateScope();
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<FotoUser>>();
-        var newUser = new FotoUser { UserName = username };
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+        var newUser = new User { UserName = username };
         var result = await userManager.CreateAsync(newUser, password ?? Guid.NewGuid().ToString());
+        Assert.True(result.Succeeded);
+    }
+    public async Task PreRegisterUserAsync(string username, string? password = null)
+    {
+        using var scope = Services.CreateScope();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+        var newUser = new User { UserName = username, Email = username};
+        var result = await userManager.CreateAsync(newUser);
+        Assert.True(result.Succeeded);
+    }
+    
+    public async Task AddDefaultAdmin()
+    {
+        using var scope = Services.CreateScope();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
+        var role = roleManager.CreateAsync(new Role { Name = "Admin" });
+        
+        var newUser = new User { UserName = "admin", Email = "admin@somedomain.com"};
+        var result = await userManager.CreateAsync(newUser, "P@ssw0rd!");
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(newUser, "Admin");
+        }
         Assert.True(result.Succeeded);
     }
 
@@ -41,6 +78,14 @@ internal class TodoApplication : WebApplicationFactory<Program>
         }));
     }
 
+    public string AddCreateUserToken(PhotoServiceDbContext db)
+    {
+        var urlToken = UrlTokenCreator.CreateUrlTokenFromUrlTokenType(UrlTokenType.AllowAddUser);
+        db.UrlTokens.Add(urlToken);
+        db.SaveChanges();
+        return urlToken.Token;
+    }
+
     protected override IHost CreateHost(IHostBuilder builder)
     {
         // Open the connection, this creates the SQLite in-memory database, which will persist until the connection is closed
@@ -48,12 +93,15 @@ internal class TodoApplication : WebApplicationFactory<Program>
 
         builder.ConfigureServices(services =>
         {
+            // services.AddSqlite<PhotoServiceDbContext>("Filename=:memory:");
             // We're going to use the factory from our tests
             services.AddDbContextFactory<PhotoServiceDbContext>();
 
             // We need to replace the configuration for the DbContext to use a different configured database
-            services.AddDbContextOptions<PhotoServiceDbContext>(o => o.UseSqlite(_sqliteConnection));
-
+            services.AddDbContextOptions<PhotoServiceDbContext>(o => o.UseSqlite(_sqliteConnection)); 
+            // services.AddIdentityCore<User>(options => options.User.RequireUniqueEmail = true)
+            //     .AddRoles<Role>()
+            //     .AddEntityFrameworkStores<PhotoServiceDbContext>();
             // Lower the requirements for the tests
             services.Configure<IdentityOptions>(o =>
             {
@@ -64,6 +112,13 @@ internal class TodoApplication : WebApplicationFactory<Program>
                 o.Password.RequireLowercase = false;
                 o.Password.RequireUppercase = false;
             });
+            services.AddSingleton<IMailSender>(s => MailSenderMock.Object);
+            services.AddScoped<IPhotoStore>(n => PhotoStoreMock.Object);
+            services.AddSingleton<IMailQueue>(s => MailQueue.Object);
+            // Just not start the services by replacing them with a do nothing service
+            services.AddSingleton<IMailSenderService, DoNothingService>();
+            services.AddSingleton<IDefaultAdminUserInitializerService, DoNothingService>();
+            services.AddSingleton<IHandleExpiredUrlTokensService, DoNothingService>();
         });
 
         // We need to configure signing keys for CI scenarios where
@@ -115,3 +170,33 @@ internal class TodoApplication : WebApplicationFactory<Program>
         }
     }
 }
+
+public static class ServiceCollectionExtensions
+{
+    public static IServiceCollection Remove<T>(this IServiceCollection services)
+    {
+        if (services.IsReadOnly)
+        {
+            throw new ReadOnlyException($"{nameof(services)} is read only");
+        }
+
+        var serviceDescriptor = services.FirstOrDefault(descriptor => descriptor.ServiceType == typeof(T));
+        if (serviceDescriptor != null) services.Remove(serviceDescriptor);
+
+        return services;
+    }
+}
+
+public class DoNothingService : IMailSenderService, IDefaultAdminUserInitializerService, IHandleExpiredUrlTokensService
+{
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+}
+

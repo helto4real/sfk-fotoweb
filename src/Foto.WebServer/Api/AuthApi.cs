@@ -25,7 +25,7 @@ public static class AuthApi
             );
         });
         
-        // External login
+        // This is the endpoint used trigger the challenge for external login
         group.MapGet("login/{provider}", (string provider, HttpContext context) =>
         {
             var urlToken = context.Request.Query["token"].Count == 1 ? context.Request.Query["token"][0] : string.Empty;
@@ -42,6 +42,7 @@ public static class AuthApi
                 );
         });
 
+        // This is the endpoint where the external provider will callback to
         group.MapGet("signin/{provider}", async (string provider, IUserService client, 
             HttpContext context, 
             AuthenticationStateProvider authenticationStateProvider,
@@ -93,7 +94,6 @@ public static class AuthApi
                     await Results.SignIn(claimPrincipal,
                         properties: properties,
                         authenticationScheme: CookieAuthenticationDefaults.AuthenticationScheme).ExecuteAsync(context);
-                    
                 }
                 else
                 {
@@ -108,8 +108,6 @@ public static class AuthApi
 
             // Delete the external cookie
             await context.SignOutAsync(AuthConstants.ExternalScheme);
-
-            // TODO: Handle the failure somehow
 
             return Results.Redirect("/");
         });
