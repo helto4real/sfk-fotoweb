@@ -15,7 +15,7 @@ jobs:
           dotnet-version: '8.0.x'
           dotnet-quality: 'preview'
     - name: dotnet build
-      run: dotnet build FotoApp.sln -c Release
+      run: dotnet build src/FotoApp.sln -c Release
 
-    # - name: dotnet test
-    #   run: dotnet test FotoApp.sln -c Release --no-build
+    - name: dotnet test
+      run: dotnet test src/FotoApp.sln -c Release --no-build
