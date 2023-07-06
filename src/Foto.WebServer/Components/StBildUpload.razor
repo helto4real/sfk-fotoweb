@@ -174,9 +174,10 @@
         }
 
     }
+    private static string[] AllowedExtensions = {".jpg", ".jpeg"};
     public class LoginOrCreateUserModelValidator : AbstractValidator<StBildUploadModel> 
     {
-        public LoginOrCreateUserModelValidator() 
+        public LoginOrCreateUserModelValidator()
         {
             RuleFor(x => x.Description)
                 .NotEmpty()
@@ -198,10 +199,11 @@
             RuleFor(x => x.Time)
                 .LessThanOrEqualTo(e => DateTime.Now.AddDays(1))
                 .WithMessage("Tidpunkt kan inte vara framåt i tiden");
-            
+
             RuleFor(x => x.ImageName)
-                .Must(x => Path.GetExtension(x).ToLowerInvariant() == ".jpg")
-                .WithMessage("Bilden måste vara en jpg bild.");
+                .Must(x => AllowedExtensions.Contains( Path.GetExtension(x).ToLowerInvariant()))
+                .WithMessage("Bilden måste vara en jpg bild, (*.jpg eller *.jpeg)");
+            
             RuleFor(x => x.ImageSize)
                 .LessThanOrEqualTo(IImageService.MaxAllowedImageSize)
                 .WithMessage($"Bilden får inte vara större än {IImageService.MaxAllowedImageSize / 1024 /1024}Mb.");
