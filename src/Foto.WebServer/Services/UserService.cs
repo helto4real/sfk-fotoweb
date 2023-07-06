@@ -43,7 +43,7 @@ public class UserService : IUserService
         return (userResponse, null);
     }
 
-    public async Task<User?> GetOrCreateUserAsync(string provider, ExternalUserInfo userInfo)
+    public async Task<User?> GetOrRegisterUserAsync(string provider, ExternalUserInfo userInfo)
     {
         var response = await _httpClient.PostAsJsonAsync($"/api/users/token/{provider}", userInfo);
 

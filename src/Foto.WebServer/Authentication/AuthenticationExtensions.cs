@@ -23,24 +23,9 @@ public static class AuthenticationExtensions
         // Add the default authentication cookie that will be used between the front end and
         // the backend.
         authenticationBuilder.AddCookie();
-        //     options => 
-        // {
-        //     // options.Cookie.Name = "FotoAuth";
-        //     // options.Cookie.SameSite = SameSiteMode.Strict;
-        //     // options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        //     // options.Cookie.HttpOnly = true;
-        //     // options.Cookie.IsEssential = true;
-        //     // options.Cookie.MaxAge = TimeSpan.FromDays(30);
-        //     // options.ExpireTimeSpan = TimeSpan.FromDays(30);
-        //     // options.SlidingExpiration = true;
-        //     options.LoginPath = "/auth/login";
-        //     // options.LogoutPath = "/auth/logout";
-        //     // options.AccessDeniedPath = "/auth/accessdenied";          
-        // });
     
         // This is the cookie that will store the user information from the external login provider
         authenticationBuilder.AddCookie(AuthConstants.ExternalScheme);
-    
         
         // Add external auth providers based on configuration
         //{
@@ -123,11 +108,6 @@ public static class AuthenticationExtensions
     public static void SetExternalProvider(this AuthenticationProperties properties, string providerName) =>
         properties.SetString(ExternalProviderKey, providerName);
     
-    // public static void AddCookieExpiration(this AuthenticationProperties properties, TimeSpan expiration) 
-    // {
-    //     properties.IsPersistent = true;
-    //     properties.ExpiresUtc = DateTimeOffset.UtcNow.Add(expiration);
-    // }
     public static bool HasExternalToken(this AuthenticationProperties properties) =>
         properties.GetString(HasExternalTokenKey) is not null;
 

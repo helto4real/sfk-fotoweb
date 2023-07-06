@@ -1,6 +1,8 @@
 ﻿@using Foto.WebServer.Services
 @using Foto.WebServer.Dto
 @using System.ComponentModel.DataAnnotations
+@using FluentValidation
+@using Blazored.FluentValidation
 @inject IImageService ImageService;
 
  <div class="container ">
@@ -12,21 +14,23 @@
     <div class="row g-3 mb-5 justify-content-center align-items-center">
         <div class="col col-8" style="max-width: 400px;">
             <CvEditForm id="uploadForm" EditContext="@_editContext" class="form" OnValidSubmit="@HandleValidSubmit">
-                <DataAnnotationsValidator />
+                <FluentValidationValidator/>
                 <div class="mb-3">
                     <label for="imagefile" class="form-label">Ladda upp dit foto</label>
                     @if (!_clearInputFileSelector)
                     {
-                        <InputFile class="form-control" MaxFileSize="@IImageService.MaxAllowedImageSize" id="imagefile" OnChange="@HandleFileSelection" On @bind-Value="@_model.ImageName"/>
+                        <InputFile class="form-control" MaxFileSize="@IImageService.MaxAllowedImageSize" id="imagefile" OnChange="@HandleFileSelection" />
                     }
                     <ValidationMessage class="text-danger" For="@(() => _model.ImageFile)" />
+                    <ValidationMessage class="text-danger" For="@(() => _model.ImageSize)" />
+                    <ValidationMessage class="text-danger" For="@(() => _model.ImageName)" />
                 </div>
                 <div class="mb-3">
                     <label for="title" class="form-label">Titel</label>
                     <InputText id="title" type="title" maxlength="18" class="form-control :invalid " @bind-Value="@_model.Title" />
                     <ValidationMessage class="text-danger" For="@(() => _model.Title)" />
                 </div>
-                <button type="submit" class="btn btn-primary" disabled="@(!_model.IsValid)">Ladda upp bild</button>
+                <button type="submit" class="btn btn-primary" disabled="@(!IsValid)">Ladda upp bild</button>
             </CvEditForm>
         </div>
     </div>
@@ -54,11 +58,21 @@
         if (imageItem != null)
         {
             _uploadedImages.Add(imageItem);
-            _model.ImageFile = null;
-            _model.ImageName = string.Empty;
-            _model.Title = string.Empty;
-            ClearInputFile();
+            ClearForm();
         }
+    }
+    public bool IsValid => _model.ImageFile is not null && _editContext is not null && _editContext.Validate() ;
+
+    private bool _clearInputFileSelector;
+    private void ClearForm()
+    {
+        _model.ImageFile = null;
+        _model.Title = string.Empty;
+        _clearInputFileSelector = true;
+        // Hack to clear input file selector
+        StateHasChanged();
+        _clearInputFileSelector = false;
+        StateHasChanged();
     }
     
     private void HandleFileSelection(InputFileChangeEventArgs e)
@@ -67,49 +81,65 @@
         
         var filenameWithoutExtensions = Path.GetFileNameWithoutExtension(file.Name);
 
-        _model.ImageName = file.Name;
         _model.ImageFile = e.File;
         _model.Title = filenameWithoutExtensions.Length > 18? filenameWithoutExtensions.Substring(0,18) : filenameWithoutExtensions;
         
         _editContext?.Validate();
     }
     
-    private bool _clearInputFileSelector;
-    /// <summary>
-    ///     This is a hack to clear the input file selector.
-    /// </summary>
-    private void ClearInputFile()
-    {
-        _clearInputFileSelector = true;
-        StateHasChanged();
-        _clearInputFileSelector = false;
-        StateHasChanged();
-    }
 
-    private class ImageUploadModel : IValidatableObject
+    public class ImageUploadModel
     {
-        public string ImageName { get; set; } = string.Empty;
+        private string? _imageName;
+        private long _imageSize;
+        IBrowserFile? _imageFile;
+        
+        public string ImageName => _imageName ?? string.Empty;
+        public long ImageSize => _imageSize;
 
-        [Required(ErrorMessage = "Titel är obligatoriskt.")]
         public string Title { get; set; } = string.Empty;
 
-        public  IBrowserFile? ImageFile { get; set; }
-
-        public bool IsValid => ImageFile is not null;
-
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        public IBrowserFile? ImageFile
         {
-            if (Path.GetExtension(ImageName).ToLowerInvariant() != ".jpg")
+            get => _imageFile;
+            set
             {
-                yield return new ValidationResult("Bilden måste vara en jpg bild.", new[] { nameof(ImageFile)});
-            }
-            if (ImageFile is not null)
-            {
-                if (ImageFile.Size >  IImageService.MaxAllowedImageSize)
+                if (value is not null)
                 {
-                    yield return new ValidationResult($"Bilden får inte vara större än {IImageService.MaxAllowedImageSize / 1024 /1024}Mb.", new[] { nameof(ImageFile)});
+                    _imageFile = value;
+                    _imageName = value.Name;
+                    _imageSize = value.Size;
+                }
+                else
+                {
+                    _imageFile = null;
+                    _imageName = null;
+                    _imageSize = 0;
                 }
             }
+        }
+
+        
+    }
+    
+    public class ImageUploadModelValidator : AbstractValidator<ImageUploadModel>
+    {
+        public ImageUploadModelValidator()
+        {
+            RuleFor(x => x.Title)
+                .NotEmpty()
+                .WithMessage("Bilden måste ha en titel!")
+                .MaximumLength(18)
+                .WithMessage("Titel får max vara 18 tecken")
+                .MinimumLength(3)
+                .WithMessage("Titel måste vara minst 3 tecken");
+
+            RuleFor(x => x.ImageName)
+                .Must(x => Path.GetExtension(x).ToLowerInvariant() == ".jpg")
+                .WithMessage("Bilden måste vara en jpg bild.");
+            RuleFor(x => x.ImageSize)
+                .LessThanOrEqualTo(IImageService.MaxAllowedImageSize)
+                .WithMessage($"Bilden får inte vara större än {IImageService.MaxAllowedImageSize / 1024 /1024}Mb.");
         }
     }
 }

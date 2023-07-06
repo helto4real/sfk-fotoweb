@@ -75,9 +75,9 @@ app.UseAuthorization();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
-app.MapAuth();
-app.MapCookieConsent();
-app.MapPhotoImages(photoApiUrl);
+app.MapAuthenticationApi();
+app.MapCookieConsentApi();
+app.MapImageForwardApi(photoApiUrl);
 // app.MapUser();
 app.UseCookiePolicy();
 app.Run();

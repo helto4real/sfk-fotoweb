@@ -14,8 +14,10 @@ public class AdminApiTests
         var client = application.CreateClient("admin", true);
         var response = await client.GetAsync("api/admin/users");
         Assert.True(response.IsSuccessStatusCode);
-        var users =await  response.Content.ReadFromJsonAsync<IEnumerable<User>>();
+        var users =await  response.Content.ReadFromJsonAsync<List<User>>();
         Assert.NotNull(users);
-        Assert.True(users.Single().UserName.Equals("admin"));
+        
+        var user = users.Single();
+        Assert.Equal("admin", user.UserName);
     }
 }

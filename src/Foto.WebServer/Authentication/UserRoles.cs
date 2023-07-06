@@ -15,18 +15,13 @@ public static class UserRolesExtensions
         return role switch
         {
             UserRoles.Admin => "Admin",
-            UserRoles.User => "ListUsers",
+            UserRoles.User => "User",
             _ => throw new ArgumentOutOfRangeException(nameof(role), role, null)
         };
     }
-    
+
     public static IEnumerable<string> AsEnumerable()
     {
         return Enum.GetValues<UserRoles>().Select(ToRoleName);
-    }
-    
-    public static string[] RolesFromUser(IPrincipal? user)
-    {
-        return user is null ? Array.Empty<string>() : AsEnumerable().Where(user.IsInRole).ToArray();
     }
 }

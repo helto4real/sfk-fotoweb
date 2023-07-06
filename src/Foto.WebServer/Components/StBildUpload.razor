@@ -21,9 +21,11 @@
                     <label for="imagefile" class="form-label">Ladda upp dit foto</label>
                     @if (!_clearInputFileSelector)
                     {
-                        <InputFile class="form-control" MaxFileSize="@IImageService.MaxAllowedImageSize" id="imagefile" OnChange="@HandleFileSelection" On @bind-Value="@_model.ImageName"/>
+                        <InputFile class="form-control" MaxFileSize="@IImageService.MaxAllowedImageSize" id="imagefile" OnChange="@HandleFileSelection"/>
                     }
                     <ValidationMessage class="text-danger" For="@(() => _model.ImageFile)" />
+                    <ValidationMessage class="text-danger" For="@(() => _model.ImageSize)" />
+                    <ValidationMessage class="text-danger" For="@(() => _model.ImageName)" />
                 </div>
                 <div class="mb-3">
                     <label for="title" class="form-label">Rubrik: (Rubrikförslag, lämpligen tre, fyra ord)</label>
@@ -56,7 +58,7 @@
                     <ValidationMessage class="text-danger" For="@(() => _model.Time)" />
                 </div>
                 <div class="d-flex justify-content-start align-items-center">
-                    <button type="submit" class="btn btn-primary" disabled="@_isSubmitting">Ladda upp st-bild</button>
+                    <button type="submit" class="btn btn-primary" disabled="@(_isSubmitting || !IsValid)">Ladda upp st-bild</button>
                     <div class="spinner-border spinner-border-sm ms-1" role="status" aria-hidden="true" style="display: @(_isSubmitting? "block":"none");" >
                         <span class="visually-hidden">Sparar ST-bild ...</span>
                     </div>
@@ -88,6 +90,7 @@
         _editContext = new(_model);
     }
     
+    public bool IsValid => _model.ImageFile is not null && _editContext is not null && _editContext.Validate();
     private async Task HandleValidSubmit()
     {
         _isSubmitting = true;
@@ -98,12 +101,7 @@
         if (imageItem != null)
         {
             _uploadedImages.Add(imageItem);
-            _model.ImageFile = null;
-            _model.ImageName = string.Empty;
-            _model.Title = string.Empty;
-            _model.Description = string.Empty;
-            _model.Location = string.Empty;
-            
+            _model = new();
             ClearInputFile();
             _alertMessage = null;
         }
@@ -122,14 +120,9 @@
     
     private void HandleFileSelection(InputFileChangeEventArgs e)
     {
-        var file = e.File;
-        
-        var filenameWithoutExtensions = Path.GetFileNameWithoutExtension(file.Name);
-
-        _model.ImageName = file.Name;
         _model.ImageFile = e.File;
-        
         _editContext?.Validate();
+        StateHasChanged();
     }
     
     private bool _clearInputFileSelector;
@@ -146,7 +139,12 @@
 
     public class StBildUploadModel
     {
-        public string ImageName { get; set; } = string.Empty;
+        private string? _imageName;
+        private long _imageSize;
+        IBrowserFile? _imageFile;
+        
+        public string ImageName => _imageName ?? string.Empty;
+        public long ImageSize => _imageSize;
 
         public string Title { get; set; } = default!;
         public string Name { get; set; } = default!;
@@ -154,7 +152,26 @@
         public DateTime Time { get; set; } = new DateTime(2023, 1, 1);
         public string Description { get; set; } = default!;
         public string AboutThePhotograper { get; set; } = default!;
-        public  IBrowserFile? ImageFile { get; set; }
+        
+        public IBrowserFile? ImageFile
+        {
+            get => _imageFile;
+            set
+            {
+                if (value is not null)
+                {
+                    _imageFile = value;
+                    _imageName = value.Name;
+                    _imageSize = value.Size;
+                }
+                else
+                {
+                    _imageFile = null;
+                    _imageName = null;
+                    _imageSize = 0;
+                }
+            }
+        }
 
     }
     public class LoginOrCreateUserModelValidator : AbstractValidator<StBildUploadModel> 
@@ -181,6 +198,13 @@
             RuleFor(x => x.Time)
                 .LessThanOrEqualTo(e => DateTime.Now.AddDays(1))
                 .WithMessage("Tidpunkt kan inte vara framåt i tiden");
+            
+            RuleFor(x => x.ImageName)
+                .Must(x => Path.GetExtension(x).ToLowerInvariant() == ".jpg")
+                .WithMessage("Bilden måste vara en jpg bild.");
+            RuleFor(x => x.ImageSize)
+                .LessThanOrEqualTo(IImageService.MaxAllowedImageSize)
+                .WithMessage($"Bilden får inte vara större än {IImageService.MaxAllowedImageSize / 1024 /1024}Mb.");
         }
     }
 

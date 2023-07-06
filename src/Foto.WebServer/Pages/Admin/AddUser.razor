@@ -25,12 +25,12 @@
         <div class="container">
             <div class="row g-3 mb-5 justify-content-center align-items-center">
                 <div class="col col-8" style="max-width: 300px;">
-                    <EditForm Model="@User" OnValidSubmit="@HandleValidSubmit" Context="authirzationContext">
+                    <EditForm Model="@NewUserModel" OnValidSubmit="@HandleValidSubmit" Context="authirzationContext">
                         <FluentValidationValidator/>
                         <div class="mb-3">
                             <label for="email" class="form-label">E-post</label>
-                            <InputText id="email" type="email" class="form-control" @bind-Value="User.Email"/>
-                            <ValidationMessage For="@(() => User.Email)"/>
+                            <InputText id="email" type="email" class="form-control" @bind-Value="NewUserModel.Email"/>
+                            <ValidationMessage For="@(() => NewUserModel.Email)"/>
                         </div>
                         <div class="d-flex justify-content-between align-items-center mt-1">
                             <button type="submit" class="btn btn-primary">Spara</button>
@@ -38,13 +38,13 @@
                     </EditForm>
                 </div>
             </div>
-            @if (_addedUsers.Any())
+            @if (_preCreatedUserNames.Any())
             {
                 <div class="row g-3 mb-5 justify-content-center align-items-center">
                     <div class="col col-8" style="max-width: 300px;">
                         <h5>Tillagda användare</h5>
                         <ul class="list-group">
-                            @foreach (var user in _addedUsers)
+                            @foreach (var user in _preCreatedUserNames)
                             {
                                 <li class="list-group-item">@user</li>
                             }
@@ -62,17 +62,18 @@
 }
 
 @code {
-    private PreCreateUserModel User { get; set; } = new();
+    private PreCreateUserModel NewUserModel { get; set; } = new();
     private readonly ResponseHandler _responseHandler = new();
-    private readonly List<string> _addedUsers = new();
+    private readonly List<string> _preCreatedUserNames = new();
+    
     private async Task HandleValidSubmit()
     {
-        var user = _responseHandler.CheckResponse(await AdminService.PreCreateUserAsync(User.Email));
+        var user = _responseHandler.CheckResponse(await AdminService.PreCreateUserAsync(NewUserModel.Email));
         if (user is not null)
         {
-            _addedUsers.Add(user.UserName);
+            _preCreatedUserNames.Add(user.UserName);
             // We succeeded in creating a user, so we can clear the form and allow create a new one
-            User = new();
+            NewUserModel = new();
         }
         StateHasChanged();
     }

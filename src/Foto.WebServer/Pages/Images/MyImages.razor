@@ -12,21 +12,21 @@
 </div>
 
 <div class="mt-3">
-    <ImageViewer Images="@_images" OnDeleteImage="DeleteImage "/>
+    <ImageViewer Images="@_userImages" OnDeleteImage="DeleteUserImage "/>
 </div>
 
 @code
 {
-    private IEnumerable<ImageItem>? _images { get; set; }
+    private IEnumerable<ImageItem>? _userImages { get; set; }
     protected override async Task OnInitializedAsync()
     {
-        _images = await ImageService.GetImagesForUserAsync();
+        _userImages = await ImageService.GetImagesForUserAsync();
     }
     
-    private async Task DeleteImage(ImageItem imageItem)
+    private async Task DeleteUserImage(ImageItem imageItem)
     {
         await ImageService.DeleteImageAsync(imageItem.Id);
-        _images = await ImageService.GetImagesForUserAsync();
+        _userImages = await ImageService.GetImagesForUserAsync();
         StateHasChanged();
     }
 }

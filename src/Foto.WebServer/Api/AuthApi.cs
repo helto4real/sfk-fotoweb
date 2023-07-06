@@ -1,30 +1,18 @@
-﻿using System.Security.Claims;
-using Blazored.LocalStorage;
+﻿using Blazored.LocalStorage;
 using Foto.WebServer.Authentication;
 using Foto.WebServer.Dto;
 using Foto.WebServer.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Foto.WebServer.Api;
 
 public static class AuthApi
 {
-    public static RouteGroupBuilder MapAuth(this IEndpointRouteBuilder routes)
+    public static RouteGroupBuilder MapAuthenticationApi(this IEndpointRouteBuilder routes)
     {
         var group = routes.MapGroup("/api/auth");
 
-        group.MapPost("logout", (HttpContext context) =>
-        {
-            return Results.SignOut(
-                properties: new AuthenticationProperties { RedirectUri = "/login" },
-                authenticationSchemes: new[] { CookieAuthenticationDefaults.AuthenticationScheme }
-            );
-        });
-        
         // This is the endpoint used trigger the challenge for external login
         group.MapGet("login/{provider}", (string provider, HttpContext context) =>
         {
@@ -33,79 +21,56 @@ public static class AuthApi
             var redirectUrl = string.IsNullOrEmpty(urlToken)
                 ? $"/api/auth/signin/{provider}"
                 : $"/api/auth/signin/{provider}?token={Uri.EscapeDataString(urlToken)}";
-            
+
             // Trigger the external login flow by issuing a challenge with the provider name.
             // This name maps to the registered authentication scheme names in AuthenticationExtensions.cs
             return Results.Challenge(
-                properties: new() { RedirectUri = redirectUrl },
-                authenticationSchemes: new[] { provider }
-                );
+                new AuthenticationProperties { RedirectUri = redirectUrl },
+                new[] { provider }
+            );
         });
 
         // This is the endpoint where the external provider will callback to
-        group.MapGet("signin/{provider}", async (string provider, IUserService client, 
-            HttpContext context, 
-            AuthenticationStateProvider authenticationStateProvider,
+        group.MapGet("signin/{provider}", async (string provider, IUserService client,
+            HttpContext context,
+            TokenAuthorizationProvider authenticationStateProvider,
             ILocalStorageService localStorageService) =>
         {
-            var urlToken = context.Request.Query["token"].Count == 1 ? context.Request.Query["token"][0] : string.Empty;
+            // The urltoken is used to allow a user to register if they have been pre-registered
+            var urlToken = GetUrlTokenFromHttpContextQueryString(context) ?? string.Empty;
 
-            if (!string.IsNullOrEmpty(urlToken))
-            {
-                urlToken = Uri.UnescapeDataString(urlToken);
-            }
-            
             // Grab the login information from the external login dance
-            var result = await context.AuthenticateAsync(AuthConstants.ExternalScheme);
+            var authenticateResult = await context.AuthenticateAsync(AuthConstants.ExternalScheme);
+            var externalClaimsPrincipalManager = new ExternalClaimsPrincipalManager(authenticateResult, provider);
 
-            if (result.Succeeded)
+            if (authenticateResult.Succeeded)
             {
-                var principal = result.Principal;
-
-                var id = principal.FindFirstValue(ClaimTypes.NameIdentifier)!;
-
-                // TODO: We should have the newUser pick a newUser name to complete the external login dance
-                // for now we'll prefer the email address
-                var name = (principal.FindFirstValue(ClaimTypes.Email) ?? principal.Identity?.Name)!;
-                
-                var token = await client.GetOrCreateUserAsync(provider, new() { Username = name, ProviderKey = id, UrlToken = urlToken ?? string.Empty});
-
-                if (token is not null)
+                var user = await client.GetOrRegisterUserAsync(provider, new ExternalUserInfo
                 {
-                    var authStateProvider = (TokenAuthorizationProvider)authenticationStateProvider;
-                    var externalClaimsIdentity = authStateProvider.GetExternalClaimsIdentity(id, name, token.IsAdmin );
-                    var authTokens = result.Properties.GetTokens();
-                    var properties = new AuthenticationProperties();
-                    properties.SetExternalProvider(provider);
-                    if (authTokens.Any())
-                    {
-                        properties.SetHasExternalToken(true);
-                    }
-                    var tokens = authTokens.Any() ? authTokens : new[]
-                    {
-                        new AuthenticationToken { Name = TokenNames.AccessToken, Value = token.Token}
-                    };
-                    properties.StoreTokens(tokens);
-                    var claimPrincipal = new ClaimsPrincipal(externalClaimsIdentity);
+                    UserName = externalClaimsPrincipalManager.Name,
+                    ProviderKey = externalClaimsPrincipalManager.NameIdentifier,
+                    UrlToken = urlToken
+                });
+
+                if (user is not null)
+                {
+                    var claimPrincipal = externalClaimsPrincipalManager.NewClaimsPrincipal(user.Token, user.IsAdmin);
                     // We create an temporary cookie to store the token so
                     // we can use it to authenticate in the provider correctly
-                    context.Response.Cookies.Append("externaltokeninfo", token.Token, 
-                        new CookieOptions(){Secure = true, MaxAge = TimeSpan.FromSeconds(10)});
+                    context.Response.Cookies.Append("externaltokeninfo", user.Token,
+                        new CookieOptions { Secure = true, MaxAge = TimeSpan.FromSeconds(10) });
                     await Results.SignIn(claimPrincipal,
-                        properties: properties,
-                        authenticationScheme: CookieAuthenticationDefaults.AuthenticationScheme).ExecuteAsync(context);
+                        externalClaimsPrincipalManager.AuthenticationProperties,
+                        CookieAuthenticationDefaults.AuthenticationScheme).ExecuteAsync(context);
                 }
                 else
                 {
                     // The user is not pre-registered, so we need to move them back to the pre-registration page
-                    
-                    // Delete the external cookie
                     await context.SignOutAsync(AuthConstants.ExternalScheme);
-                    return Results.Redirect($@"/register/?token={Uri.EscapeDataString(urlToken??string.Empty)}&success=false");
-                    
+                    return Results.Redirect(
+                        $@"/register/?token={Uri.EscapeDataString(urlToken ?? string.Empty)}&success=false");
                 }
             }
-
             // Delete the external cookie
             await context.SignOutAsync(AuthConstants.ExternalScheme);
 
@@ -115,45 +80,12 @@ public static class AuthApi
         return group;
     }
 
-    private static IResult SignIn(LoginUserInfo newUserInfo, AuthToken token)
+    private static string? GetUrlTokenFromHttpContextQueryString(HttpContext context)
     {
-        return SignIn(newUserInfo.Username, newUserInfo.Username, token, providerName: null, authTokens: Enumerable.Empty<AuthenticationToken>());
-    }
+        var urlToken = context.Request.Query["token"].Count == 1 ? context.Request.Query["token"][0] : string.Empty;
 
-    private static IResult SignIn(string userId, string userName, AuthToken token, string? providerName, IEnumerable<AuthenticationToken> authTokens)
-    {
-        var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
-        identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId));
-        identity.AddClaim(new Claim(ClaimTypes.Name, userName));
-        if (token.IsAdmin)
-        {
-            identity.AddClaim(new Claim(ClaimTypes.Role, "Admin"));
-        }
-        var properties = new AuthenticationProperties();
+        if (!string.IsNullOrEmpty(urlToken)) urlToken = Uri.UnescapeDataString(urlToken);
 
-        // Store the external provider name so we can do remote sign out
-        if (providerName is not null)
-        {
-            properties.SetExternalProvider(providerName);
-        }
-
-        if (authTokens.Any())
-        {
-            properties.SetHasExternalToken(true);
-        }
-
-        // properties.AddCookieExpiration(TimeSpan.FromSeconds(10));
-
-        var tokens = authTokens.Any() ? authTokens : new[]
-        {
-            new AuthenticationToken { Name = TokenNames.AccessToken, Value = token.Token }
-        };
-
-        properties.StoreTokens(tokens);
-
-
-        return Results.SignIn(new ClaimsPrincipal(identity),
-            properties: properties,
-            authenticationScheme: CookieAuthenticationDefaults.AuthenticationScheme);
+        return urlToken;
     }
 }

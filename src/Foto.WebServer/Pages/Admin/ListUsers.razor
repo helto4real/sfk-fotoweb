@@ -53,13 +53,11 @@
 
 
 @code {
-   
-    private NewUserInfo? User { get; set; } = new NewUserInfo();
     
     [Parameter]
     public string[] SocialProviders { get; set; } = Array.Empty<string>();
 
-    private List<UserInfo> _users = new List<UserInfo>();
+    private List<UserInfo> _users = new();
     
     protected override async Task OnInitializedAsync()
     {

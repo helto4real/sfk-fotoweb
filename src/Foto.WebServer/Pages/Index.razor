@@ -1,5 +1,4 @@
 ﻿@page "/"
-@using Foto.WebServer.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @layout MainLayout
 @inherits AuthorizedBasePage
@@ -15,9 +14,6 @@
 </div>
 
 @code {
-    [Parameter] 
-    public AuthorizedUserInfo? CurrentUser { get; set; }
-
     [Parameter]
     public string[] SocialProviders { get; set; } = Array.Empty<string>();
 

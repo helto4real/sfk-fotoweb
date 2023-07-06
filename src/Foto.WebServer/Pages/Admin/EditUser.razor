@@ -43,7 +43,7 @@
                             </div>
                             <div class="d-flex justify-content-between align-items-center mt-1">
                                 <button type="submit" class="btn btn-primary">Spara</button>
-                                <button type="button" class="btn btn-secondary" @onclick="OnDelete">Ta bort</button>
+                                <button type="button" class="btn btn-secondary" @onclick="OnDeleteUser">Ta bort</button>
                             </div>
                         </EditForm>
                     </div>
@@ -65,14 +65,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        User = await LoadUser(UserName);
+        User = await AdminService.GetUserByUsernameAsync(UserName);
         StateHasChanged();
         await base.OnInitializedAsync();
-    }
-
-    private async Task<UserInfo?> LoadUser(string username)
-    {
-        return await AdminService.GetUserByUsernameAsync(username);
     }
 
     private async Task HandleValidSubmit()
@@ -90,19 +85,18 @@
             return;
         }
 
-    // Navigate back to the newUser list page
+        // Navigate back to the newUser list page
         NavigationManager?.NavigateTo("/admin/users/list");
     }
 
-    private async Task OnDelete()
+    private async Task OnDeleteUser()
     {
-        var confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"Är du säker på att du vill ta bort användaren {UserName}?");
+        var confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"Är du säker på att du vill ta bort användaren {UserName}? Detta kommar ta bort all information och bilder om användaren!");
         if (confirmed)
         {
             await AdminService.DeleteUserAsync(UserName);
-    // Navigate back to the newUser list page
+            // Navigate back to the newUser list page
             NavigationManager?.NavigateTo("/admin/users/list");
         }
     }
-
 }
