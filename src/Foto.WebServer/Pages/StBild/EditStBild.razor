@@ -113,8 +113,10 @@
     protected override async Task OnInitializedAsync()
     {
         var claimsPrincipal = (await AuthenticationStateTask!).User;
-        _stBild = await StBildService.GetStBild(StbildId);
-        _isReadOnly = (claimsPrincipal.IsInRole("Admin") && _stBild.IsAccepted) || _stBild.IsUsed;
+        _stBild = await StBildService.GetStBildAsync(StbildId);
+        if (_stBild is not null)
+            _isReadOnly = (claimsPrincipal.IsInRole("Admin") && _stBild.IsAccepted) || _stBild.IsUsed;
+        // Todo: Add error handling
         StateHasChanged();
         await base.OnInitializedAsync();
     }
@@ -123,7 +125,7 @@
     {
         if (_stBild is not null)
         {
-            await StBildService.UpdateStBild(_stBild);
+            await StBildService.UpdateStBildAsync(_stBild);
             // Navigate back to the StBild list page
             NavigationManager?.NavigateTo("/st-bild/list");
         }

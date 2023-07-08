@@ -17,11 +17,13 @@
         <PackageReference Include="FluentValidation" Version="11.5.2" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.0-preview.5.23302.2" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="8.0.0-preview.5.23302.2" />
+        <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.8" />
         <PackageReference Include="Microsoft.Tye.Extensions.Configuration" Version="0.10.0-alpha.21420.1" />
         <PackageReference Include="Yarp.ReverseProxy" Version="2.0.1" />
     </ItemGroup>
 
     <ItemGroup>
+      <AdditionalFiles Include="Pages\Admin\ManageStBilder.razor" />
       <AdditionalFiles Include="Shared\Footer.razor" />
       <AdditionalFiles Include="Shared\MainLayout.razor" />
       <AdditionalFiles Include="Shared\NavMenu.razor" />

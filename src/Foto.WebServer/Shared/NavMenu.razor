@@ -1,6 +1,6 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using Foto.WebServer.Authentication
-@inject TokenAuthorizationProvider AuthenticationStateProvider
+@* @inject TokenAuthorizationProvider AuthenticationStateProvider *@
 @inject NavigationManager NavigationManager
 
 <nav class="navbar navbar-expand-md">
@@ -31,8 +31,20 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Admin</a>
                     <ul class="dropdown-menu">
-                        <li><NavLink class="dropdown-item" href="admin/users/list">Hantera användare</NavLink></li>
-                        <li><NavLink class="dropdown-item" href="admin/users/precreate">Lägg till användare</NavLink></li>
+                        <li class="dropdown-submenu"><a class="dropdown-item dropdown-toggle" href="#">Användare</a>
+                            <ul class="dropdown-menu">
+                                <li><NavLink class="dropdown-item" href="admin/users/list">Hantera användare</NavLink></li>
+                                <li><NavLink class="dropdown-item" href="admin/users/precreate">Lägg till användare</NavLink></li>
+                            </ul>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li class="dropdown-submenu"><a class="dropdown-item dropdown-toggle" href="#">ST-bilder</a>
+                            <ul class="dropdown-menu">
+                                <li><NavLink class="dropdown-item" href="/admin/st-bild/hantera">Hantera ST-bilder</NavLink></li>
+                                <li><NavLink class="dropdown-item" href="/admin/st-bild/paketera">Paketera ST-bilder</NavLink></li>
+                            </ul>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
                         <li><NavLink class="dropdown-item" href="admin/tokens">Hantera tokens</NavLink></li>
                     </ul>
                 </li>
@@ -68,9 +80,9 @@
 @* </div> *@
 
 @code {
-    async Task Logout()
+    void Logout()
     {
-        await AuthenticationStateProvider.MarkUserAsLoggedOut();
+      //  await AuthenticationStateProvider.MarkUserAsLoggedOut();
         NavigationManager?.NavigateTo("/signout", true);
     }
 }

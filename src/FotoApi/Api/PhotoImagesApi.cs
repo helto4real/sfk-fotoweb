@@ -42,7 +42,7 @@ internal static class PhotoImagesApi
                 return TypedResults.Ok(result);
             });
 
-        group.MapGet("/{id}",
+        group.MapGet("/{id:guid}",
             async Task<Results<Ok<ImageResponse>, NotFound<ErrorDetail>>> 
                 (Guid id, CurrentUser owner, IMediator mediator) =>
             {
@@ -51,7 +51,7 @@ internal static class PhotoImagesApi
             });
         
         // Get image stream by id
-        group.MapGet("/image/{id}",
+        group.MapGet("image/{id:guid}",
                 async Task<IResult> (Guid id, CurrentUser owner, HttpRequest req, IMediator mediator) =>
                 {
                     var isThumbnail = req.Query.ContainsKey("thumb");
@@ -88,7 +88,7 @@ internal static class PhotoImagesApi
                 return TypedResults.Created($"/image/{result.Id}", result);
             });
 
-        group.MapPut("/{id}",
+        group.MapPut("{id:guid}",
             async Task<Results<Ok, NotFound<ErrorDetail>>> (Guid id, ImageRequest request,
                 CurrentUser owner, IMediator mediator) =>
             {
@@ -96,7 +96,7 @@ internal static class PhotoImagesApi
                 return TypedResults.Ok();
             });
 
-        group.MapDelete("/{id}",
+        group.MapDelete("{id:guid}",
             async Task<Results<Ok, NotFound<ErrorDetail>>> 
                 (Guid id, CurrentUser owner, IMediator mediator) =>
             {

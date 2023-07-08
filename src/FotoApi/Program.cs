@@ -20,11 +20,20 @@ using FotoApi.Infrastructure.Telemetry;
 using FotoApi.Infrastructure.Validation;
 using FotoApi.Model;
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.AspNetCore.ResponseCompression;
 
 [assembly: InternalsVisibleTo("Foto.Tests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 var builder = WebApplication.CreateBuilder(args);
 
+// Add the signalR hub
+builder.Services.AddResponseCompression(opts =>
+{
+    opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+        new[] { "application/octet-stream" });
+});
+
+builder.Services.AddSignalR();
 
 var connectionString = builder.Configuration.GetConnectionString("FotoApi") ?? "Data Source=.db/PhotoService.db";
 builder.Services.AddSqlite<PhotoServiceDbContext>(connectionString);
@@ -124,6 +133,8 @@ app.MapStBildApi();
 
 // Configure the prometheus endpoint for scraping metrics
 app.MapPrometheusScrapingEndpoint();
-// NOTE: This should only be exposed on an internal port!
-// .RequireHost("*:9100");
+
+app.UseResponseCompression();
+app.MapHub<SignalRApi>("/signalr").RequireAuthorization();
+
 app.Run();

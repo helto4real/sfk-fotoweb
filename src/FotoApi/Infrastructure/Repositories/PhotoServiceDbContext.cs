@@ -11,6 +11,8 @@ public class PhotoServiceDbContext(DbContextOptions<PhotoServiceDbContext> optio
     public DbSet<UrlToken> UrlTokens => Set<UrlToken>();
     public DbSet<Image> Images => Set<Image>();
     public DbSet<StBild> StBilder => Set<StBild>();
+    public DbSet<StPackage> StPackage => Set<StPackage>();
+    public DbSet<StPackageItem> StPackageItem => Set<StPackageItem>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -49,6 +51,25 @@ public class PhotoServiceDbContext(DbContextOptions<PhotoServiceDbContext> optio
             e.Property(p => p.Time).IsRequired();
             e.Property(p => p.Description).IsRequired();
             e.Property(p => p.Name).IsRequired();
+        });
+        builder.Entity<StPackage>(e =>
+        {
+            e.HasKey(k => k.Id);
+            e.Property(p => p.PackageNumber).ValueGeneratedOnAdd();
+            e.Property(p => p.PackageRelativPath).IsRequired();
+        });
+        
+        builder.Entity<StPackageItem>(e =>
+        {
+            e.HasKey(k => k.Id);
+            e.HasOne<StPackage>()
+                .WithMany()
+                .HasForeignKey(f => f.StPackageReference)
+                .OnDelete(DeleteBehavior.Cascade);
+            e.HasOne<StBild>()
+                .WithMany()
+                .HasForeignKey(f => f.StBildReference)
+                .OnDelete(DeleteBehavior.Cascade);
         });
         base.OnModelCreating(builder);
     }

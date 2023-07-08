@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using Foto.WebServer.Authentication;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Primitives;
 using Yarp.ReverseProxy.Forwarder;
 
 namespace Foto.WebServer.Api;
@@ -15,6 +16,7 @@ public static class ImageForwardApi
 
         var transform = static async ValueTask (HttpContext context, HttpRequestMessage req) =>
         {
+            
             var result = await context.AuthenticateAsync();
 
             var properties = result.Properties!;

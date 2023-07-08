@@ -58,14 +58,22 @@ public static class StBilderApi
         });        
         
         group.MapGet("/", async Task<Results<Ok<List<StBildResponse>>, NotFound<ErrorDetail>>> 
-            (CurrentUser owner, IMediator mediator, HttpContext ctx) =>
+            (bool showPackagedImages, CurrentUser owner, IMediator mediator) =>
         {
-            var useOnlyCurrentUserImages = false;
-            ctx.Request.Query.TryGetValue("useMyImages", out var useMyImages);
-            if (useMyImages == "True")
-                useOnlyCurrentUserImages = true;
-            
-            var result = await mediator.Send(new GetAllStBilderQuery(useOnlyCurrentUserImages, owner));
+            var result = await mediator.Send(new GetAllStBilderForCurrentUserQuery(showPackagedImages, owner));
+            return TypedResults.Ok(result);
+        });
+        group.MapGet("/packageble", async Task<Results<Ok<List<StBildResponse>>, NotFound<ErrorDetail>>> 
+            (CurrentUser owner, IMediator mediator) =>
+        {
+            var result = await mediator.Send(new GetAllPackageStBilderQuery(owner));
+            return TypedResults.Ok(result);
+        });
+        
+        group.MapPost("/package", async Task<Results<
+            Ok<bool>, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> (PackageStBildResquest request, IMediator mediator, CurrentUser owner) =>
+        {
+            var result = await mediator.Send(new PackageStBilderCommand(request.Ids, owner));
             return TypedResults.Ok(result);
         });
         

@@ -40,14 +40,10 @@ public class ExternalUserInfo
     public string UrlToken { get; set; } = default!;
 }
 
-public record AuthToken(string Token, bool IsAdmin);
-
 public class LoginUserInfo
 {
     public string Username { get; set; } = default!;
 
     public string Password { get; set; } = default!;
-    
-    public bool IsAdmin { get; set; } = false;
     
 }

@@ -117,6 +117,49 @@ namespace FotoApi.Infrastructure.Repositories.Migrations
                     b.ToTable("StBilder");
                 });
 
+            modelBuilder.Entity("FotoApi.Model.StPackage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsDelivered")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("PackageNumber")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("PackageRelativPath")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("StPackage");
+                });
+
+            modelBuilder.Entity("FotoApi.Model.StPackageItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("StBildReference")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("StPackageReference")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StBildReference");
+
+                    b.HasIndex("StPackageReference");
+
+                    b.ToTable("StPackageItem");
+                });
+
             modelBuilder.Entity("FotoApi.Model.UrlToken", b =>
                 {
                     b.Property<Guid>("Id")
@@ -307,6 +350,21 @@ namespace FotoApi.Infrastructure.Repositories.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("FotoApi.Model.StPackageItem", b =>
+                {
+                    b.HasOne("FotoApi.Model.StBild", null)
+                        .WithMany()
+                        .HasForeignKey("StBildReference")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FotoApi.Model.StPackage", null)
+                        .WithMany()
+                        .HasForeignKey("StPackageReference")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

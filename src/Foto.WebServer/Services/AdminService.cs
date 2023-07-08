@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Blazored.LocalStorage;
 using Foto.WebServer.Dto;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 
 namespace Foto.WebServer.Services;
@@ -11,13 +12,15 @@ public class AdminService : IAdminService
 {
     private readonly HttpClient _httpClient;
     private readonly ILocalStorageService _localStorageService;
+    private readonly IHttpContextAccessor _accessor;
     private readonly AppSettings _appSettings;
     private readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
 
-    public AdminService(HttpClient httpClient, IOptions<AppSettings> appSettings, ILocalStorageService localStorageService)
+    public AdminService(HttpClient httpClient, IOptions<AppSettings> appSettings, ILocalStorageService localStorageService, IHttpContextAccessor accessor)
     {
         _httpClient = httpClient;
         _localStorageService = localStorageService;
+        _accessor = accessor;
         _appSettings = appSettings.Value;
         _jsonOptions.Converters.Add(new JsonStringEnumConverter());
         httpClient.BaseAddress = new Uri(_appSettings.FotoApiUrl);
@@ -109,7 +112,10 @@ public class AdminService : IAdminService
 
     private async Task AddAuthorizationHeaders()
     {
-        var token = await _localStorageService.GetItemAsync<string>("accessToken");
+        var authResult = await _accessor.HttpContext!.AuthenticateAsync();
+        var properties = authResult.Properties!;
+
+        var token = properties.GetTokenValue(TokenNames.AccessToken);
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
     }
     private async Task<ErrorDetail?> HandleResponse(HttpResponseMessage response)

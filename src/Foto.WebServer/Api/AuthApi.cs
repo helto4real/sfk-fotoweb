@@ -4,6 +4,7 @@ using Foto.WebServer.Dto;
 using Foto.WebServer.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Foto.WebServer.Api;
 
@@ -12,7 +13,7 @@ public static class AuthApi
     public static RouteGroupBuilder MapAuthenticationApi(this IEndpointRouteBuilder routes)
     {
         var group = routes.MapGroup("/api/auth");
-
+        
         // This is the endpoint used trigger the challenge for external login
         group.MapGet("login/{provider}", (string provider, HttpContext context) =>
         {
@@ -32,9 +33,7 @@ public static class AuthApi
 
         // This is the endpoint where the external provider will callback to
         group.MapGet("signin/{provider}", async (string provider, IUserService client,
-            HttpContext context,
-            TokenAuthorizationProvider authenticationStateProvider,
-            ILocalStorageService localStorageService) =>
+            HttpContext context) =>
         {
             // The urltoken is used to allow a user to register if they have been pre-registered
             var urlToken = GetUrlTokenFromHttpContextQueryString(context) ?? string.Empty;

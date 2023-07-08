@@ -4,6 +4,7 @@
 @using Foto.WebServer.Authentication
 @using Foto.WebServer.Dto
 @using Blazored.FluentValidation
+@using Foto.WebServer.Pages
 @inject IUserService UserService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ExternalProviders ExternalProviders
@@ -19,7 +20,7 @@
     </div>
     <div class="row g-3 mb-5 justify-content-center align-items-center">
         <div class="col col-8" style="max-width: 300px;">
-            <CvEditForm Model="@_model" class="form-horizontal py-5" OnValidSubmit="@LoginOrCreate">
+            <CvEditForm Model="@_model" class="form-horizontal py-5" OnValidSubmit="@LoginOrCreate" >
                 <FluentValidationValidator/>
                 <div class="mb-3">
                     <label for="username" class="form-label">Användarnamn</label>
@@ -73,7 +74,6 @@
     private readonly ResponseHandler _responseHandler = new();
 
     bool _isSubmitting = false;
-
     
     private LoginOrCreateUserModel _model = new();
 
@@ -96,11 +96,12 @@
         
     
         // It is impossible that Username or Password is null here, because the form is invalid if they are.
-        var (user, error) = await UserService.LoginAsync(new LoginUserInfo { Username = _model.Username!, Password = _model.Password! });
+        var loginInfo = new LoginUserInfo { Username = _model.Username!, Password = _model.Password! };
+        var (user, error) = await UserService.LoginAsync(loginInfo);
         if (user is not null)
         {
-            var authStateProvider = (TokenAuthorizationProvider)AuthenticationStateProvider;
-            await authStateProvider.MarkUserAsAuthenticated(user);
+            // var authStateProvider = (TokenAuthorizationProvider)AuthenticationStateProvider;
+            // await authStateProvider.MarkUserAsAuthenticated(user);
             await OnLoggedIn.InvokeAsync(_model.Username);
         }
         else

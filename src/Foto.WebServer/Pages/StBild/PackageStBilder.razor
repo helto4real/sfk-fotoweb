@@ -1,0 +1,119 @@
+﻿@page "/admin/st-bild/paketera"
+@using Microsoft.AspNetCore.Components.Authorization
+@using Foto.WebServer.Dto
+@using Foto.WebServer.Services
+@inherits AuthorizedBasePage
+@inject IStBildService StBildService
+@inject INotificationService<int> PackageNotifications
+@using Microsoft.AspNetCore.SignalR.Client
+@implements IAsyncDisposable
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <div class="container d-flex flex-column justify-content-center align-items-center mb-6">
+            <div class="row row-cols-auto align-items-center">
+                <h2>Packetera godkända ST-bilder</h2>
+            </div>
+        </div>
+        @if (_stBilder is not null)
+        {
+            @if (_stBilder.Any())
+            {
+                <div class="container d-flex flex-column justify-content-center align-items-center mb-3">
+                    <div class="d-flex justify-content-between align-items-center mt-1">
+                        <button type="button" class="btn btn-primary" @onclick="OnPackageStBilder" disabled="@(!CanPackage)">Paketera ST bilder nedan</button>
+                    </div>
+                </div>
+                <div class="row row-cols-auto justify-content-center align-items-center mt-3">
+                    @foreach (var image in _stBilder)
+                    {
+                        <div class="col card m-1 p-0 text-center" style="width: 10rem; height: 13rem;">
+                            <div class="card-header p-1">
+                                <h6 class="card-subtitle text-center mt-0 mb-0 text-body-secondary" style="font-size: 0.6em;">@(image.Title.Length > 20 ? image.Title.Substring(0, 20) : image.Title)</h6>
+                            </div>
+                            <div class="card-body p-0 d-flex m-auto">
+                                <img class="img-thumbnail mt-2 rounded-3" src="/api/images/image/@image.ImageReference?thumb" style="max-width: 8.2em; max-height: 8.2em; object-fit:scale-down;" alt="@image.Title" >
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="container d-flex flex-column justify-content-center align-items-center">
+                    <div class="row row-cols-auto align-items-center">
+                        Det finns inga godkända st-bilder att packetera.
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="container d-flex flex-column justify-content-center align-items-center">
+                <div class="row row-cols-auto align-items-center">
+                    Vänta medans innehåll laddas!
+                </div>
+            </div>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <div class="container d-flex flex-column justify-content-center align-items-center">
+            <div class="row row-cols-auto align-items-center">
+                <p>Denna sida kan bara användas av admininstratörer!</p>
+            </div>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+@if (Progress >= 0)
+{
+    <div class="alert alert-info mt-5">
+        <div class="progress">
+          <div class="progress-bar progress-bar-striped" role="progressbar" style="width: @Progress%;" aria-valuenow="@Progress" aria-valuemin="0" aria-valuemax="100">@Progress%</div>
+        </div>
+    </div>
+}
+@code {
+    private List<StBildInfo>? _stBilder;
+    private bool CanPackage { get; set; }
+    private int Progress { get; set; } = -1;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _stBilder = await StBildService.GetApprovedNotPackagedStBilderAsync();
+        if (_stBilder.Any())
+        {
+            CanPackage = true;
+            await PackageNotifications.RegisterCallback(NotificationEventHandler,"package_progress");
+        }
+        await InvokeAsync(StateHasChanged);
+        await base.OnInitializedAsync();
+    }
+
+    private async Task NotificationEventHandler(int progress)
+    {
+        if (progress == 100)
+        {
+            _ = new Timer(async state =>
+            {
+                Progress = -1;
+                _stBilder = await StBildService.GetApprovedNotPackagedStBilderAsync();
+                CanPackage = _stBilder.Any();
+                await InvokeAsync(StateHasChanged);
+            }, null, TimeSpan.FromSeconds(5), Timeout.InfiniteTimeSpan);
+        }
+        Progress = progress;
+        await InvokeAsync(StateHasChanged);
+    }
+    private async Task OnPackageStBilder()
+    {
+        CanPackage = false;
+        StateHasChanged();
+        if (_stBilder is not null)
+            await StBildService.PackageStBilder(new GuidIds{ Ids = _stBilder.Select(e => e.Id).ToList()});
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await PackageNotifications.DisposeAsync();
+    }
+}

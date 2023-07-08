@@ -1,4 +1,4 @@
-﻿@page "/login"
+﻿@page "/login2"
 @using BlazorStrap.V5
 @using BlazorStrap
 @inherits Foto.WebServer.Shared.BasePage
@@ -23,7 +23,7 @@
     public string[] SocialProviders { get; set; } = Array.Empty<string>();
 
     private Task OnLoggedIn()
-    {
+    { 
         Logger.LogInformation("Is logged in!");
         NavigationManager?.NavigateTo("/", true);
         return Task.CompletedTask;

@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using Blazored.LocalStorage;
 using Foto.WebServer.Dto;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Options;
 
@@ -9,17 +10,17 @@ namespace Foto.WebServer.Services;
 public class ImageService : IImageService
 {
     private readonly HttpClient _httpClient;
+
+    private readonly IHttpContextAccessor _accessor;
+
     //Todo: refactor to use the AuthenticationStateProvider
-    private readonly ILocalStorageService _localStorageService;
-    private readonly AppSettings _appSettings;
     public ImageService(
         HttpClient httpClient, IOptions<AppSettings> appSettings,
-        ILocalStorageService localStorageService)
+        IHttpContextAccessor accessor)
     {
         _httpClient = httpClient;
-        _localStorageService = localStorageService;
-        _appSettings = appSettings.Value;
-        httpClient.BaseAddress = new Uri(_appSettings.FotoApiUrl);
+        _accessor = accessor;
+        httpClient.BaseAddress = new Uri(appSettings.Value.FotoApiUrl);
         httpClient.DefaultRequestHeaders.Add("User-Agent", "FotoWebbServer");
     }
 
@@ -93,7 +94,10 @@ public class ImageService : IImageService
 
     private async Task AddAuthorizationHeaders()
     {
-        var token = await _localStorageService.GetItemAsync<string>("accessToken");
+        var authResult = await _accessor.HttpContext!.AuthenticateAsync();
+        var properties = authResult.Properties!;
+
+        var token = properties.GetTokenValue(TokenNames.AccessToken);
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
     }
     public async Task<ErrorDetail?> HandleResponse(HttpResponseMessage response)

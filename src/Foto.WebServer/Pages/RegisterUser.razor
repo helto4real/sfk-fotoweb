@@ -149,20 +149,20 @@
             });
             if (registeredUser is not null)
             {
+                NavigationManager?.NavigateTo("/login", true);
                 // It is impossible that Username or Password is null here, because the form is invalid if they are.
-                var (user, error) = await UserService.LoginAsync(new LoginUserInfo { Username = _model.UserName!, Password = _model.Password! });
-                if (user is not null)
-                {
-                    var authStateProvider = (TokenAuthorizationProvider)AuthenticationStateProvider;
-                    await authStateProvider.MarkUserAsAuthenticated(user);
-                    NavigationManager?.NavigateTo("/", true);
-                }
-                else
-                {
-                    _isSubmitting = false;
-                    _responseHandler.CheckResponse((user, error));
-                    StateHasChanged();
-                }
+                // var (user, error) = await UserService.LoginAsync(new LoginUserInfo { Username = _model.UserName!, Password = _model.Password! });
+                // if (user is not null)
+                // {
+                //     
+                //     NavigationManager?.NavigateTo("/", true);
+                // }
+                // else
+                // {
+                //     _isSubmitting = false;
+                //     _responseHandler.CheckResponse((user, error));
+                //     StateHasChanged();
+                // }
             }
             else
             {

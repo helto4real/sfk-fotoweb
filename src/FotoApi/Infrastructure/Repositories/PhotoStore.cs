@@ -1,7 +1,11 @@
-﻿using FotoApi.Features.HandleImages.Exceptions;
+﻿using System.Text;
+using FotoApi.Features.HandleImages.Exceptions;
 using FotoApi.Infrastructure.Security.Authorization;
+using FotoApi.Model;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Processing.Processors.Transforms;
+using Image = SixLabors.ImageSharp.Image;
+using System.IO.Compression;
 
 namespace FotoApi.Infrastructure.Repositories;
 
@@ -17,8 +21,10 @@ public class PhotoStore : IPhotoStore, IPhoto, IDisposable
     private readonly string _photoUserFolderAndPath;
     private readonly string _imagePath;
 
+    private const string ImageFolder = ".images";
     private const string ImageRootFolder = ".images/user_images";
-    
+    private const string StPackageRootFolder = ".images/st-packages";
+
     public PhotoStore(IWebHostEnvironment env, CurrentUser currentUser, ILogger<PhotoStore> logger)
     {
         _env = env;
@@ -96,6 +102,7 @@ public class PhotoStore : IPhotoStore, IPhoto, IDisposable
         if (string.IsNullOrEmpty(directory))
             return false;
         Directory.CreateDirectory(directory);
+        
         return true;
     }
     
@@ -135,7 +142,104 @@ public class PhotoStore : IPhotoStore, IPhoto, IDisposable
     }
     
     public string PhotoUserFolderAndPath => _photoUserFolderAndPath;
+    public async Task PackageStBild(string imageLocalRelativeFilePath, Guid packageId, StBild stBild)
+    {
+        var packageFolder = Path.Combine(StPackageRootFolder, packageId.ToString());
+        if (!EnsureDirectoryExists(packageFolder))
+        {
+            _logger.LogError("Could not create directory {StPackageRootFolder}", StPackageRootFolder);
+            return;
+        }
 
+        var destinationFilenameWithoutExtension = MakeFilenameSafe(stBild.Title);
+        var destinationImageFileName = MakeFilenameUnique(destinationFilenameWithoutExtension + ".jpg");
+        var destinationInfoFileName = MakeFilenameUnique(destinationFilenameWithoutExtension + ".txt");
+        var destinationImageFilePath = Path.Combine(packageFolder, destinationImageFileName);
+        var destinationInfoFilePath = Path.Combine(packageFolder, destinationInfoFileName);
+        
+        var imageSourcePath = Path.Combine(ImageRootFolder, imageLocalRelativeFilePath);
+        
+        if (!EnsureDirectoryExists(destinationImageFilePath))
+        {
+            _logger.LogError("Could not create directory {DestinationImageFilePath}", destinationImageFilePath);
+            return;
+        }
+        
+        await CopyFileAsync(imageSourcePath, destinationImageFilePath);
+        await WriteStTextInfo(destinationInfoFilePath, stBild);
+    }
+    
+    public string ZipPackage(Guid packageId, int packageNumber)
+    {
+        var packageFolder = Path.Combine(StPackageRootFolder, packageId.ToString());
+        var zipFilePath = Path.Combine(StPackageRootFolder, $"SFK ST-bilder paket {packageNumber}" + ".zip");
+        if (File.Exists(zipFilePath))
+            File.Delete(zipFilePath);
+        
+        ZipFile.CreateFromDirectory(packageFolder, zipFilePath);
+        Directory.Delete(packageFolder, true);
+        return zipFilePath;
+    }
+
+    private async Task WriteStTextInfo(string destinationPath, StBild stBild)
+    {
+        await using var destinationStream = new FileStream(destinationPath, FileMode.CreateNew, FileAccess.Write,
+            FileShare.None, bufferSize: 4096, useAsync: true);
+        await using var writer = new StreamWriter(destinationStream);
+        
+        await writer.WriteLineAsync("Fotograf: " + stBild.Name + "\r\n");
+        await writer.WriteLineAsync("Titel: " + stBild.Title + "\r\n");
+        await writer.WriteLineAsync("Beskrivning: " + stBild.Description + "\r\n");
+        await writer.WriteLineAsync("Plats: " + stBild.Location + "\r\n");
+        await writer.WriteLineAsync("Datum: " + stBild.Time + "\r\n");
+        await writer.WriteLineAsync("Om fotografen: " + stBild.AboutThePhotograper + "\r\n");
+    }
+
+    public static async Task CopyFileAsync(string sourcePath, string destinationPath)
+    {
+        using (var sourceStream = new FileStream(sourcePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, useAsync: true))
+        using (var destinationStream = new FileStream(destinationPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, bufferSize: 4096, useAsync: true))
+        {
+            await sourceStream.CopyToAsync(destinationStream);
+        }
+    }
+    
+    public static string MakeFilenameUnique(string filename)
+    {
+        var uniqueFilename = filename;
+        var count = 1;
+
+        while (File.Exists(uniqueFilename))
+        {
+            var extension = Path.GetExtension(filename);
+            var nameWithoutExtension = Path.GetFileNameWithoutExtension(filename);
+            uniqueFilename = $"{nameWithoutExtension} ({count}){extension}";
+            count++;
+        }
+
+        return uniqueFilename;
+    }
+    
+    public static string MakeFilenameSafe(string filename)
+    {
+        var invalidChars = Path.GetInvalidFileNameChars();
+        var safeFilename = new StringBuilder(filename.Length);
+
+        foreach (var c in filename)
+        {
+            if (invalidChars.Contains(c))
+            {
+                safeFilename.Append('_');
+            }
+            else
+            {
+                safeFilename.Append(c);
+            }
+        }
+
+        return safeFilename.ToString();
+    }
+    
     public void Dispose()
     {
         if (_image == null) return;
@@ -188,6 +292,8 @@ public interface IPhotoStore
     void DeletePhoto(string reativePath);
     string PhotoUserFolderAndPath { get; }
 
+    Task PackageStBild(string imageLocalRelativeFilePath, Guid packageId, StBild stBild);
+    string ZipPackage(Guid packageId, int packageNumber);
 }
 
 public interface IPhoto

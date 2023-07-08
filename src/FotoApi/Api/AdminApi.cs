@@ -1,4 +1,6 @@
-﻿using FotoApi.Features.HandleUrlTokens.Commands;
+﻿using FotoApi.Features.HandleStBilder.Dto;
+using FotoApi.Features.HandleStBilder.Queries;
+using FotoApi.Features.HandleUrlTokens.Commands;
 using FotoApi.Features.HandleUrlTokens.Model;
 using FotoApi.Features.HandleUrlTokens.Queries;
 using FotoApi.Features.HandleUsers.Commands;
@@ -96,6 +98,13 @@ public static class AdminApi
         group.MapGet("token/valid-tokens", async Task<Ok<List<UrlTokenResponse>>> (IMediator mediatr) =>
         {
             var result = await mediatr.Send(new GetValidUrlTokensQuery());
+            return TypedResults.Ok(result);
+        });
+        
+        group.MapGet("stbilder", async Task<Results<Ok<List<StBildResponse>>, NotFound<ErrorDetail>>> 
+            (bool showPackagedImages, IMediator mediator) =>
+        {
+            var result = await mediator.Send(new GetAllStBilderQuery(showPackagedImages));
             return TypedResults.Ok(result);
         });
         return group;
