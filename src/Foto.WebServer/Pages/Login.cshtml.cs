@@ -45,7 +45,18 @@ public class LogIn : PageModel
     
     [BindProperty]
     public string? Password { get; set; } = "";
-    
+
+    public bool HasConsentCookie
+    {
+        get
+        {
+            Request.Cookies.TryGetValue("ConsentCookie", out var consentCookie);
+            return consentCookie is not null;
+        }
+    }
+
+    public string? ErrorMessage { get; set; }
+
     public void SocialLoginClickCallback()
     {
         IsSubmitting = true;
@@ -81,12 +92,21 @@ public class LogIn : PageModel
             
         if (user is null)
         {
+            if (error?.StatusCode == 403)
+            {
+                ErrorMessage = "Fel användarnamn eller lösenord.";
+            }
+            else
+            {
+                ErrorMessage = "Okänt fel, prova igen senare.";
+            }
             return Page();
         }
             
         var externalClaimsPrincipalManager = new UserClaimPrincipal(user.UserName, user.Email, user.IsAdmin);
         if (error is not null)
         {
+            ErrorMessage = "Okänt fel, prova igen senare.";
             return Page();
         }
 

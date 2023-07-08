@@ -9,7 +9,8 @@
 <html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="utf-8"/>
-    <meta http-equiv="Content-Security-Policy" content="block-all-mixed-content;upgrade-insecure-requests;default-src 'self';img-src data: 'self';script-src stackpath.bootstrapcdn.com 'sha256-34WLX60Tw3aG6hylk0plKbZZFXCuepeQ6Hu7OqRf8PI=' 'self'; style-src stackpath.bootstrapcdn.com fonts.googleapis.com 'unsafe-inline' 'self'; font-src fonts.gstatic.com 'self';">
+    <meta http-equiv="Content-Security-Policy" content="block-all-mixed-content;upgrade-insecure-requests;default-src 'self';img-src data: 'self';script-src stackpath.bootstrapcdn.com 'sha256-34WLX60Tw3aG6hylk0plKbZZFXCuepeQ6Hu7OqRf8PI=' 'sha256-ow65JsyasLOOQo8C9jJZrSAGUwsRWNUOp/utLg/LYzY=' 'self'; style-src stackpath.bootstrapcdn.com fonts.googleapis.com 'unsafe-inline' 'self'; font-src fonts.gstatic.com 'self';">
+    
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <base href="~/"/>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
@@ -26,102 +27,119 @@
  
 <header id="header" class="header">
     
-<nav class="navbar navbar-expand-md">
-  <div class="container-fluid">
-     <a href="/" class="logo navbar-brand">
-            <!-- Uncomment the line below if you also wish to use an image logo -->
-            <img class="d-inline-block" src="logo.jpg" alt="">
-            SFK Fotowebb
-        </a>
-    @* <a class="navbar-brand" href="#">Navbar</a> *@
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
-        <ul class="navbar-nav ms-auto  mb-2 mb-lg-0">
-            <li class="nav-item mr-3">
-                <a class="nav-link m" href="/login">Logga in</a>
-            </li>
-        </ul>
-    </div>
-  </div>
-</nav>
+    <nav class="navbar navbar-expand-md">
+        <div class="container-fluid">
+            <a href="/" class="logo navbar-brand">
+                <!-- Uncomment the line below if you also wish to use an image logo -->
+                <img class="d-inline-block" src="logo.jpg" alt="">
+                SFK Fotowebb
+            </a>
+            @* <a class="navbar-brand" href="#">Navbar</a> *@
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+                <ul class="navbar-nav ms-auto  mb-2 mb-lg-0">
+                    <li class="nav-item mr-3">
+                        <a class="nav-link m" href="/login">Logga in</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 </header>
-<main id="main" role="main" class="main">
-    <div class="container ">
-        <div class="row g-3 mb-1 justify-content-center align-items-center">
-            <div class="col col-8">
-                <h1 class="text-center">Logga in</h1>
-                <p class="text-center">
-                    Logga in genom att ange ditt användarnamn och lösenord nedan eller använd ditt konto grån Google genom att
-                    trycka på knappen under rubriken "Logga in med ditt sociala konto:"
-                </p>
+@if (Model.HasConsentCookie)
+{
+    <main id="main" role="main" class="main">
+        <div class="container ">
+            <div class="row g-3 mb-1 justify-content-center align-items-center">
+                <div class="col col-8">
+                    <h1 class="text-center">Logga in</h1>
+                    <p class="text-center">
+                        Logga in genom att ange ditt användarnamn och lösenord nedan eller använd ditt konto grån Google genom att
+                        trycka på knappen under rubriken "Logga in med ditt sociala konto:"
+                    </p>
+                </div>
             </div>
-        </div>
-        <div class="row g-3 mb-5 justify-content-center align-items-center">
-            <div class="col col-8" style="max-width: 300px;">
-                <form method="post">
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Användarnamn:</label>
-                        <input type="text" id="username" name="username" class="form-control" value="@Model.UserName"/>
-                        <span asp-validation-for="UserName" class="text-danger"></span>
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Lösenord:</label>
-                        <input type="password" id="password" name="password" class="form-control" value="@Model.Password">
-                        <span asp-validation-for="Password" class="text-danger"></span>
-                    </div>
-                    <div class="d-flex justify-content-start align-items-center">
-                        <button type="submit" class="btn btn-primary">Logga in</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <div class="row justify-content-center">
-            <div class="col col-8" style="max-width: 300px;">
-                <h6>Logga in med ditt sociala konto:</h6>
-                <div class="row ">
-                    @foreach (var provider in Model.ExternalProviders.SocialProviders.Value)
-                    {
-                        <div class="col">
-                            <a href="/api/auth/login/@provider">
-                                <button type="button" 
-                                        class="btn btn-danger btn-lg btn-block bg-secondary border-dark" >
-                                    <i
-                                        class="@(Model.GetClassFromProvider(provider))"></i>
-                                </button>
-                            </a>
+            <div class="row g-3 mb-5 justify-content-center align-items-center">
+                <div class="col col-8" style="max-width: 300px;">
+                    <form method="post" onsubmit="disableButtons()">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Användarnamn:</label>
+                            <input type="text" id="username" name="username" class="form-control" value="@Model.UserName"/>
+                            <span asp-validation-for="UserName" class="text-danger"></span>
                         </div>
-                    }
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Lösenord:</label>
+                            <input type="password" id="password" name="password" class="form-control" value="@Model.Password">
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                        <div class="d-flex justify-content-start align-items-center">
+                            <button id="loginbutton" type="submit" class="btn btn-primary">Logga in</button>
+                        </div>
+                        <div id="spinner" class="spinner-border spinner-border-sm ms-1" role="status" aria-hidden="true" style="display: none">
+                            <span class="visually-hidden">Loggar in ..</span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col col-8" style="max-width: 300px;">
+                    <h6>Logga in med ditt sociala konto:</h6>
+                    <div class="row ">
+                        @foreach (var provider in Model.ExternalProviders.SocialProviders.Value)
+                        {
+                            <div class="col">
+                                <a href="/api/auth/login/@provider">
+                                    <button type="button" id="button-@provider" onclick="disableButtons()"
+                                            class="btn btn-danger btn-lg btn-block bg-secondary border-dark" >
+                                        <i
+                                            class="@(Model.GetClassFromProvider(provider))"></i>
+                                    </button>
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+}
+else
+{
+    <div class="modal show fade" tabindex="-1" data-bs-backdrop="static" m-auto style="display: block">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    Cookies och GDPR
+                </div>
+                <div class="modal-body">
+                    Vi använder cookies för att ge dig bästa möjliga upplevelse. För att kunna fortsätta att använda siten behöver du acceptera
+                            att vi lagrar cookies genom att trycka på knappen "Jag förstår".
+                </div>
+                <div class="modal-footer">
+                    <a href="/cookie/consent"> <BSButton  Color="BSColor.Primary">Jag förstår</BSButton></a>
+                    <a href="/cookiepolicy" target="_blank"><BSButton  Color="BSColor.Secondary">Läs mer...</BSButton></a>
                 </div>
             </div>
         </div>
     </div>
-</main>
-@* <BSModal @ref="@Model.AcceptCookieModal" MarginTop="Margins.Auto" DataId="acceptCookieModal"> *@
-@*     <Header>Cookies och GDPR</Header> *@
-@*     <Content>Vi använder cookies för att ge dig bästa möjliga upplevelse. För att kunna fortsätta att använda siten behöver du acceptera  *@
-@*         att vi lagrar cookies genom att trycka på knappen "Jag förstår".</Content> *@
-@*     <Footer Context="cookiemodal"> *@
-@*         <a href="/cookie/consent"> <BSButton  Color="BSColor.Primary">Jag förstår</BSButton></a> *@
-@*         <a href="/cookiepolicy" target="_blank"><BSButton  Color="BSColor.Secondary">Läs mer...</BSButton></a> *@
-@*     </Footer> *@
-@* </BSModal> *@
-<footer class="fixed-bottom">
-    <Footer/>
-</footer>
-
-
-<div id="blazor-error-ui">
-    <environment include="Staging,Production">
-        Ett fel har inträffat, prova att refresha sidan och logga in igen! Om felet uppstår kontakta administratören.
-    </environment>
-    <environment include="Development">
-        An unhandled exception has occurred. See browser dev tools for details.
-    </environment>
-    <a href="" class="reload">Ladda om sidan!</a>
-    <a class="dismiss">🗙</a>
-</div>
+}
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger mt-5">@Model.ErrorMessage</div>
+}
+<script>
+    function disableButtons() {
+        var button = document.getElementById('loginbutton');
+        button.disabled = true;
+        var buttonGoogle = document.getElementById('button-Google');
+        buttonGoogle.disabled = true;
+        
+        var spinner = document.getElementById('spinner');
+        spinner.style.display = 'block';
+    }
+</script>
 
 <script src="_framework/blazor.server.js"></script>
 <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
