@@ -28,6 +28,8 @@ spec:
         - name: fotowebb
           image: 'helto4real/fotowebb'
           env:
+            - name: ReverseProxy__Clusters__cluster1__Destinations__destination1__Address
+              value: "https://api.sundsvallsfotoklubb.online:8001"
             - name: Kestrel__Endpoints__Https__Certificate__Path
               value: "/cert/keys/letsencrypt/fullchain.pem"
             - name: Kestrel__Endpoints__Https__Certificate__KeyPath

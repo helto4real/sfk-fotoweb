@@ -9,7 +9,7 @@
 <html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="utf-8"/>
-    <meta http-equiv="Content-Security-Policy" content="block-all-mixed-content;upgrade-insecure-requests;default-src 'self';img-src data: 'self';script-src stackpath.bootstrapcdn.com 'sha256-34WLX60Tw3aG6hylk0plKbZZFXCuepeQ6Hu7OqRf8PI=' 'sha256-ow65JsyasLOOQo8C9jJZrSAGUwsRWNUOp/utLg/LYzY=' 'self'; style-src stackpath.bootstrapcdn.com fonts.googleapis.com 'unsafe-inline' 'self'; font-src fonts.gstatic.com 'self';">
+    <meta http-equiv="Content-Security-Policy" content="block-all-mixed-content;upgrade-insecure-requests;default-src 'self';img-src data: 'self';script-src stackpath.bootstrapcdn.com 'sha256-34WLX60Tw3aG6hylk0plKbZZFXCuepeQ6Hu7OqRf8PI=' 'sha256-ow65JsyasLOOQo8C9jJZrSAGUwsRWNUOp/utLg/LYzY=' 'sha256-HU12q4hTLt0INlq0UBW6M5D5JYS2DLzQLA7sDXKLXmw=' 'self'; style-src stackpath.bootstrapcdn.com fonts.googleapis.com 'unsafe-inline' 'self'; font-src fonts.gstatic.com 'self';">
     
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <base href="~/"/>
@@ -66,12 +66,12 @@
                     <form method="post" onsubmit="disableButtons()">
                         <div class="mb-3">
                             <label for="username" class="form-label">Användarnamn:</label>
-                            <input type="text" id="username" name="username" class="form-control" value="@Model.UserName"/>
+                            <input type="text" id="username" name="username" class="form-control" value="@Model.UserName" autocomplete="username"/>
                             <span asp-validation-for="UserName" class="text-danger"></span>
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Lösenord:</label>
-                            <input type="password" id="password" name="password" class="form-control" value="@Model.Password">
+                            <input type="password" id="password" name="password" class="form-control" autocomplete="current-password" value="@Model.Password">
                             <span asp-validation-for="Password" class="text-danger"></span>
                         </div>
                         <div class="d-flex justify-content-start align-items-center">

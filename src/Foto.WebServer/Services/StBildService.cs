@@ -42,10 +42,24 @@ public class StBildService : IStBildService
         await _httpClient.PutAsJsonAsync($"/api/stbilder/{stBild.Id}", stBild);
     }
 
-    public async Task<List<StBildInfo>> GetStBilder(bool showPackagedImages)
+    public async Task<List<StBildInfo>> GetStBilderForCurrentUser(bool showPackagedImages)
     {
         await AddAuthorizationHeaders();
         var response = await _httpClient.GetAsync($"/api/stbilder?showPackagedImages={showPackagedImages}");
+        if (response.IsSuccessStatusCode)
+        {
+            var stBilder = await response.Content.ReadFromJsonAsync<List<StBildInfo>>();
+            if (stBilder is not null)
+                return stBilder;
+        }
+
+        return new List<StBildInfo>();
+    }
+    
+    public async Task<List<StBildInfo>> GetStBilder(bool showPackagedImages)
+    {
+        await AddAuthorizationHeaders();
+        var response = await _httpClient.GetAsync($"/api/stbilder/all?showPackagedImages={showPackagedImages}");
         if (response.IsSuccessStatusCode)
         {
             var stBilder = await response.Content.ReadFromJsonAsync<List<StBildInfo>>();
@@ -77,6 +91,23 @@ public class StBildService : IStBildService
         return response.IsSuccessStatusCode;
     }
 
+    public async Task<ErrorDetail?> SetAcceptStatusForStBild(Guid stBildId, bool stBildIsAccepted)
+    {
+        await AddAuthorizationHeaders();
+        var response = await _httpClient.PostAsync($"/api/stbilder/{stBildId}/acceptstatus/{stBildIsAccepted}", null);
+        var result = await HandleResponse(response);
+        return result ?? null;
+    }
+    private async Task<ErrorDetail?> HandleResponse(HttpResponseMessage response)
+    {
+        if (!response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<ErrorDetail>();
+        }
+
+        return null;
+    }
+    
     private async Task AddAuthorizationHeaders()
     {
         var authResult = await _accessor.HttpContext!.AuthenticateAsync();

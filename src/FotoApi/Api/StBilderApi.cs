@@ -57,12 +57,20 @@ public static class StBilderApi
             return TypedResults.Ok(result);
         });        
         
-        group.MapGet("/", async Task<Results<Ok<List<StBildResponse>>, NotFound<ErrorDetail>>> 
+        group.MapGet("/{showPackagedImages:bool}", async Task<Results<Ok<List<StBildResponse>>, NotFound<ErrorDetail>>> 
             (bool showPackagedImages, CurrentUser owner, IMediator mediator) =>
         {
             var result = await mediator.Send(new GetAllStBilderForCurrentUserQuery(showPackagedImages, owner));
             return TypedResults.Ok(result);
         });
+
+        group.MapGet("/all", async Task<Results<Ok<List<StBildResponse>>, NotFound<ErrorDetail>>> 
+            (bool showPackagedImages, CurrentUser owner, IMediator mediator) =>
+        {
+            var result = await mediator.Send(new GetAllStBilderQuery(showPackagedImages));
+            return TypedResults.Ok(result);
+        });
+        
         group.MapGet("/packageble", async Task<Results<Ok<List<StBildResponse>>, NotFound<ErrorDetail>>> 
             (CurrentUser owner, IMediator mediator) =>
         {
@@ -75,6 +83,12 @@ public static class StBilderApi
         {
             var result = await mediator.Send(new PackageStBilderCommand(request.Ids, owner));
             return TypedResults.Ok(result);
+        });
+        group.MapPost("{stBildId:guid}/acceptstatus/{stBildAcceptStatus:bool}", async Task<Results<
+            Ok, NotFound<ErrorDetail>>> (Guid stBildId, bool stBildAcceptStatus, PackageStBildResquest request, IMediator mediator, CurrentUser owner) =>
+        {
+            await mediator.Send(new AcceptStBildCommand(stBildId, stBildAcceptStatus));
+            return TypedResults.Ok();
         });
         
      

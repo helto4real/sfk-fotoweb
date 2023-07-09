@@ -9,7 +9,6 @@ namespace FotoApi.Features.HandleImages.Commands;
 public class DeleteImageHandler : ICommandHandler<DeleteImageCommand>
 {
     private readonly PhotoServiceDbContext _db;
-    private readonly CurrentUser _owner;
     private readonly IMediator _mediator;
     private readonly IPhotoStore _photoStore;
 
@@ -17,7 +16,6 @@ public class DeleteImageHandler : ICommandHandler<DeleteImageCommand>
     {
         _db = db;
         _photoStore = photoStore;
-        _owner = owner;
         _mediator = mediator;
     }
 

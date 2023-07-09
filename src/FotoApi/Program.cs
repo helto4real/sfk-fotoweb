@@ -37,14 +37,6 @@ builder.Services.AddSignalR();
 
 var connectionString = builder.Configuration.GetConnectionString("FotoApi") ?? "Data Source=.db/PhotoService.db";
 builder.Services.AddSqlite<PhotoServiceDbContext>(connectionString);
-// builder.Services.Configure<PhotoServiceDbContext>(
-// s =>
-// {
-//     // s.Database.lo
-//     s.Database.EnsureDeleted();
-//     // s.Database.EnsureCreated();
-//     s.Database.Migrate();
-// });
 
 builder.Services.AddDbContext<PhotoServiceDbContext>();
 
@@ -81,9 +73,6 @@ builder.Services.Configure<SwaggerGeneratorOptions>(o => o.InferSecuritySchemes 
 builder.Services.AddRateLimiting();
 
 // Configure initial data for identity database
-builder.Services.AddSingleton<DefaultAdminUserInitializerService>();
-builder.Services.AddSingleton<IDefaultAdminUserInitializerService, DefaultAdminUserInitializerService>();
-builder.Services.AddHostedService<IDefaultAdminUserInitializerService>(s => s.GetRequiredService<IDefaultAdminUserInitializerService>());
 
 builder.Services.AddSingleton<HandleExpiredUrlTokensService>();
 builder.Services.AddSingleton<IHandleExpiredUrlTokensService, HandleExpiredUrlTokensService>();

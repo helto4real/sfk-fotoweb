@@ -1,6 +1,6 @@
 ﻿namespace FotoApi.Model;
 
-public record StPackage()
+public record StPackage : TimeTrackedEntity
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public int PackageNumber { get; init; }

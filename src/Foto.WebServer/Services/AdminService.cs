@@ -109,6 +109,7 @@ public class AdminService : IAdminService
         var user = await response.Content.ReadFromJsonAsync<User>();
         return (user, null);
     }
+    
 
     private async Task AddAuthorizationHeaders()
     {

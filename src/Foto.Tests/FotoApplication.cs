@@ -117,7 +117,6 @@ internal class FotoApplication : WebApplicationFactory<Program>
             services.AddSingleton<IMailQueue>(s => MailQueue.Object);
             // Just not start the services by replacing them with a do nothing service
             services.AddSingleton<IMailSenderService, DoNothingService>();
-            services.AddSingleton<IDefaultAdminUserInitializerService, DoNothingService>();
             services.AddSingleton<IHandleExpiredUrlTokensService, DoNothingService>();
         });
 
@@ -187,7 +186,7 @@ public static class ServiceCollectionExtensions
     }
 }
 
-public class DoNothingService : IMailSenderService, IDefaultAdminUserInitializerService, IHandleExpiredUrlTokensService
+public class DoNothingService : IMailSenderService, IHandleExpiredUrlTokensService
 {
     public Task StartAsync(CancellationToken cancellationToken)
     {

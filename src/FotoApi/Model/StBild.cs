@@ -1,6 +1,6 @@
 ﻿namespace FotoApi.Model;
 
-public record StBild
+public record StBild : TimeTrackedEntity
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public Guid ImageReference { get; set; }

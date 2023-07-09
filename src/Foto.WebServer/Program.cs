@@ -29,6 +29,9 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
     options.ConsentCookie.Name = "ConsentCookie";
     options.CheckConsentNeeded = context => true;
 });
+
+builder.Services.AddMemoryCache();
+
 // Configure auth with the front end
 builder.AddAuthentication();
 builder.Services.AddAuthorizationBuilder().AddPolicy("AdminPolicy", policy =>

@@ -12,7 +12,7 @@
     <Authorized>
         <div class="container d-flex flex-column justify-content-center align-items-center mb-6">
             <div class="row row-cols-auto align-items-center">
-                <h2>Packetera godkända ST-bilder</h2>
+                <h2>Paketera godkända ST-bilder</h2>
             </div>
         </div>
         @if (_stBilder is not null)
@@ -27,7 +27,7 @@
                 <div class="row row-cols-auto justify-content-center align-items-center mt-3">
                     @foreach (var image in _stBilder)
                     {
-                        <div class="col card m-1 p-0 text-center" style="width: 10rem; height: 13rem;">
+                        <div class="col card m-1 p-0 text-center" style="width: 10rem; height: 10.8rem;">
                             <div class="card-header p-1">
                                 <h6 class="card-subtitle text-center mt-0 mb-0 text-body-secondary" style="font-size: 0.6em;">@(image.Title.Length > 20 ? image.Title.Substring(0, 20) : image.Title)</h6>
                             </div>
@@ -42,7 +42,7 @@
             {
                 <div class="container d-flex flex-column justify-content-center align-items-center">
                     <div class="row row-cols-auto align-items-center">
-                        Det finns inga godkända st-bilder att packetera.
+                        Det finns inga godkända st-bilder att paketera.
                     </div>
                 </div>
             }

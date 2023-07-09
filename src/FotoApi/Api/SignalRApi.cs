@@ -25,6 +25,12 @@ public class SignalRApi : Hub, IDisposable
         await base.OnConnectedAsync();
     }
 
+    public override async Task OnDisconnectedAsync(Exception? exception)
+    {
+        await _cancellationTokenSource.CancelAsync();
+        await base.OnDisconnectedAsync(exception);
+    }
+
     public new void Dispose()
     {
         _cancellationTokenSource.Cancel();

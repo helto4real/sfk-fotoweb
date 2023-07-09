@@ -3,8 +3,14 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Foto.WebServer.Authentication;
 
-public class ExternalProviders(IAuthenticationSchemeProvider schemeProvider)
+public class ExternalProviders
 {
+    private readonly IAuthenticationSchemeProvider _schemeProvider;
+
+    public ExternalProviders(IAuthenticationSchemeProvider schemeProvider)
+    {
+        _schemeProvider = schemeProvider;
+    }
     private Task<string[]>? _providerNames;
 
     public Task<string[]> GetProviderNamesAsync()
@@ -18,7 +24,7 @@ public class ExternalProviders(IAuthenticationSchemeProvider schemeProvider)
     {
         List<string>? providerNames = null;
 
-        var schemes = await schemeProvider.GetAllSchemesAsync();
+        var schemes = await _schemeProvider.GetAllSchemesAsync();
 
         foreach (var s in schemes)
         {

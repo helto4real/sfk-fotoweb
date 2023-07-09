@@ -1,4 +1,5 @@
 ﻿using FotoApi.Features.HandleUsers.Commands;
+using FotoApi.Infrastructure.Api;
 using FotoApi.Infrastructure.ExceptionsHandling;
 using FotoApi.Model;
 using MediatR;
@@ -13,7 +14,6 @@ public static class PublicApi
     public static RouteGroupBuilder MapPublic(this IEndpointRouteBuilder routes)
     {
         var group = routes.MapGroup("/api/public");
-
         group.WithTags("Public");
 
         group.MapGet("confirmemail/{token}",

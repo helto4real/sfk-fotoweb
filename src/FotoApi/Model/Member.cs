@@ -2,7 +2,7 @@
 
 namespace FotoApi.Model;
 
-public class Member
+public record Member : TimeTrackedEntity
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public string OwnerReference { get; set; } = default!;
