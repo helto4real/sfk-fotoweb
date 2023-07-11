@@ -6,6 +6,7 @@ using FotoApi.Infrastructure.ExceptionsHandling;
 using FotoApi.Infrastructure.Security.Authorization;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using StBildMapper = FotoApi.Features.HandleStBilder.Dto.StBildMapper;
 
 namespace FotoApi.Api;
@@ -69,6 +70,13 @@ public static class StBilderApi
         {
             var result = await mediator.Send(new GetAllStBilderQuery(showPackagedImages));
             return TypedResults.Ok(result);
+        });
+        
+        group.MapPost("/{stBildId}/acceptstatus/{stBildIsAccepted}", async Task<Results<
+            Ok, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> ([FromRoute] Guid stBildId, [FromRoute] bool stBildIsAccepted, IMediator mediator, CurrentUser owner) =>
+        {
+            await mediator.Send(new AcceptStBildCommand(StBildId: stBildId, StBildAcceptStatus: stBildIsAccepted));
+            return TypedResults.Ok();
         });
         
         group.MapGet("/packageble", async Task<Results<Ok<List<StBildResponse>>, NotFound<ErrorDetail>>> 

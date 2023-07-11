@@ -11,15 +11,19 @@ namespace Foto.WebServer.Services;
 public class AdminService : IAdminService
 {
     private readonly HttpClient _httpClient;
-    private readonly ILocalStorageService _localStorageService;
+    private readonly IAuthService _authService;
     private readonly IHttpContextAccessor _accessor;
     private readonly AppSettings _appSettings;
     private readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
 
-    public AdminService(HttpClient httpClient, IOptions<AppSettings> appSettings, ILocalStorageService localStorageService, IHttpContextAccessor accessor)
+    public AdminService(
+        HttpClient httpClient, 
+        IOptions<AppSettings> appSettings, 
+        IAuthService authService, 
+        IHttpContextAccessor accessor)
     {
         _httpClient = httpClient;
-        _localStorageService = localStorageService;
+        _authService = authService;
         _accessor = accessor;
         _appSettings = appSettings.Value;
         _jsonOptions.Converters.Add(new JsonStringEnumConverter());
@@ -29,7 +33,6 @@ public class AdminService : IAdminService
     }
     public async Task<UserInfo?> GetUserByUsernameAsync(string username)
     {
-        await AddAuthorizationHeaders();
         var response = await _httpClient.GetAsync($"api/admin/user/{username}");
 
         var user = await response.Content.ReadFromJsonAsync<UserInfo>();
@@ -39,21 +42,18 @@ public class AdminService : IAdminService
 
     public async Task<bool> UpdateUserAsync(UserInfo user)
     {
-        await AddAuthorizationHeaders();
         var response = await _httpClient.PutAsJsonAsync("api/admin/user", user);
         return response.IsSuccessStatusCode;
     }
 
     public async Task<bool> DeleteUserAsync(string username)
     {
-        await AddAuthorizationHeaders();
         var response = await _httpClient.DeleteAsync($"api/admin/user/{username}");
         return response.IsSuccessStatusCode;
     }
 
     public async Task<IEnumerable<User>> GetAllUsers()
     {
-        await AddAuthorizationHeaders();
         var response = await _httpClient.GetAsync("api/admin/users");
 
 
@@ -64,7 +64,6 @@ public class AdminService : IAdminService
 
     public async Task<User?> CreateUserAsync(NewUserInfo user)
     {
-        await AddAuthorizationHeaders();
         var response = await _httpClient.PostAsJsonAsync("api/admin/user", user);
         var users = await response.Content.ReadFromJsonAsync<User>();
         return users;
@@ -72,7 +71,6 @@ public class AdminService : IAdminService
 
     public async Task<IEnumerable<UrlToken>> GetCurrentTokens()
     {
-        await AddAuthorizationHeaders();
         var response = await _httpClient.GetAsync($"api/admin/token/valid-tokens");
 
         if (!response.IsSuccessStatusCode) return new List<UrlToken>();
@@ -82,13 +80,11 @@ public class AdminService : IAdminService
 
     public async ValueTask DeleteToken(Guid tokenId)
     {
-        await AddAuthorizationHeaders();
         var response = await _httpClient.DeleteAsync( $"api/admin/token/{tokenId}");
     }
 
     public async Task<UrlToken?> AddTokenByTokenType(UrlTokenType tokenType)
     {
-        await AddAuthorizationHeaders();
         var response = await _httpClient.PostAsJsonAsync("api/admin/token/addtokenbytype", new NewTokenByType { UrlTokenType = tokenType });
 
         // Todo handle error
@@ -99,7 +95,6 @@ public class AdminService : IAdminService
 
     public async Task<(User?, ErrorDetail?)> PreCreateUserAsync(string? email)
     {
-        await AddAuthorizationHeaders();
         var response = await _httpClient.PostAsJsonAsync("api/admin/users/precreate", new {email = email});
         var result = await HandleResponse(response);
         if (result is not null)
@@ -110,15 +105,6 @@ public class AdminService : IAdminService
         return (user, null);
     }
     
-
-    private async Task AddAuthorizationHeaders()
-    {
-        var authResult = await _accessor.HttpContext!.AuthenticateAsync();
-        var properties = authResult.Properties!;
-
-        var token = properties.GetTokenValue(TokenNames.AccessToken);
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-    }
     private async Task<ErrorDetail?> HandleResponse(HttpResponseMessage response)
     {
         if (!response.IsSuccessStatusCode)

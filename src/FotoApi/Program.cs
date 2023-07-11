@@ -21,6 +21,7 @@ using FotoApi.Infrastructure.Validation;
 using FotoApi.Model;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.AspNetCore.SignalR;
 
 [assembly: InternalsVisibleTo("Foto.Tests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
@@ -33,7 +34,10 @@ builder.Services.AddResponseCompression(opts =>
         new[] { "application/octet-stream" });
 });
 
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(o =>
+{
+    o.AddFilter<AuthHubFilter>();
+});
 
 var connectionString = builder.Configuration.GetConnectionString("FotoApi") ?? "Data Source=.db/PhotoService.db";
 builder.Services.AddSqlite<PhotoServiceDbContext>(connectionString);

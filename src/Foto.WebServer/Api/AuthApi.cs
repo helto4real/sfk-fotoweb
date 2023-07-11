@@ -32,7 +32,7 @@ public static class AuthApi
         });
 
         // This is the endpoint where the external provider will callback to
-        group.MapGet("signin/{provider}", async (string provider, IUserService client,
+        group.MapGet("signin/{provider}", async (string provider, IAuthService client,
             HttpContext context) =>
         {
             // The urltoken is used to allow a user to register if they have been pre-registered
@@ -40,26 +40,26 @@ public static class AuthApi
 
             // Grab the login information from the external login dance
             var authenticateResult = await context.AuthenticateAsync(AuthConstants.ExternalScheme);
-            var externalClaimsPrincipalManager = new ExternalClaimsPrincipalManager(authenticateResult, provider);
+            var externalClaimsPrincipal = new ExternalClaimsPrincipal(authenticateResult, provider);
 
             if (authenticateResult.Succeeded)
             {
                 var user = await client.GetOrRegisterUserAsync(provider, new ExternalUserInfo
                 {
-                    UserName = externalClaimsPrincipalManager.Name,
-                    ProviderKey = externalClaimsPrincipalManager.NameIdentifier,
+                    UserName = externalClaimsPrincipal.Name,
+                    ProviderKey = externalClaimsPrincipal.NameIdentifier,
                     UrlToken = urlToken
                 });
 
                 if (user is not null)
                 {
-                    var claimPrincipal = externalClaimsPrincipalManager.NewClaimsPrincipal(user.Token, user.IsAdmin);
-                    // We create an temporary cookie to store the token so
-                    // we can use it to authenticate in the provider correctly
-                    context.Response.Cookies.Append("externaltokeninfo", user.Token,
-                        new CookieOptions { Secure = true, MaxAge = TimeSpan.FromSeconds(10) });
+                    var claimPrincipal = externalClaimsPrincipal.NewClaimsPrincipal(user.RefreshToken, user.IsAdmin);
+                    // // We create an temporary cookie to store the token so
+                    // // we can use it to authenticate in the provider correctly
+                    // context.Response.Cookies.Append("externaltokeninfo", user.Token,
+                    //     new CookieOptions { Secure = true, MaxAge = TimeSpan.FromSeconds(10) });
                     await Results.SignIn(claimPrincipal,
-                        externalClaimsPrincipalManager.AuthenticationProperties,
+                        externalClaimsPrincipal.AuthenticationProperties,
                         CookieAuthenticationDefaults.AuthenticationScheme).ExecuteAsync(context);
                 }
                 else

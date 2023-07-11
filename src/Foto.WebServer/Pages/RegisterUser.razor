@@ -8,8 +8,7 @@
 @inherits BasePage
 @layout MainLayout
 @inject ExternalProviders ExternalProviders
-@inject IUserService UserService
-@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAuthService AuthService
 
 <div class="row g-3 mb-1 justify-content-center align-items-center">
     <div class="col col-8">
@@ -138,7 +137,7 @@
         if (HasToken)
         {
             var unEscapedToken = Uri.UnescapeDataString(Token);
-            var (registeredUser, errorRegisteredUser) = await UserService.RegisterUserAsync(new NewUserInfo
+            var (registeredUser, errorRegisteredUser) = await AuthService.RegisterUserAsync(new NewUserInfo
             {
                 FirstName = _model.FirstName!,
                 LastName = _model.LastName!,
@@ -150,19 +149,6 @@
             if (registeredUser is not null)
             {
                 NavigationManager?.NavigateTo("/login", true);
-                // It is impossible that Username or Password is null here, because the form is invalid if they are.
-                // var (user, error) = await UserService.LoginAsync(new LoginUserInfo { Username = _model.UserName!, Password = _model.Password! });
-                // if (user is not null)
-                // {
-                //     
-                //     NavigationManager?.NavigateTo("/", true);
-                // }
-                // else
-                // {
-                //     _isSubmitting = false;
-                //     _responseHandler.CheckResponse((user, error));
-                //     StateHasChanged();
-                // }
             }
             else
             {

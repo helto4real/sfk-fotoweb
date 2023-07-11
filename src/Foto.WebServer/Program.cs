@@ -13,9 +13,6 @@ using Microsoft.AspNetCore.Http.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// builder.Services.AddScoped<TokenAuthorizationProvider>();
-// builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<TokenAuthorizationProvider>());
-
 builder.Services.Configure<JsonOptions>(o =>
 {
     o.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
@@ -54,18 +51,26 @@ var photoApiUrl = builder.Configuration.GetServiceUri("fotoapp")?.ToString() ??
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddHttpContextAccessor();
 
-// Add the forwarder to make sending requests to the backend easier
-
-// Configure the HttpClient for the backend API
-
 // Configure the HttpClient for the backend API
 builder.Services.AddSingleton<HttpClient>();
-builder.Services.AddHttpClient<IUserService, UserService>(client => client.BaseAddress = new(photoApiUrl));
-builder.Services.AddHttpClient<IAdminService, AdminService>(client => client.BaseAddress = new(photoApiUrl));
-builder.Services.AddHttpClient<IStBildService, StBildService>(client => client.BaseAddress = new(photoApiUrl));
-builder.Services.AddHttpClient<IImageService, ImageService>(client => client.BaseAddress = new(photoApiUrl));
+
+builder.Services.AddScoped<AuthorizedHttpClientHandler>();
+// We cannot use the handler in auth service since it is used in the handler
+builder.Services.AddHttpClient<IAuthService, AuthService>();
+
+builder.Services.AddHttpClient<IUserService, UserService>()
+    .AddHttpMessageHandler(sp => sp.GetRequiredService<AuthorizedHttpClientHandler>());
+builder.Services.AddHttpClient<IAdminService, AdminService>()
+    .AddHttpMessageHandler(sp => sp.GetRequiredService<AuthorizedHttpClientHandler>());
+builder.Services.AddHttpClient<IStBildService, StBildService>()
+    .AddHttpMessageHandler(sp => sp.GetRequiredService<AuthorizedHttpClientHandler>());;
+builder.Services.AddHttpClient<IImageService, ImageService>()
+    .AddHttpMessageHandler(sp => sp.GetRequiredService<AuthorizedHttpClientHandler>());;
+
+// Register notification service
 builder.Services.AddScoped(typeof(INotificationService<>), typeof(NotificationService<>));
 builder.Services.AddScoped<IValidator<LogIn>, LogIn.SingInValidator>();
+
 builder.Services.AddBlazorStrap();
 
 var app = builder.Build();
@@ -82,6 +87,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 app.UseAuthentication();
+app.UseMiddleware<RefreshTokenMiddleware>();
 app.UseAuthorization();
 
 app.MapBlazorHub();

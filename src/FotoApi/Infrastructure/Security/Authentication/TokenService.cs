@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -21,14 +22,15 @@ public interface ITokenService
 {
     // Generate a JWT token for the specified user name and admin role
     string GenerateToken(string username, bool isAdmin = false);
+    (string refreshToken, DateTime expireTime) GenerateRefreshToken();
     string? GetUserIdByAccessTokenAsync(string accessToken);
 }
 
 public sealed class TokenService : ITokenService
 {
     private readonly string _issuer;
-    private readonly string _audience
-        ;
+    private readonly string _audience;
+    private readonly int _refreshTokenValidityInDays;
 
     private readonly byte[] _key;
     private readonly SigningCredentials _signingCredential;
@@ -38,6 +40,16 @@ public sealed class TokenService : ITokenService
     {
         _issuer = config["Jwt:Issuer"]!;
         _audience = config["Jwt:Audience"]!;
+
+        if (int.TryParse(config["JWT:RefreshTokenValidityInDays"], out int refreshTokenValidityInDays))
+        {
+            _refreshTokenValidityInDays = refreshTokenValidityInDays;
+        }
+        else
+        {
+            _refreshTokenValidityInDays = 7; // default to 7 days
+        }
+
         _key = Encoding.ASCII.GetBytes
             (config["Jwt:Key"]!);
         _securityKey = new SymmetricSecurityKey(_key);
@@ -77,6 +89,21 @@ public sealed class TokenService : ITokenService
 
          return handler.WriteToken(jwtToken);
     }
+
+    /// <summary>
+    ///     Generates a refresh token and returns it along with the expiration time
+    /// </summary>
+    /// <remarks>
+    ///     For refresh token we just generate an random base64 encoded string. We do not need any other data
+    /// </remarks>
+    public (string refreshToken, DateTime expireTime) GenerateRefreshToken()
+    {
+        var randomNumber = new byte[64];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(randomNumber);
+        return (Convert.ToBase64String(randomNumber), DateTime.UtcNow.AddDays(_refreshTokenValidityInDays));
+    }
+
     public string? GetUserIdByAccessTokenAsync(string accessToken)
     {
         var handler = new JwtSecurityTokenHandler();

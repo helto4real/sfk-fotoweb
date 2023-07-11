@@ -1,8 +1,10 @@
 ﻿@page "/admin/st-bild/godkann"
 @using Foto.WebServer.Dto
 @using Foto.WebServer.Services
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @inherits AuthorizedBasePage
+@attribute [Authorize(Roles = "Admin")]
 @inject IStBildService StBildService
 
 <div class="container d-flex flex-column justify-content-center align-items-center">
@@ -30,7 +32,7 @@
                         {
                             <tr >
                                 <td><img class="img-thumbnail mt-2" src="/api/images/image/@stBild.ImageReference?thumb" style="max-width: 8.2em; max-height: 8.2em; object-fit:scale-down;" alt="@stBild.Title" data-bs-toggle="modal" data-bs-target="#@stBild.ImageReference"></td>
-                                <td><NavLink class="nav-link" href="@GetEditLink(stBild.Id)"><span>Godskänsn</span></NavLink></td>
+                                <td><NavLink class="nav-link" href="@GetEditLink(stBild.Id)"><span>Godkänn</span></NavLink></td>
                             </tr>
                         }
                         </tbody>
@@ -97,6 +99,6 @@ else
         StateHasChanged();
     }
 
-    private string GetEditLink(Guid imageId) => $"/admin/st-bild/edit/{imageId}";
+    private string GetEditLink(Guid imageId) => $"/admin/st-bild/edit/{imageId}?isFromAcceptList=true";
 
 }

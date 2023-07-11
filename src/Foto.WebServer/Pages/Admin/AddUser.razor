@@ -3,58 +3,49 @@
 @using Foto.WebServer.Services
 @using FluentValidation
 @using Blazored.FluentValidation
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @inherits AuthorizedBasePage
+@attribute [Authorize(Roles = "Admin")]
+
 @inject IAdminService AdminService
 <div class="container d-flex flex-column justify-content-center align-items-center">
     <div class="row row-cols-auto align-items-center">
         <h2>Lägg till användare</h2>
     </div>
 </div>
-<AuthorizeView Roles="Admin">
-    <Authorizing>
-        <div class="container">
-            <div class="row g-3 mb-5 justify-content-center align-items-center">
-                <div class="col col-8" style="max-width: 300px;">
-                    <p>Loggar in användare</p>
+
+<div class="container">
+    <div class="row g-3 mb-5 justify-content-center align-items-center">
+        <div class="col col-8" style="max-width: 300px;">
+            <EditForm Model="@NewUserModel" OnValidSubmit="@HandleValidSubmit" Context="authirzationContext">
+                <FluentValidationValidator/>
+                <div class="mb-3">
+                    <label for="email" class="form-label">E-post</label>
+                    <InputText id="email" type="email" class="form-control" @bind-Value="NewUserModel.Email"/>
+                    <ValidationMessage For="@(() => NewUserModel.Email)"/>
                 </div>
-            </div>
+                <div class="d-flex justify-content-between align-items-center mt-1">
+                    <button type="submit" class="btn btn-primary">Spara</button>
+                </div>
+            </EditForm>
         </div>
-    </Authorizing>
-    <Authorized>
-        <div class="container">
-            <div class="row g-3 mb-5 justify-content-center align-items-center">
-                <div class="col col-8" style="max-width: 300px;">
-                    <EditForm Model="@NewUserModel" OnValidSubmit="@HandleValidSubmit" Context="authirzationContext">
-                        <FluentValidationValidator/>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">E-post</label>
-                            <InputText id="email" type="email" class="form-control" @bind-Value="NewUserModel.Email"/>
-                            <ValidationMessage For="@(() => NewUserModel.Email)"/>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center mt-1">
-                            <button type="submit" class="btn btn-primary">Spara</button>
-                        </div>
-                    </EditForm>
-                </div>
-            </div>
-            @if (_preCreatedUserNames.Any())
-            {
-                <div class="row g-3 mb-5 justify-content-center align-items-center">
-                    <div class="col col-8" style="max-width: 300px;">
-                        <h5>Tillagda användare</h5>
-                        <ul class="list-group">
-                            @foreach (var user in _preCreatedUserNames)
-                            {
-                                <li class="list-group-item">@user</li>
-                            }
-                        </ul>
-                    </div>    
-                </div>
-            }
+    </div>
+    @if (_preCreatedUserNames.Any())
+    {
+        <div class="row g-3 mb-5 justify-content-center align-items-center">
+            <div class="col col-8" style="max-width: 300px;">
+                <h5>Tillagda användare</h5>
+                <ul class="list-group">
+                    @foreach (var user in _preCreatedUserNames)
+                    {
+                        <li class="list-group-item">@user</li>
+                    }
+                </ul>
+            </div>    
         </div>
-    </Authorized>
-</AuthorizeView>
+    }
+</div>
 
 @if (_responseHandler.HasAlert)
 {

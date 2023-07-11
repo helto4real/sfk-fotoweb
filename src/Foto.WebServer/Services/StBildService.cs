@@ -25,7 +25,6 @@ public class StBildService : IStBildService
 
     public async Task<StBildInfo?> GetStBildAsync(Guid stbildId)
     {
-        await AddAuthorizationHeaders();
         var response = await _httpClient.GetAsync($"/api/stbilder/{stbildId}");
         if (response.IsSuccessStatusCode)
         {
@@ -38,13 +37,11 @@ public class StBildService : IStBildService
 
     public async Task UpdateStBildAsync(StBildInfo stBild)
     {
-        await AddAuthorizationHeaders();
         await _httpClient.PutAsJsonAsync($"/api/stbilder/{stBild.Id}", stBild);
     }
 
     public async Task<List<StBildInfo>> GetStBilderForCurrentUser(bool showPackagedImages)
     {
-        await AddAuthorizationHeaders();
         var response = await _httpClient.GetAsync($"/api/stbilder?showPackagedImages={showPackagedImages}");
         if (response.IsSuccessStatusCode)
         {
@@ -58,7 +55,6 @@ public class StBildService : IStBildService
     
     public async Task<List<StBildInfo>> GetStBilder(bool showPackagedImages)
     {
-        await AddAuthorizationHeaders();
         var response = await _httpClient.GetAsync($"/api/stbilder/all?showPackagedImages={showPackagedImages}");
         if (response.IsSuccessStatusCode)
         {
@@ -72,7 +68,6 @@ public class StBildService : IStBildService
 
     public async Task<List<StBildInfo>> GetApprovedNotPackagedStBilderAsync()
     {
-        await AddAuthorizationHeaders();
         var response = await _httpClient.GetAsync($"/api/stbilder/packageble");
         if (response.IsSuccessStatusCode)
         {
@@ -86,14 +81,12 @@ public class StBildService : IStBildService
 
     public async Task<bool> PackageStBilder(GuidIds guidIds)
     {
-        await AddAuthorizationHeaders();
         var response = await _httpClient.PostAsJsonAsync($"/api/stbilder/package", guidIds);
         return response.IsSuccessStatusCode;
     }
 
     public async Task<ErrorDetail?> SetAcceptStatusForStBild(Guid stBildId, bool stBildIsAccepted)
     {
-        await AddAuthorizationHeaders();
         var response = await _httpClient.PostAsync($"/api/stbilder/{stBildId}/acceptstatus/{stBildIsAccepted}", null);
         var result = await HandleResponse(response);
         return result ?? null;
@@ -106,14 +99,5 @@ public class StBildService : IStBildService
         }
 
         return null;
-    }
-    
-    private async Task AddAuthorizationHeaders()
-    {
-        var authResult = await _accessor.HttpContext!.AuthenticateAsync();
-        var properties = authResult.Properties!;
-
-        var token = properties.GetTokenValue(TokenNames.AccessToken);
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
     }
 }

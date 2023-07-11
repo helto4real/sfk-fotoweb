@@ -1,6 +1,8 @@
 ﻿@page "/admin/st-bild/paket"
 @using Foto.WebServer.Services
+@using Microsoft.AspNetCore.Authorization
 @inherits AuthorizedBasePage
+@attribute [Authorize(Roles = "Admin")]
 @inject IStBildService StBildService
 <h3>ViewStBildPackages</h3>
 

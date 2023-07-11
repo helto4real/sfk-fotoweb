@@ -5,9 +5,14 @@ namespace Foto.WebServer.Pages;
 
 public class IndexModel : PageModel
 {
-    public Task OnGet()
-    {
-        return Task.CompletedTask;
-    }
-    
+    // public IActionResult OnGet()
+    // {
+    //     return Page();
+    // }
+    //
+    // public async Task<IActionResult> OnPostAsync()
+    // {
+    //     return Page();
+    // }
+
 }

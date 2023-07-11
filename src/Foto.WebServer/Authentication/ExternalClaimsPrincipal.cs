@@ -6,12 +6,12 @@ namespace Foto.WebServer.Authentication;
 /// <summary>
 ///     Creates a new ClaimsPrincipal from the external login
 /// </summary>
-public class ExternalClaimsPrincipalManager
+public class ExternalClaimsPrincipal
 {
     private readonly ClaimsPrincipal _externalPrincipal;
     private readonly AuthenticationProperties _externalProperties;
 
-    public ExternalClaimsPrincipalManager(AuthenticateResult authResult, string provider)
+    public ExternalClaimsPrincipal(AuthenticateResult authResult, string provider)
     {
         _ = authResult.Principal ?? throw new NullReferenceException("authResult.Principal is null");
         _ = authResult.Properties ?? throw new NullReferenceException("authResult.Principal is null");
@@ -25,10 +25,10 @@ public class ExternalClaimsPrincipalManager
     public string NameIdentifier => _externalPrincipal.FindFirstValue(ClaimTypes.NameIdentifier)!;
     public string Name => _externalPrincipal.FindFirstValue(ClaimTypes.Email) ?? _externalPrincipal.Identity?.Name!;
 
-    public ClaimsPrincipal NewClaimsPrincipal(string token, bool isAdmin)
+    public ClaimsPrincipal NewClaimsPrincipal(string refreshToken, bool isAdmin)
     {
         var claimsIdentity = CreateExternalClaimsIdentity(isAdmin);
-        AddTokens(token);
+        AddTokens(refreshToken);
         return new ClaimsPrincipal(claimsIdentity);
     }
 
@@ -40,21 +40,27 @@ public class ExternalClaimsPrincipalManager
             new Claim(ClaimTypes.NameIdentifier, NameIdentifier)
         }, "fotowebb external authentication");
 
-        if (isAdmin) identity.AddClaim(new Claim(ClaimTypes.Role, "Admin"));
+        if (isAdmin)
+            identity.AddClaim(new Claim(ClaimTypes.Role, "Admin"));
+        else
+            identity.AddClaim(new Claim(ClaimTypes.Role, "User"));
         return identity;
     }
 
-    private void AddTokens(string token)
+    private void AddTokens(string refreshToken)
     {
         var externalTokens = _externalProperties.GetTokens().ToArray();
-
-        if (externalTokens.Any()) AuthenticationProperties.SetHasExternalToken(true);
-        var tokens = externalTokens.Any()
-            ? externalTokens
-            : new[]
-            {
-                new AuthenticationToken { Name = TokenNames.AccessToken, Value = token }
-            };
+        // Todo should I support external tokens?
+        // if (externalTokens.Any()) AuthenticationProperties.SetHasExternalToken(true);
+        // var tokens = externalTokens.Any()
+        //     ? externalTokens
+        //     : new[]
+        //     {
+        //         new AuthenticationToken { Name = TokenNames.AccessToken, Value = refreshToken }
+        //     };
+        // For now we only support our own tokens
+        var tokens = new[] { new AuthenticationToken { Name = TokenNames.AccessToken, Value = refreshToken } };
+            
         AuthenticationProperties.StoreTokens(tokens);
     }
 }

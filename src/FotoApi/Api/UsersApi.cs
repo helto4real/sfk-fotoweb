@@ -41,7 +41,14 @@ public static class UsersApi
         group.MapPost("/token", async Task<Results<Ok<UserAuthorizedResponse>, BadRequest<ErrorDetail>>> 
             (LoginUserRequest request, IMediator mediator) =>
         {
-            var result = await mediator.Send(new LoginUserCommand(request.UserName, request.Password, request.IsAdmin));
+            var result = await mediator.Send(new LoginUserCommand(request.UserName, request.Password));
+            return TypedResults.Ok(result);
+        }); 
+        
+        group.MapPost("/token/refresh", async Task<Results<Ok<UserAuthorizedResponse>, BadRequest<ErrorDetail>>> 
+            (RefreshTokenRequest request, IMediator mediator) =>
+        {
+            var result = await mediator.Send(new RefreshTokenCommand(request.RefreshToken, request.UserName));
             return TypedResults.Ok(result);
         });
         

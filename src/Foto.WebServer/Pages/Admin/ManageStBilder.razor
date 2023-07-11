@@ -1,85 +1,86 @@
 ﻿@page "/admin/st-bild/hantera"
 @using Foto.WebServer.Dto
 @using Foto.WebServer.Services
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @inherits AuthorizedBasePage
+@attribute [Authorize(Roles = "Admin")]
 @inject IStBildService StBildService
 
-<AuthorizeView Roles="Admin">
-    <div class="container d-flex flex-column justify-content-center align-items-center">
-        <div class="row row-cols-auto align-items-center">
-            <h2>Hantera ST-bilder</h2>
-        </div>
+<div class="container d-flex flex-column justify-content-center align-items-center">
+    <div class="row row-cols-auto align-items-center">
+        <h2>Hantera ST-bilder</h2>
     </div>
-    @if (_stBilder is not null)
-    {
-        <div class="container mt-3">
-            <div class="row g-3 mb-5 justify-content-center align-items-center">
-                @if (_stBilder.Any())
-                {
-                    <div class="col col-8" style="max-width: 300px;">
-                        <div class="form-group">
-                            <label>Visa skickade bilder:</label>
-                            <input type="checkbox" class="form-check-input mb-2" @onchange="OnShowPackagedImagesClicked"/>
-                        </div>
-                        <table class="table table-striped table-bordered table-hover">
-                            <thead>
-                            <tr>
-                                <th scope="col">Bild</th>
-                                <th scope="col">Godkänd</th>
-                                <th scope="col" class="text-center"></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach (var stBild in _stBilder)
-                            {
-                                <tr >
-                                    <td><img class="img-thumbnail" src="/api/images/image/@stBild.ImageReference?thumb" style="max-width: 8.2em; max-height: 8.2em; object-fit:scale-down;" alt="@stBild.Title" data-bs-toggle="modal" data-bs-target="#@stBild.ImageReference"></td>
-                                    <td class="text-center"><InputCheckbox @bind-Value="@stBild.IsAccepted" disabled="true"/></td>
-                                    <td><NavLink class="nav-link" href="@GetEditLink(stBild.Id)"><span>Visa</span></NavLink></td>
-                                </tr>
-                            }
-                            </tbody>
-                        </table>
+</div>
+
+@if (_stBilder is not null)
+{
+    <div class="container mt-3">
+        <div class="row g-3 mb-5 justify-content-center align-items-center">
+            @if (_stBilder.Any())
+            {
+                <div class="col col-8" style="max-width: 300px;">
+                    <div class="form-group">
+                        <label>Visa skickade bilder:</label>
+                        <input type="checkbox" class="form-check-input mb-2" @onchange="OnShowPackagedImagesClicked"/>
                     </div>
-                    @foreach (var stBild in _stBilder)
-                    {
-                        <div class="modal fade" id="@stBild.ImageReference" tabindex="-1" aria-labelledby="@(stBild.Title)" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered modal-fullscreen" data-bs-toggle="modal" data-bs-target="#@stBild.ImageReference">
-                                <div class="modal-content">
-                                    <div class="modal-body d-flex p-5">
-                                        <img src="/api/images/image/@stBild.ImageReference" class="img-fluid m-auto mw-100 mh-100" alt="@stBild.Title" style="max-width: 100%; max-height: 100%;">
-                                    </div>
+                    <table class="table table-striped table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th scope="col">Bild</th>
+                            <th scope="col">Godkänd</th>
+                            <th scope="col" class="text-center"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var stBild in _stBilder)
+                        {
+                            <tr >
+                                <td><img class="img-thumbnail" src="/api/images/image/@stBild.ImageReference?thumb" style="max-width: 8.2em; max-height: 8.2em; object-fit:scale-down;" alt="@stBild.Title" data-bs-toggle="modal" data-bs-target="#@stBild.ImageReference"></td>
+                                <td class="text-center"><InputCheckbox @bind-Value="@stBild.IsAccepted" disabled="true"/></td>
+                                <td><NavLink class="nav-link" href="@GetEditLink(stBild.Id)"><span>Visa</span></NavLink></td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+                @foreach (var stBild in _stBilder)
+                {
+                    <div class="modal fade" id="@stBild.ImageReference" tabindex="-1" aria-labelledby="@(stBild.Title)" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-fullscreen" data-bs-toggle="modal" data-bs-target="#@stBild.ImageReference">
+                            <div class="modal-content">
+                                <div class="modal-body d-flex p-5">
+                                    <img src="/api/images/image/@stBild.ImageReference" class="img-fluid m-auto mw-100 mh-100" alt="@stBild.Title" style="max-width: 100%; max-height: 100%;">
                                 </div>
                             </div>
                         </div>
-                    }
-                }
-                else
-                {
-                    <div class="container d-flex flex-column justify-content-center align-items-center">
-                        <div class="row row-cols-auto align-items-center">
-                            <p>Alla bilder är redan skickade. Om du ändå vill titta på skickade bilder, tryck på knappen nedan.</p>
-                        </div>
-                        <div class="form-group">
-                                <button type="submit" class="btn btn-primary" @onclick="OnShowPackagedImages">
-                                    Visa skickade bilder
-                                </button>
-                        </div>
                     </div>
                 }
-            </div>
+            }
+            else
+            {
+                <div class="container d-flex flex-column justify-content-center align-items-center">
+                    <div class="row row-cols-auto align-items-center">
+                        <p>Alla bilder är redan skickade. Om du ändå vill titta på skickade bilder, tryck på knappen nedan.</p>
+                    </div>
+                    <div class="form-group">
+                            <button type="submit" class="btn btn-primary" @onclick="OnShowPackagedImages">
+                                Visa skickade bilder
+                            </button>
+                    </div>
+                </div>
+            }
         </div>
-    }
-    else
-    {
-        <div class="container d-flex flex-column justify-content-center align-items-center">
-            <div class="row row-cols-auto align-items-center">
-                Sidan laddar...
-            </div>
+    </div>
+}
+else
+{
+    <div class="container d-flex flex-column justify-content-center align-items-center">
+        <div class="row row-cols-auto align-items-center">
+            Sidan laddar...
         </div>
-    }
-</AuthorizeView>
+    </div>
+}
 
 @code {
     private List<StBildInfo>? _stBilder;

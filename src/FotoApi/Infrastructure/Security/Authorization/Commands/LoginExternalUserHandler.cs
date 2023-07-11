@@ -53,9 +53,15 @@ public class LoginExternalUserHandler : ICommandHandler<LoginExternalUserCommand
             result = await _userManager.AddLoginAsync(loginUser,
                     new UserLoginInfo(command.Provider, command.ProviderKey, null));
         }
-
+        
         if (result.Succeeded)
         {
+            var (refreshToken, expireTime) = _tokenService.GenerateRefreshToken();
+            
+            loginUser.RefreshToken = refreshToken;
+            loginUser.RefreshTokenExpirationDate = expireTime;
+            await _userManager.UpdateAsync(loginUser);
+            
             var userRoles = await _userManager.GetRolesAsync(loginUser);
             var isAdmin = userRoles.Contains("Admin");
             return (new UserAuthorizedResponse
@@ -65,6 +71,8 @@ public class LoginExternalUserHandler : ICommandHandler<LoginExternalUserCommand
                 LastName = "LastName",
                 Email = loginUser.Email!,
                 Token = _tokenService.GenerateToken(loginUser.UserName!, isAdmin),
+                RefreshToken = refreshToken,
+                RefreshTokenExpiration = expireTime,
                 IsAdmin = isAdmin
             });
         }

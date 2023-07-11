@@ -8,6 +8,7 @@ using Foto.WebServer.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -17,21 +18,17 @@ namespace Foto.WebServer.Pages;
 public class LogIn : PageModel
 {
     private readonly IValidator<LogIn> _validator;
-    private readonly IUserService _userService;
+    private readonly IAuthService _authService;
 
     public LogIn(IValidator<
         LogIn> validator, 
-        IUserService userService, 
+        IAuthService authService, 
         ExternalProviders externalProviders)
     {
         _validator = validator;
-        _userService = userService;
         ExternalProviders = externalProviders;
+        _authService = authService;
     }
-    // [CascadingParameter]
-    // public bool ConsentGiven { get; set; }
-    //
-    // public BSModal? AcceptCookieModal;
     public ExternalProviders ExternalProviders { get; }
 
     public bool IsSubmitting { get; set; }
@@ -88,7 +85,7 @@ public class LogIn : PageModel
             return Page();
         }
         
-        var (user, error) = await _userService.LoginAsync(new LoginUserInfo(){Username = UserName!, Password = Password!});
+        var (user, error) = await _authService.LoginAsync(new LoginUserInfo(){Username = UserName!, Password = Password!});
             
         if (user is null)
         {
@@ -103,21 +100,18 @@ public class LogIn : PageModel
             return Page();
         }
             
-        var externalClaimsPrincipalManager = new UserClaimPrincipal(user.UserName, user.Email, user.IsAdmin);
         if (error is not null)
         {
             ErrorMessage = "Okänt fel, prova igen senare.";
             return Page();
         }
 
-        var authProps =  new AuthenticationProperties();
-        var tokens = new[]
-        {
-            new AuthenticationToken { Name = TokenNames.AccessToken, Value = user.Token },
-        };
-        authProps.StoreTokens(tokens);
-        authProps.RedirectUri = "/";
-        return SignIn(externalClaimsPrincipalManager, authProps,
+        var userClaimsPrincipal = new UserClaimPrincipal(user.UserName, user.IsAdmin, user.RefreshToken);
+        
+        // Since we are successfully authenticated, we redirect the user to the home page.
+        userClaimsPrincipal.AuthenticationProperties.RedirectUri = "/";
+        
+        return SignIn(userClaimsPrincipal, userClaimsPrincipal.AuthenticationProperties,
             CookieAuthenticationDefaults.AuthenticationScheme);
     }
     public class SingInValidator : AbstractValidator<LogIn> 

@@ -1,13 +1,11 @@
 ﻿@page "/admin/st-bild/edit/{stbildId:guid}"
 @inherits AuthorizedBasePage
-@using FluentValidation
-@using Microsoft.AspNetCore.Components.Authorization
+@attribute [Authorize(Roles = "Admin")]
 @using Foto.WebServer.Dto
 @using Foto.WebServer.Services
-@using Blazored.FluentValidation
+@using Microsoft.AspNetCore.Authorization
 @inject IStBildService StBildService
 
-<AuthorizeView Roles="Admin">
 <div class="container d-flex flex-column justify-content-center align-items-center">
     <div class="row row-cols-auto align-items-center">
             <h2>Godkänn ST-bild</h2>
@@ -71,12 +69,13 @@
                     <label for="isaccepted" class="form-check-label">Godkänd:</label>
                     <InputCheckbox id="isaccepted" class="form-check-input" disabled="true" @bind-Value="@_stBild.IsAccepted"/>
                 </div>
-                <button type="button" class="btn btn-secondary m-lg-1" @onclick="OnCancel">Gå tillbaka till listan</button>
+                <button type="button" class="btn btn-primary" disabled="@_stBild.IsUsed" @onclick="OnAccept">Godkänn</button>
+                <button type="button" class="btn btn-danger m-lg-1" disabled="@_stBild.IsUsed" @onclick="OnReject">Avvisa</button>
+                <button type="button" class="btn btn-secondary m-lg-1" @onclick="OnCancel">Avbryt</button>
             </CvEditForm>
         }
     </div>
 </div>
-</AuthorizeView>
 
 @code {
 
@@ -87,12 +86,14 @@
     [Parameter]
     public Guid StbildId { get; set; }
     
+    [SupplyParameterFromQuery]
+    public bool IsFromAcceptList { get; set; }
+    
     protected override async Task OnInitializedAsync()
     {
-        var claimsPrincipal = (await AuthenticationStateTask!).User;
         _stBild = await StBildService.GetStBildAsync(StbildId);
         if (_stBild is not null)
-            _isPackaged = (claimsPrincipal.IsInRole("Admin") && _stBild.IsAccepted) || _stBild.IsUsed;
+            _isPackaged = _stBild.IsUsed;
         // Todo: Add error handling
         StateHasChanged();
         await base.OnInitializedAsync();
@@ -100,6 +101,29 @@
 
     private void OnCancel()
     {
-        NavigationManager?.NavigateTo("/admin/st-bild/hantera");
+        NavigateBack();
     }
+
+    public async Task OnAccept()
+    {
+        if (_stBild is not null) 
+            await StBildService.SetAcceptStatusForStBild(_stBild.Id, true);
+        NavigateBack();
+    }
+    public async Task OnReject()
+    {
+        if (_stBild is not null) 
+            await StBildService.SetAcceptStatusForStBild(_stBild.Id, false);
+
+        NavigateBack();
+    }
+
+    private void NavigateBack()
+    {
+        if (IsFromAcceptList)
+            NavigationManager?.NavigateTo("/admin/st-bild/godkann");
+        else
+            NavigationManager?.NavigateTo("/admin/st-bild/hantera");
+    }
+
 }

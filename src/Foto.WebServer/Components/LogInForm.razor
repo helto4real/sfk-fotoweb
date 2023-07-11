@@ -5,8 +5,7 @@
 @using Foto.WebServer.Dto
 @using Blazored.FluentValidation
 @using Foto.WebServer.Pages
-@inject IUserService UserService
-@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAuthService AuthService
 @inject ExternalProviders ExternalProviders
 <div class="container ">
     <div class="row g-3 mb-1 justify-content-center align-items-center">
@@ -97,7 +96,7 @@
     
         // It is impossible that Username or Password is null here, because the form is invalid if they are.
         var loginInfo = new LoginUserInfo { Username = _model.Username!, Password = _model.Password! };
-        var (user, error) = await UserService.LoginAsync(loginInfo);
+        var (user, error) = await AuthService.LoginAsync(loginInfo);
         if (user is not null)
         {
             // var authStateProvider = (TokenAuthorizationProvider)AuthenticationStateProvider;

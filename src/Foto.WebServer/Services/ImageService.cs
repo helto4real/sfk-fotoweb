@@ -13,7 +13,6 @@ public class ImageService : IImageService
 
     private readonly IHttpContextAccessor _accessor;
 
-    //Todo: refactor to use the AuthenticationStateProvider
     public ImageService(
         HttpClient httpClient, IOptions<AppSettings> appSettings,
         IHttpContextAccessor accessor)
@@ -26,7 +25,6 @@ public class ImageService : IImageService
 
     public async Task<(ImageItem?, ErrorDetail?)> UploadImageWithMetadata<T>(IBrowserFile? file, string title, T metadata, string metadataType) where T : class
     {
-        await AddAuthorizationHeaders();
         
         if (file is null) return (null, new ErrorDetail(){Title = "Du har inte valt en fil", Detail = "Något är fel, försök igen."});
 
@@ -54,8 +52,6 @@ public class ImageService : IImageService
     {
         if (file is null) return (null, new ErrorDetail(){Title = "Du har inte valt en fil", Detail = "Något är fel, försök igen."});
 
-        await AddAuthorizationHeaders();
-    
         var content = new MultipartFormDataContent();
     
         content.Add(new StringContent(file.Name), "filename");
@@ -76,7 +72,6 @@ public class ImageService : IImageService
 
     public async Task<IEnumerable<ImageItem>> GetImagesForUserAsync()
     {
-        await AddAuthorizationHeaders();
         var response = await _httpClient.GetAsync("api/images/user");
 
         var result = await HandleResponse(response);
@@ -88,18 +83,9 @@ public class ImageService : IImageService
 
     public async Task DeleteImageAsync(Guid id)
     {
-        await AddAuthorizationHeaders();
         await _httpClient.DeleteAsync($"api/images/{id}");
     }
 
-    private async Task AddAuthorizationHeaders()
-    {
-        var authResult = await _accessor.HttpContext!.AuthenticateAsync();
-        var properties = authResult.Properties!;
-
-        var token = properties.GetTokenValue(TokenNames.AccessToken);
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-    }
     public async Task<ErrorDetail?> HandleResponse(HttpResponseMessage response)
     {
         if (!response.IsSuccessStatusCode)

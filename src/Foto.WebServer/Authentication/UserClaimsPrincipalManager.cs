@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Foto.WebServer.Authentication;
@@ -6,12 +7,20 @@ namespace Foto.WebServer.Authentication;
 public class UserClaimPrincipal : ClaimsPrincipal
 
 {
-    public UserClaimPrincipal(string username, string email, bool isAdmin)
-        : base(CreateClaimIdentity(username, email, isAdmin))
+    public AuthenticationProperties AuthenticationProperties { get; } = new();
+    
+    public UserClaimPrincipal(string username, bool isAdmin, string refreshToken)
+        : base(CreateClaimIdentity(username, isAdmin))
     {
+        var tokens = new[]
+        {
+            new AuthenticationToken { Name = TokenNames.AccessToken, Value = refreshToken },
+        };
+        
+        AuthenticationProperties.StoreTokens(tokens);
     }
 
-    private static ClaimsIdentity CreateClaimIdentity(string username, string email, bool isAdmin)
+    private static ClaimsIdentity CreateClaimIdentity(string username, bool isAdmin)
     {
         var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
         
@@ -20,7 +29,6 @@ public class UserClaimPrincipal : ClaimsPrincipal
             {
                 new Claim(ClaimTypes.Name, username),
                 new Claim(ClaimTypes.NameIdentifier, username),
-                new Claim(ClaimTypes.Email, email)
             });
 
         if (isAdmin)

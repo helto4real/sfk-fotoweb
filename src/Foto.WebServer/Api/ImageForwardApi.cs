@@ -1,6 +1,8 @@
 ﻿using System.Net.Http.Headers;
 using Foto.WebServer.Authentication;
+using Foto.WebServer.Services;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Primitives;
 using Yarp.ReverseProxy.Forwarder;
 
@@ -16,12 +18,20 @@ public static class ImageForwardApi
 
         var transform = static async ValueTask (HttpContext context, HttpRequestMessage req) =>
         {
-            
+            var authService = context.RequestServices.GetRequiredService<IAuthService>();
+
             var result = await context.AuthenticateAsync();
 
             var properties = result.Properties!;
 
-            var accessToken = properties.GetTokenValue(TokenNames.AccessToken);
+            var refreshToken = properties.GetTokenValue(TokenNames.AccessToken);
+            
+            if (refreshToken is null || result.Principal?.Identity?.Name is null) return;
+            
+            var (accessToken, _) = authService.GetAccessTokenFromRefreshToken(refreshToken, result.Principal!.Identity!.Name!);
+            
+            if (accessToken is null) return;
+            
             req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
             if (properties.HasExternalToken() && properties.GetExternalProvider() is string externalProvider)

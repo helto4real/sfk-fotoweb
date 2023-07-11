@@ -7,8 +7,8 @@ public class BasePage : ComponentBase //, IAsyncDisposable
 {
     [Inject] protected NavigationManager? NavigationManager { get; set; }
 
-    [Inject] protected IJSRuntime? JavaScriptRuntime { get; set; }
-    
+    // [Inject] protected IJSRuntime? JavaScriptRuntime { get; set; }
+    //
     // private IJSObjectReference? _jsObjectReference;
     
     // protected override async Task OnAfterRenderAsync(bool firstRender)

@@ -30,7 +30,14 @@ public class PreCreateUserHandler : ICommandHandler<PreCreateUserCommand, UserRe
             throw new UserAlreadyExistsException(request.Email);
         if (await _userManager.FindByNameAsync(request.Email) is not null)
             throw new UserAlreadyExistsException(request.Email);
-        var result = await _userManager.CreateAsync(new User { UserName = request.Email, Email = request.Email, PasswordHash  = null});
+        var result = await _userManager.CreateAsync(new User
+        {
+            UserName = request.Email, 
+            Email = request.Email, 
+            PasswordHash  = null, 
+            RefreshToken = "", // No refresh token when precreating this is created on first login
+            RefreshTokenExpirationDate = DateTime.MinValue
+        });
         if (!result.Succeeded)
             throw new UserException(result.Errors.Select(e => e.Description));
         var user = await _userManager.FindByNameAsync(request.Email);
