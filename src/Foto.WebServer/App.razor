@@ -14,12 +14,8 @@
                             </div>
                         </div>
                     </Authorizing>
-                     <NotAuthorized>
-                        @if (context?.User?.Identity is not null && !context.User.Identity.IsAuthenticated)
-                        {
-                            <RedirectToLogin />
-                        }
-                        else
+                    <NotAuthorized>
+                        @if (context?.User?.Identity is not null && context.User.Identity.IsAuthenticated)
                         {
                             <div class="container d-flex flex-column justify-content-center align-items-center">
                                 <div class="row row-cols-auto align-items-center">
@@ -27,7 +23,7 @@
                                 </div>
                             </div>
                         }
-                     </NotAuthorized>
+                    </NotAuthorized>
                 </AuthorizeRouteView>
                 <FocusOnNavigate RouteData="@routeData" Selector="h1"/>
             </Found>

@@ -14,9 +14,9 @@ public class AuthException : HubException
 
 public class AuthHubFilter : IHubFilter
 {
-    public async ValueTask<object> InvokeMethodAsync(
+    public async ValueTask<object?> InvokeMethodAsync(
         HubInvocationContext invocationContext,
-        Func<HubInvocationContext, ValueTask<object>> next
+        Func<HubInvocationContext, ValueTask<object?>> next
     )
     {
         var feature = invocationContext.Context.Features.Get<IConnectionHeartbeatFeature>();
@@ -68,8 +68,8 @@ public class AuthHubFilter : IHubFilter
 
     public Task OnDisconnectedAsync(
         HubLifetimeContext context,
-        Exception exception,
-        Func<HubLifetimeContext, Exception, Task> next
+        Exception? exception,
+        Func<HubLifetimeContext, Exception?, Task> next
     )
     {
         return next(context, exception);
