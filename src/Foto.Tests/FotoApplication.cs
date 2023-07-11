@@ -48,26 +48,26 @@ internal class FotoApplication : WebApplicationFactory<Program>
     {
         using var scope = Services.CreateScope();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-        var newUser = new User { UserName = username, Email = username};
+        var newUser = new User { UserName = username, Email = username, RefreshToken = "", RefreshTokenExpirationDate = DateTime.MinValue};
         var result = await userManager.CreateAsync(newUser);
         Assert.True(result.Succeeded);
     }
     
-    public async Task AddDefaultAdmin()
-    {
-        using var scope = Services.CreateScope();
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
-        var role = roleManager.CreateAsync(new Role { Name = "Admin" });
-        
-        var newUser = new User { UserName = "admin", Email = "admin@somedomain.com"};
-        var result = await userManager.CreateAsync(newUser, "P@ssw0rd!");
-        if (result.Succeeded)
-        {
-            await userManager.AddToRoleAsync(newUser, "Admin");
-        }
-        Assert.True(result.Succeeded);
-    }
+    // public async Task AddDefaultAdmin()
+    // {
+    //     using var scope = Services.CreateScope();
+    //     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+    //     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
+    //     var role = roleManager.CreateAsync(new Role { Name = "Admin" });
+    //     
+    //     var newUser = new User { UserName = "admin", Email = "admin@somedomain.com", RefreshToken = "", RefreshTokenExpirationDate = DateTime.MinValue};
+    //     var result = await userManager.CreateAsync(newUser, "P@ssw0rd!");
+    //     if (result.Succeeded)
+    //     {
+    //         await userManager.AddToRoleAsync(newUser, "Admin");
+    //     }
+    //     Assert.True(result.Succeeded);
+    // }
 
     public HttpClient CreateClient(string id, bool isAdmin = false)
     {

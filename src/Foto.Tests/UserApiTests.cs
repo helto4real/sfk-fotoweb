@@ -24,9 +24,9 @@ public class UserApiTests
         });
 
         Assert.True(response.IsSuccessStatusCode);
-        
-        
-        var user = db.Users.Single();
+
+
+        var user = db.Users.Single(n => n.UserName == "fotoapiuser@somedomain.com");
         Assert.NotNull(user);
 
         Assert.Equal("fotoapiuser@somedomain.com", user.UserName);
