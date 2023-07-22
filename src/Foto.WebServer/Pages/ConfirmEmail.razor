@@ -35,12 +35,16 @@
         await base.OnParametersSetAsync();
     }
     
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        IsConfirmed = await UserService.ConfirmEmailAsync(Token);
-        StateHasChanged();
-        await Task.Delay(TimeSpan.FromSeconds(5000));
-        NavigationManager?.NavigateTo("login", true);
-        await base.OnInitializedAsync();
+        if (firstRender)
+        {
+            IsConfirmed = await UserService.ConfirmEmailAsync(Token);
+            StateHasChanged();
+            await Task.Delay(TimeSpan.FromSeconds(5000));
+            NavigationManager?.NavigateTo("login", true);
+        }
+        
+        await base.OnAfterRenderAsync(firstRender);
     }
 }

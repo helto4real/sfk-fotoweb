@@ -77,16 +77,19 @@
     private bool CanPackage { get; set; }
     private int Progress { get; set; } = -1;
     
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        _stBilder = await StBildService.GetApprovedNotPackagedStBilderAsync();
-        if (_stBilder.Any())
+        if (firstRender)
         {
-            CanPackage = true;
-            await PackageNotifications.RegisterCallback(NotificationEventHandler,"package_progress");
+            _stBilder = await StBildService.GetApprovedNotPackagedStBilderAsync();
+            if (_stBilder.Any())
+            {
+                CanPackage = true;
+                await PackageNotifications.RegisterCallback(NotificationEventHandler,"package_progress");
+            }
+            await InvokeAsync(StateHasChanged);
         }
-        await InvokeAsync(StateHasChanged);
-        await base.OnInitializedAsync();
+        await base.OnAfterRenderAsync(firstRender);
     }
 
     private async Task NotificationEventHandler(int progress)

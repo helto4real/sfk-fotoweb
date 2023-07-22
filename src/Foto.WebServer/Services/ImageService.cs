@@ -4,6 +4,7 @@ using Foto.WebServer.Dto;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Options;
+using Microsoft.JSInterop;
 
 namespace Foto.WebServer.Services;
 

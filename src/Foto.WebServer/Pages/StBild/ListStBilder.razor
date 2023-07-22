@@ -77,10 +77,13 @@ else
     private List<StBildInfo>? _stBilder;
     private bool ShowPackagedImages { get; set; } = false;
     
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await base.OnInitializedAsync();
-        await PopulateStBilderList();
+        if (firstRender)
+        {
+            await PopulateStBilderList();
+        }
+        await base.OnAfterRenderAsync(firstRender);
     }
 
     private async Task PopulateStBilderList()

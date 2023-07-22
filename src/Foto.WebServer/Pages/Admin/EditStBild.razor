@@ -89,14 +89,17 @@
     [SupplyParameterFromQuery]
     public bool IsFromAcceptList { get; set; }
     
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        _stBild = await StBildService.GetStBildAsync(StbildId);
-        if (_stBild is not null)
-            _isPackaged = _stBild.IsUsed;
-        // Todo: Add error handling
-        StateHasChanged();
-        await base.OnInitializedAsync();
+        if (firstRender)
+        {
+            _stBild = await StBildService.GetStBildAsync(StbildId);
+            if (_stBild is not null)
+                _isPackaged = _stBild.IsUsed;
+            // Todo: Add error handling
+            StateHasChanged();
+        }
+        await base.OnAfterRenderAsync(firstRender);
     }
 
     private void OnCancel()

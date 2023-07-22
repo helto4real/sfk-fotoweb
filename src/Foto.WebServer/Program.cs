@@ -2,12 +2,12 @@ using System.Text.Json.Serialization;
 using Blazored.LocalStorage;
 using BlazorStrap;
 using FluentValidation;
+using Foto.WebServer;
 using Foto.WebServer.Api;
 using Foto.WebServer.Authentication;
 using Foto.WebServer.Dto;
 using Foto.WebServer.Pages;
 using Foto.WebServer.Services;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http.Json;
 
 
@@ -37,6 +37,7 @@ builder.Services.AddAuthorizationBuilder().AddPolicy("AdminPolicy", policy =>
 });
 
 builder.Services.AddRazorPages();
+//builder.Services.AddRazorComponents().AddServerComponents();
 builder.Services.AddHttpForwarder();
 // The reverse proxy for SignalR
 var proxySettings = builder.Configuration.GetSection("ReverseProxy");
@@ -57,13 +58,14 @@ builder.Services.AddSingleton<HttpClient>();
 builder.Services.AddScoped<AuthorizedHttpClientHandler>();
 // We cannot use the handler in auth service since it is used in the handler
 builder.Services.AddHttpClient<IAuthService, AuthService>();
+builder.Services.AddScoped<ISignInService, SignInService>();
 
 builder.Services.AddHttpClient<IUserService, UserService>()
     .AddHttpMessageHandler(sp => sp.GetRequiredService<AuthorizedHttpClientHandler>());
 builder.Services.AddHttpClient<IAdminService, AdminService>()
     .AddHttpMessageHandler(sp => sp.GetRequiredService<AuthorizedHttpClientHandler>());
 builder.Services.AddHttpClient<IStBildService, StBildService>()
-    .AddHttpMessageHandler(sp => sp.GetRequiredService<AuthorizedHttpClientHandler>());;
+    .AddHttpMessageHandler(sp => sp.GetRequiredService<AuthorizedHttpClientHandler>());
 builder.Services.AddHttpClient<IImageService, ImageService>()
     .AddHttpMessageHandler(sp => sp.GetRequiredService<AuthorizedHttpClientHandler>());;
 
@@ -92,6 +94,8 @@ app.UseAuthorization();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
+// app.MapRazorComponents<App>();
+//app.MapRazorPages();
 app.MapAuthenticationApi();
 app.MapCookieConsentApi();
 app.MapImageForwardApi(photoApiUrl);

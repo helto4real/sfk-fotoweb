@@ -83,7 +83,7 @@ public sealed class TokenService : ITokenService
              audience: null,
              identity,
              notBefore: DateTime.UtcNow,
-             expires: DateTime.UtcNow.AddMinutes(30),
+             expires: DateTime.UtcNow.AddMinutes(15),
              issuedAt: DateTime.UtcNow,
              _signingCredential);
 
@@ -111,6 +111,7 @@ public sealed class TokenService : ITokenService
         var tokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
+            ValidateLifetime = true,
             IssuerSigningKey = _securityKey,
             ValidateIssuer = false,
             ValidateAudience = false

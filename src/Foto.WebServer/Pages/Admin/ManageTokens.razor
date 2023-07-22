@@ -65,12 +65,16 @@
 
     private string NewTokenTokenType { get; set; } = string.Empty;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await base.OnInitializedAsync();
-        var currentTokens = await AdminService.GetCurrentTokens();
-        _tokens.AddRange(currentTokens);
-        StateHasChanged();
+        if (firstRender)
+        {
+            await base.OnInitializedAsync();
+            var currentTokens = await AdminService.GetCurrentTokens();
+            _tokens.AddRange(currentTokens);
+            StateHasChanged();
+        }
+        await base.OnAfterRenderAsync(firstRender);
     }
 
     private async Task DeleteToken(Guid tokenId)

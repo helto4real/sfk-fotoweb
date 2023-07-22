@@ -1,4 +1,5 @@
-﻿using Blazored.LocalStorage;
+﻿using System.Security.Claims;
+using Blazored.LocalStorage;
 using Foto.WebServer.Authentication;
 using Foto.WebServer.Dto;
 using Foto.WebServer.Services;
@@ -13,6 +14,38 @@ public static class AuthApi
     public static RouteGroupBuilder MapAuthenticationApi(this IEndpointRouteBuilder routes)
     {
         var group = routes.MapGroup("/api/auth");
+
+        group.MapGet("refresh", async ([FromQuery]string? refreshToken, HttpContext context, IAuthService authService) =>
+        {
+            // Todo: Make more robust
+            var (authInfo, _) = await authService.RefreshAccessTokenAsync(refreshToken!, context.User!.Identity!.Name!);
+            if (authInfo is null)
+            {
+                return Results.BadRequest("Invalid refresh token");
+            }
+            var userClaimsPrincipal = new UserClaimPrincipal(authInfo.UserName, authInfo.IsAdmin, authInfo.RefreshToken );
+
+            await context.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme, userClaimsPrincipal, userClaimsPrincipal.AuthenticationProperties);
+            return Results.Ok();
+        });
+        
+        group.MapGet("signin", async ([FromQuery]string? refreshToken, HttpContext context) =>
+        {
+            var userClaimsPrincipal = new UserClaimPrincipal("tomash277@gmail.com", true, refreshToken! );
+            await context.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme, userClaimsPrincipal, userClaimsPrincipal.AuthenticationProperties);
+            return Results.Ok();
+        });
+        
+        group.MapGet("signout", async (HttpContext context) =>
+        {
+            // Todo: Make more robust
+        
+            await context.SignOutAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme);
+            return Results.Ok();
+        });
         
         // This is the endpoint used trigger the challenge for external login
         group.MapGet("login/{provider}", (string provider, HttpContext context) =>

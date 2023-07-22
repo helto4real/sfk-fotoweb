@@ -23,7 +23,7 @@
     <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered"/>
 </head>
 <body>
-<component type="typeof(App)" render-mode="ServerPrerendered" 
+<component type="typeof(App)" render-mode="Server" 
            param-ConsentGiven = "@HttpContext.Features.Get<ITrackingConsentFeature>()!.HasConsent"/>
 <div id="blazor-error-ui">
     <environment include="Staging,Production">

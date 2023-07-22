@@ -28,8 +28,9 @@ public static class AuthenticationExtensions
                     (Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)),
                 ValidateIssuer = true,
                 ValidateAudience = true,
-                ValidateLifetime = false,
-                ValidateIssuerSigningKey = true
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                // ClockSkew = TimeSpan.Zero // This is for testing expiration, remove!!!
             };
             o.Events = new JwtBearerEvents
             {

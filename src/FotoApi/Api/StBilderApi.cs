@@ -65,8 +65,8 @@ public static class StBilderApi
             return TypedResults.Ok(result);
         });
 
-        group.MapGet("/all", async Task<Results<Ok<List<StBildResponse>>, NotFound<ErrorDetail>>> 
-            (bool showPackagedImages, CurrentUser owner, IMediator mediator) =>
+        group.MapGet("/all/{showPackagedImages}", async Task<Results<Ok<List<StBildResponse>>, NotFound<ErrorDetail>>> 
+            (bool showPackagedImages, IMediator mediator) =>
         {
             var result = await mediator.Send(new GetAllStBilderQuery(showPackagedImages));
             return TypedResults.Ok(result);

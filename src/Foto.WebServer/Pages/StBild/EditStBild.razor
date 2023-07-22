@@ -1,4 +1,4 @@
-﻿@page "/st-bild/edit/{stbildId:guid}"
+﻿@page "/st-bild/edit/{StbildId:guid}"
 @inherits AuthorizedBasePage
 @using FluentValidation
 @using Microsoft.AspNetCore.Components.Authorization
@@ -109,16 +109,20 @@
 
     [Parameter]
     public Guid StbildId { get; set; }
-
-    protected override async Task OnInitializedAsync()
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var claimsPrincipal = (await AuthenticationStateTask!).User;
-        _stBild = await StBildService.GetStBildAsync(StbildId);
-        if (_stBild is not null)
-            _isReadOnly = (claimsPrincipal.IsInRole("Admin") && _stBild.IsAccepted) || _stBild.IsUsed;
-        // Todo: Add error handling
-        StateHasChanged();
-        await base.OnInitializedAsync();
+        if (firstRender)
+        {
+            var claimsPrincipal = (await AuthenticationStateTask!).User;
+            _stBild = await StBildService.GetStBildAsync(StbildId);
+            if (_stBild is not null)
+                _isReadOnly = (claimsPrincipal.IsInRole("Admin") && _stBild.IsAccepted) || _stBild.IsUsed;
+            // Todo: Add error handling
+            StateHasChanged();
+            
+        }
+        await base.OnAfterRenderAsync(firstRender);
     }
 
     private async Task HandleValidSubmit()

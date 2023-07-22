@@ -4,28 +4,36 @@ using System.Text.Json.Serialization;
 using Blazored.LocalStorage;
 using Foto.WebServer.Dto;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Options;
+using Microsoft.JSInterop;
 
 namespace Foto.WebServer.Services;
 
 public class AdminService : IAdminService
 {
     private readonly HttpClient _httpClient;
-    private readonly IAuthService _authService;
     private readonly IHttpContextAccessor _accessor;
+    private readonly ISignInService _signInService;
+    private readonly IJSRuntime? _jsRuntime;
+    private readonly ILogger<AdminService> _logger;
     private readonly AppSettings _appSettings;
     private readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
 
     public AdminService(
         HttpClient httpClient, 
         IOptions<AppSettings> appSettings, 
-        IAuthService authService, 
-        IHttpContextAccessor accessor)
+        IHttpContextAccessor accessor,
+        ISignInService signInService,
+        IJSRuntime? jsRuntime,
+        ILogger<AdminService> logger)
     {
         _httpClient = httpClient;
-        _authService = authService;
         _accessor = accessor;
         _appSettings = appSettings.Value;
+        _signInService = signInService;
+        _jsRuntime = jsRuntime;
+        _logger = logger;
         _jsonOptions.Converters.Add(new JsonStringEnumConverter());
         httpClient.BaseAddress = new Uri(_appSettings.FotoApiUrl);
         httpClient.DefaultRequestHeaders.Add("User-Agent", "FotoWebbServer");
@@ -54,12 +62,16 @@ public class AdminService : IAdminService
 
     public async Task<IEnumerable<User>> GetAllUsers()
     {
-        var response = await _httpClient.GetAsync("api/admin/users");
+        var response = await _signInService.RefreshTokenOnExpired(async () => await _httpClient.GetAsync("api/admin/users"));
+        if (response.IsSuccessStatusCode)
+        {
+            var users = await response.Content.ReadFromJsonAsync<IEnumerable<User>>();
+            return users ?? Array.Empty<User>();
+        }
+
+        return Array.Empty<User>();
 
 
-        var users = await response.Content.ReadFromJsonAsync<IEnumerable<User>>();
-
-        return users ?? Array.Empty<User>();
     }
 
     public async Task<User?> CreateUserAsync(NewUserInfo user)

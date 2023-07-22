@@ -46,15 +46,19 @@
     public string[] SocialProviders { get; set; } = Array.Empty<string>();
 
     private List<UserInfo> _users = new();
-    
-    protected override async Task OnInitializedAsync()
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await base.OnInitializedAsync();
-        foreach (var user in await AdminService.GetAllUsers())
+        if (firstRender)
         {
-            _users.Add(new UserInfo{Username = user.UserName, IsAdmin = user.IsAdmin});
+            foreach (var user in await AdminService.GetAllUsers())
+            {
+                _users.Add(new UserInfo{Username = user.UserName, IsAdmin = user.IsAdmin});
+            }
+            StateHasChanged();
+            
         }
-        StateHasChanged();
+        await base.OnAfterRenderAsync(firstRender);
     }
     
     string GetUserEditLink(string username)

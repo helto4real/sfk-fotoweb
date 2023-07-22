@@ -54,11 +54,14 @@ else
     public string UserName { get; set; } = string.Empty;
     private UserInfo? User { get; set; } = new();
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        User = await AdminService.GetUserByUsernameAsync(UserName);
-        StateHasChanged();
-        await base.OnInitializedAsync();
+        if (firstRender)
+        {
+            User = await AdminService.GetUserByUsernameAsync(UserName);
+            StateHasChanged();
+        }
+        await base.OnAfterRenderAsync(firstRender);
     }
 
     private async Task HandleValidSubmit()

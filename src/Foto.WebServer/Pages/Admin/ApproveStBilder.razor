@@ -32,7 +32,7 @@
                         {
                             <tr >
                                 <td><img class="img-thumbnail mt-2" src="/api/images/image/@stBild.ImageReference?thumb" style="max-width: 8.2em; max-height: 8.2em; object-fit:scale-down;" alt="@stBild.Title" data-bs-toggle="modal" data-bs-target="#@stBild.ImageReference"></td>
-                                <td><NavLink class="nav-link" href="@GetEditLink(stBild.Id)"><span>Godkänn</span></NavLink></td>
+                                <td><NavLink class="nav-link" href="@GetEditLink(stBild.Id)"><span>@(stBild.IsAccepted? "Ändra" : "Godkänn")</span></NavLink></td>
                             </tr>
                         }
                         </tbody>
@@ -80,11 +80,15 @@ else
 @code {
     private List<StBildInfo>? _stBilder;
     private bool ShowPackagedImages { get; set; } = false;
-    
-    protected override async Task OnInitializedAsync()
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await base.OnInitializedAsync();
-        await PopulateStBilderList();
+        if (firstRender)
+        {
+            await PopulateStBilderList();
+            StateHasChanged();
+        }
+        await base.OnAfterRenderAsync(firstRender);
     }
 
     private Task OnShowPackagedImages()

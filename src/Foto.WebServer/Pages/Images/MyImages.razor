@@ -18,10 +18,16 @@
 @code
 {
     private IEnumerable<ImageItem>? _userImages { get; set; }
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        _userImages = await ImageService.GetImagesForUserAsync();
+        if (firstRender)
+        {
+            _userImages = await ImageService.GetImagesForUserAsync();
+            StateHasChanged();
+        }
+        await base.OnAfterRenderAsync(firstRender);
     }
+
     
     private async Task DeleteUserImage(ImageItem imageItem)
     {

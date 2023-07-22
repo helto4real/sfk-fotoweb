@@ -42,7 +42,7 @@ public class StBildService : IStBildService
 
     public async Task<List<StBildInfo>> GetStBilderForCurrentUser(bool showPackagedImages)
     {
-        var response = await _httpClient.GetAsync($"/api/stbilder?showPackagedImages={showPackagedImages}");
+        var response = await _httpClient.GetAsync($"/api/stbilder/{showPackagedImages}");
         if (response.IsSuccessStatusCode)
         {
             var stBilder = await response.Content.ReadFromJsonAsync<List<StBildInfo>>();
@@ -55,7 +55,7 @@ public class StBildService : IStBildService
     
     public async Task<List<StBildInfo>> GetStBilder(bool showPackagedImages)
     {
-        var response = await _httpClient.GetAsync($"/api/stbilder/all?showPackagedImages={showPackagedImages}");
+        var response = await _httpClient.GetAsync($"/api/stbilder/all/{showPackagedImages}");
         if (response.IsSuccessStatusCode)
         {
             var stBilder = await response.Content.ReadFromJsonAsync<List<StBildInfo>>();

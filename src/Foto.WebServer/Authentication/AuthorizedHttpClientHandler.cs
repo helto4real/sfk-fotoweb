@@ -1,6 +1,8 @@
 ﻿using System.Net.Http.Headers;
 using Foto.WebServer.Services;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.JSInterop;
 
 namespace Foto.WebServer.Authentication;
 
@@ -21,7 +23,6 @@ public class AuthorizedHttpClientHandler : DelegatingHandler
         request.Headers.Authorization = authHeader;
         return await base.SendAsync(request, cancellationToken);
     }
-    
     private async Task<AuthenticationHeaderValue?> GetAuthorizationHeader()
     {
         // First get the refresh token from context
@@ -40,6 +41,7 @@ public class AuthorizedHttpClientHandler : DelegatingHandler
         {
             return new AuthenticationHeaderValue("Bearer", accessToken);
         }
+            
         return null; //Fail authorize the user
     }
 }
