@@ -10,7 +10,7 @@
 # }
 
 # @name gettoken
-POST http://localhost:5000/api/users/token
+POST https://localhost:8001/api/users/token
 Content-Type: application/json
 
 {
@@ -57,9 +57,9 @@ GET http://localhost:5000/stbilder/{{st-bild-ir}}
 Authorization: Bearer {{token}}
 
 ### Get all bild
-GET http://localhost:5000/api/stbilder
+GET https://localhost:8001/api/stbilder/user
 Authorization: Bearer {{token}}
 
 ### Get my stbilder
-GET http://localhost:5000/api/stbilder/?useMyImages=true
+GET https://localhost:8001/api/stbilder/?useMyImages=true
 Authorization: Bearer {{token}}
