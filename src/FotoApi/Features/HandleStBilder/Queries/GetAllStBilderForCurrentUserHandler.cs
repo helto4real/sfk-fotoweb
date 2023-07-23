@@ -1,25 +1,27 @@
-﻿using FotoApi.Features.HandleStBilder.Dto;
+﻿using FotoApi.Abstractions;
+using FotoApi.Features.HandleStBilder.Dto;
 using FotoApi.Infrastructure.Repositories;
+using FotoApi.Infrastructure.Security.Authorization;
 using StBildMapper = FotoApi.Features.HandleStBilder.Dto.StBildMapper;
 
 namespace FotoApi.Features.HandleStBilder.Queries;
-
-public class GetAllStBilderForCurrentUserHandler : IQueryHandler<GetAllStBilderForCurrentUserQuery, List<StBildResponse>>
+public record GetAllStBilderForCurrentUserRequest(bool ShowPackagedImages) : ICurrentUser
 {
-    private readonly PhotoServiceDbContext _db;
+    public CurrentUser CurrentUser { get; set; } = default!;
+}
+
+public class GetAllStBilderForCurrentUserHandler(PhotoServiceDbContext db) : IHandler<GetAllStBilderForCurrentUserRequest, List<StBildResponse>>
+{
     private readonly StBildMapper _mapper = new();
-    public GetAllStBilderForCurrentUserHandler(PhotoServiceDbContext db)
-    {
-        _db = db;
-    }
-    public async Task<List<StBildResponse>> Handle(GetAllStBilderForCurrentUserQuery request, CancellationToken cancellationToken)
+
+    public async Task<List<StBildResponse>> Handle(GetAllStBilderForCurrentUserRequest request, CancellationToken cancellationToken)
     {
         return request.ShowPackagedImages ? 
-            await _db.StBilder
-                .Where(e => e.OwnerReference == request.Owner.Id).Select(e => _mapper.ToStBildResponse(e))
+            await db.StBilder
+                .Where(e => e.OwnerReference == request.CurrentUser.Id).Select(e => _mapper.ToStBildResponse(e))
                 .ToListAsync(cancellationToken: cancellationToken) :
-            await _db.StBilder
-                .Where(e => e.OwnerReference == request.Owner.Id && e.IsUsed == false).Select(e => _mapper.ToStBildResponse(e))
+            await db.StBilder
+                .Where(e => e.OwnerReference == request.CurrentUser.Id && e.IsUsed == false).Select(e => _mapper.ToStBildResponse(e))
                 .ToListAsync(cancellationToken: cancellationToken);
     }
 }

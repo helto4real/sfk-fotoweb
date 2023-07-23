@@ -6,6 +6,7 @@ using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using FotoApi;
 using FotoApi.Api;
+using FotoApi.Features.HandleStBilder.Commands;
 using FotoApi.Features.HandleUrlTokens;
 using FotoApi.Features.SendEmailNotifications;
 using FotoApi.Infrastructure.Api;
@@ -13,7 +14,6 @@ using FotoApi.Infrastructure.ExceptionsHandling;
 using FotoApi.Infrastructure.Logging;
 using FotoApi.Infrastructure.Repositories;
 using FotoApi.Infrastructure.Security.Authentication;
-using FotoApi.Infrastructure.Security.Authentication.Model;
 using FotoApi.Infrastructure.Security.Authorization;
 using FotoApi.Infrastructure.Settings;
 using FotoApi.Infrastructure.Telemetry;
@@ -93,9 +93,11 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.Get
     // .AddBehavior(typeof(IPipelineBehavior<, >),typeof(ValidationBehaviour<,>)));
     .AddOpenBehavior(typeof(ValidationBehavior<,>)));
 
+builder.Services.AddFotoAppHandlers();
+builder.Services.AddFotoAppPipelines();
+
 // add validators
-// builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-builder.Services.AddValidatorsFromAssemblyContaining<LoginUserRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<NewStBildRequestValidator>();
 // add implementation of ExceptionHandling middleware
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 

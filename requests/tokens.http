@@ -1,16 +1,6 @@
-### Create a user
-# @password = P@ssw0rd!
-
-# POST http://localhost:5000/users
-# Content-Type: application/json
-
-# {
-#     "username": "myuser",
-#     "password": "{{password}}"
-# }
 
 # @name gettoken
-POST http://localhost:5000/users/token
+POST https://localhost:8001/api/users/token
 Content-Type: application/json
 
 {
@@ -25,7 +15,7 @@ Content-Type: application/json
 
 ### Create a token
 # @name temptoken
-POST http://localhost:5000/admin/token/addtokenbytype
+POST https://localhost:8001/api/admin/token/addtokenbytype
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -38,13 +28,13 @@ Content-Type: application/json
 @url-token-id = {{temptoken.response.body.id}}
 
 ### Delete token
-DELETE http://localhost:5000/admin/token/{{url-token-id}}
+DELETE https://localhost:8001/api/admin/token/{{url-token-id}}
 Authorization: Bearer {{token}}
 
 ### Get token
-GET http://localhost:5000/admin/token/{{url-token}}
+GET https://localhost:8001/api/admin/token/{{url-token}}
 Authorization: Bearer {{token}}
 
 ### Get all valid tokens
-GET http://localhost:5000/admin/token/valid-tokens
+GET https://localhost:8001/api/admin/token/valid-tokens
 Authorization: Bearer {{token}}

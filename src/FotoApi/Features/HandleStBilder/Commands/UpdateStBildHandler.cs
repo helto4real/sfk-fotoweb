@@ -4,16 +4,11 @@ using FotoApi.Infrastructure.Repositories;
 
 namespace FotoApi.Features.HandleStBilder.Commands;
 
-public class UpdateStBildHandler : ICommandHandler<UpdateStBildCommand>
+public class UpdateStBildHandler(PhotoServiceDbContext db) : IHandler<StBildRequest>
 {
-    private readonly PhotoServiceDbContext _db;
-    public UpdateStBildHandler(PhotoServiceDbContext db)
+    public async Task Handle(StBildRequest request, CancellationToken cancellationToken)
     {
-        _db = db;
-    }
-    public async Task Handle(UpdateStBildCommand request, CancellationToken cancellationToken)
-    {
-        var stBild = await _db.StBilder.FindAsync(request.Id);
+        var stBild = await db.StBilder.FindAsync(request.Id);
         if (stBild == null)
         {
             throw new StBildNotFoundException(request.Id);
@@ -26,6 +21,6 @@ public class UpdateStBildHandler : ICommandHandler<UpdateStBildCommand>
         stBild.AboutThePhotograper = request.AboutThePhotograper;
         stBild.IsAccepted = request.IsAccepted;
         
-        await _db.SaveChangesAsync(cancellationToken);
+        await db.SaveChangesAsync(cancellationToken);
     }
 }

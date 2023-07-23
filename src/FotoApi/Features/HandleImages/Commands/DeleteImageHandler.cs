@@ -6,35 +6,27 @@ using MediatR;
 
 namespace FotoApi.Features.HandleImages.Commands;
 
-public class DeleteImageHandler : ICommandHandler<DeleteImageCommand>
+public class DeleteImageHandler(PhotoServiceDbContext db, IPhotoStore photoStore, CurrentUser currentUser,
+        IMediator mediator)
+    : IHandler<Guid>
 {
-    private readonly PhotoServiceDbContext _db;
-    private readonly IMediator _mediator;
-    private readonly IPhotoStore _photoStore;
-
-    public DeleteImageHandler(PhotoServiceDbContext db, IPhotoStore photoStore, CurrentUser owner, IMediator mediator)
+    public async Task Handle(Guid id, CancellationToken cancellationToken)
     {
-        _db = db;
-        _photoStore = photoStore;
-        _mediator = mediator;
-    }
-
-    public async Task Handle(DeleteImageCommand request, CancellationToken cancellationToken)
-    {
-        var imageInfo = await _db.Images.FindAsync(request.Id);
+        var imageInfo = await db.Images.FindAsync(id);
         if (imageInfo == null)
-            throw new ImageNotFoundException(request.Id);
+            throw new ImageNotFoundException(id);
 
-        var rowsAffected = await _db.Images
-            .Where(t => t.Id == request.Id && (t.OwnerReference == request.Owner.Id || request.Owner.IsAdmin))
-            .ExecuteDeleteAsync();
+        var rowsAffected = await db.Images
+            .Where(t => t.Id == id && (t.OwnerReference == currentUser.Id || currentUser.IsAdmin))
+            .ExecuteDeleteAsync(cancellationToken: cancellationToken);
 
         if (rowsAffected > 0)
         {
-            _photoStore.DeletePhoto(imageInfo.LocalFilePath);
-            await _mediator.Publish(new ImageDeletedNotification(request.Id), cancellationToken);
+            // Todo: Make this a background job
+            photoStore.DeletePhoto(imageInfo.LocalFilePath);
+            await mediator.Publish(new ImageDeletedNotification(id), cancellationToken);
         }
         else
-            throw new ImageNotFoundException(request.Id);
+            throw new ImageNotFoundException(id);
     }
 }

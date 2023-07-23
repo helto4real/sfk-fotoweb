@@ -1,22 +1,17 @@
 ﻿using FotoApi.Features.HandleImages.Dto;
 using FotoApi.Infrastructure.Repositories;
+using FotoApi.Infrastructure.Security.Authorization;
 
 namespace FotoApi.Features.HandleImages.Queries;
 
-public class GetAllImagesForUserHandler : IQueryHandler<GetAllImagesForUserQuery, List<ImageResponse>>
+public class GetAllImagesForUserHandler(PhotoServiceDbContext db, CurrentUser currentUser) : IEmptyRequestHandler<List<ImageResponse>>
 {
-    private readonly PhotoServiceDbContext _db;
     private readonly ImagesMapper _mapper = new();
 
-    public GetAllImagesForUserHandler(PhotoServiceDbContext db)
+    public async Task<List<ImageResponse>> Handle(CancellationToken cancellationToken)
     {
-        _db = db;
-    }
-
-    public async Task<List<ImageResponse>> Handle(GetAllImagesForUserQuery request, CancellationToken cancellationToken)
-    {
-        return await _db.Images.Where(todo => todo.OwnerReference == request.Owner.Id)
+        return await db.Images.Where(todo => todo.OwnerReference == currentUser.Id)
             .Select(t => _mapper.ToImageResponse(t))
-            .AsNoTracking().ToListAsync();
+            .AsNoTracking().ToListAsync(cancellationToken: cancellationToken);
     }
 }

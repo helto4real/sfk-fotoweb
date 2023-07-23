@@ -1,21 +1,17 @@
-﻿using FotoApi.Features.HandleStBilder.Exceptions;
+﻿using FotoApi.Abstractions;
+using FotoApi.Features.HandleStBilder.Exceptions;
 using FotoApi.Infrastructure.Repositories;
+using FotoApi.Infrastructure.Security.Authorization;
 
 namespace FotoApi.Features.HandleStBilder.Commands;
 
-public class AcceptStBildHandler : ICommandHandler<AcceptStBildCommand>
-{
-    private readonly PhotoServiceDbContext _db;
+public record AcceptStBildRequest(Guid StBildId, bool StBildAcceptStatus);
 
-    public AcceptStBildHandler(
-        PhotoServiceDbContext db
-        )
+public class AcceptStBildHandler(PhotoServiceDbContext db) : IHandler<AcceptStBildRequest>
+{
+    public async Task Handle(AcceptStBildRequest request, CancellationToken cancellationToken)
     {
-        _db = db;
-    }
-    public async Task Handle(AcceptStBildCommand request, CancellationToken cancellationToken)
-    {
-        var stBild = await _db.StBilder.FindAsync(request.StBildId);
+        var stBild = await db.StBilder.FindAsync(request.StBildId);
         
         if (stBild == null)
             throw new StBildNotFoundException(request.StBildId);
@@ -23,8 +19,8 @@ public class AcceptStBildHandler : ICommandHandler<AcceptStBildCommand>
         if (stBild.IsAccepted != request.StBildAcceptStatus)
         {
             stBild.IsAccepted = request.StBildAcceptStatus;
-            _db.StBilder.Update(stBild);
-            await _db.SaveChangesAsync(cancellationToken);
+            db.StBilder.Update(stBild);
+            await db.SaveChangesAsync(cancellationToken);
         }
     }
 }

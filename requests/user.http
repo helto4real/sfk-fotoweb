@@ -1,7 +1,7 @@
 ### Create a user
 # @password = P@ssw0rd!
 
-# POST http://localhost:5000/users
+# POST https://localhost:8001/users
 # Content-Type: application/json
 
 # {
@@ -47,7 +47,7 @@ Content-Type: application/json
 
 ### Create a token
 # @name temptoken
-POST http://localhost:5000/api/admin/token/addtokenbytype
+POST https://localhost:8001/api/admin/token/addtokenbytype
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -60,7 +60,7 @@ Content-Type: application/json
 @url-token-id = {{temptoken.response.body.id}}
 
 ### Create token and user providing a url token
-POST http://localhost:5000/api/users/token/Google
+POST https://localhost:8001/api/users/token/Google
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -72,7 +72,7 @@ Content-Type: application/json
 
 ### Create user providing a url token
 # @name newuser
-POST http://localhost:5000/api/users
+POST https://localhost:8001/api/users
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -85,7 +85,7 @@ Content-Type: application/json
 }
 
 ### Update user
-PUT http://localhost:5000/api/admin/users
+PUT https://localhost:8001/api/admin/users
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -99,12 +99,12 @@ Content-Type: application/json
 }
 
 ### Get user by username
-GET http://localhost:5000/api/admin/user/admin
+GET https://localhost:8001/api/admin/user/admin
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 ### Get user by username
-DELETE http://localhost:5000/api/admin/user/bernt
+DELETE https://localhost:8001/api/admin/user/bernt
 Authorization: Bearer {{token}}
 Content-Type: application/json
 

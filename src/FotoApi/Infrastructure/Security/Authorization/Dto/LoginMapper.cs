@@ -1,4 +1,4 @@
-﻿using FotoApi.Features.HandleUsers.Commands;
+﻿using FotoApi.Features.HandleUsers.CommandHandlers;
 using FotoApi.Features.HandleUsers.Dto;
 using FotoApi.Infrastructure.Security.Authorization.Commands;
 using MediatR;
@@ -9,7 +9,7 @@ namespace FotoApi.Infrastructure.Security.Authorization.Dto;
 [Mapper]
 public partial class LoginMapper
 {
-    public partial CreateUserCommand ToCreateUserCommand(LoginAndCreateUserCommand request);
+    public partial NewUserRequest ToCreateUserCommand(LoginAndCreateUserCommand request);
 
     public UserAuthorizedResponse ToUserAuthorizedResponse(UserResponse userResponse, string token)
     {

@@ -1,4 +1,5 @@
-﻿using FotoApi.Api;
+﻿using FotoApi.Abstractions;
+using FotoApi.Api;
 using FotoApi.Infrastructure.Repositories;
 using FotoApi.Infrastructure.Security.Authorization;
 using FotoApi.Model;
@@ -6,36 +7,30 @@ using MediatR;
 using Microsoft.AspNetCore.SignalR;
 
 namespace FotoApi.Features.HandleStBilder.Commands;
-
-public class PackageStBilderHandler : ICommandHandler<PackageStBilderCommand, bool>
+public record PackageStBilderRequest(List<Guid> StBildIds) : ICurrentUser
 {
-    private readonly IHubContext<SignalRApi> _ctx;
-    private readonly IPhotoStore _photoStore;
-    private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger<PackageStBilderHandler> _logger;
-    private static SemaphoreSlim _semaphoreSlim = new(1, 1);
-    public PackageStBilderHandler(
-        IHubContext<SignalRApi> ctx, 
+    public CurrentUser CurrentUser { get; set; } = default!;
+}
+
+public class PackageStBilderHandler(
+        IHubContext<SignalRApi> ctx,
         IPhotoStore photoStore,
         IServiceProvider serviceProvider,
         ILogger<PackageStBilderHandler> logger)
-    {
-        _ctx = ctx;
-        _photoStore = photoStore;
-        _serviceProvider = serviceProvider;
-        _logger = logger;
-    }
-    public Task<bool> Handle(PackageStBilderCommand request, CancellationToken cancellationToken)
+    : IHandler<PackageStBilderRequest>
+{
+    private static SemaphoreSlim _semaphoreSlim = new(1, 1);
+
+    public Task Handle(PackageStBilderRequest request, CancellationToken cancellationToken)
     {
         if (_semaphoreSlim.CurrentCount == 0)
         {
             // We do not want to run this command more than once at a time
-            return Task.FromResult(false);
+            return Task.CompletedTask;
         }
-
-        var newScope = _serviceProvider.CreateScope();
-        _ = PackageStBilder(request.StBildIds, request.Owner, newScope);
-        return Task.FromResult(true);
+        var newScope = serviceProvider.CreateScope();
+        _ = PackageStBilder(request.StBildIds, request.CurrentUser, newScope);
+        return Task.CompletedTask;
     }
     
     public async Task PackageStBilder(List<Guid> stBildIds, CurrentUser owner, IServiceScope scope)
@@ -59,14 +54,14 @@ public class PackageStBilderHandler : ICommandHandler<PackageStBilderCommand, bo
             foreach (var stBild in imagesToPackage)
             {
                 double progress = Math.Round((double)75 / (nrOfImagesToPackage - nrOfImagesPackaged));
-                await _ctx.Clients.User(owner.User!.UserName!).SendAsync("package_progress", (int) progress);
+                await ctx.Clients.User(owner.User!.UserName!).SendAsync("package_progress", (int) progress);
                 var image = db.Images.SingleOrDefault(e => e.Id == stBild.ImageReference);
                 if (image == null)
                 {
                     // Just ignore errors for now. We should probably log this
                     continue;
                 }
-                await _photoStore.PackageStBild(image.LocalFilePath, packageId, stBild);
+                await photoStore.PackageStBild(image.LocalFilePath, packageId, stBild);
                 stBild.IsUsed = true;
                 nrOfImagesPackaged++;
             }
@@ -81,7 +76,7 @@ public class PackageStBilderHandler : ICommandHandler<PackageStBilderCommand, bo
                 }
             );
             
-            var zipFilePath = _photoStore.ZipPackage(packageId, stPackage.Entity.PackageNumber);
+            var zipFilePath = photoStore.ZipPackage(packageId, stPackage.Entity.PackageNumber);
             foreach (var stBild in imagesToPackage)
             {
                 await db.StPackageItem.AddAsync(
@@ -93,11 +88,11 @@ public class PackageStBilderHandler : ICommandHandler<PackageStBilderCommand, bo
             }
             stPackage.Entity.PackageRelativPath = zipFilePath;
             await db.SaveChangesAsync();
-            await _ctx.Clients.User(owner.User!.UserName!).SendAsync("package_progress", 100);
+            await ctx.Clients.User(owner.User!.UserName!).SendAsync("package_progress", 100);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error while packaging stBilder");
+            logger.LogError(e, "Error while packaging stBilder");
             throw;
         }
         finally
