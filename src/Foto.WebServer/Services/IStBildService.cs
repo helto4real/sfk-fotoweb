@@ -8,7 +8,7 @@ public interface IStBildService
     Task UpdateStBildAsync(StBildInfo stBild);
     Task<List<StBildInfo>> GetStBilder(bool showPackagedImages);
     Task<List<StBildInfo>> GetStBilderForCurrentUser(bool showPackagedImages);
-    Task <List<StBildInfo>> GetApprovedNotPackagedStBilderAsync();
+    Task<List<StBildInfo>> GetApprovedNotPackagedStBilderAsync();
     Task<bool> PackageStBilder(GuidIds guidIds);
     Task<ErrorDetail?> SetAcceptStatusForStBild(Guid stBildId, bool stBildIsAccepted);
 }

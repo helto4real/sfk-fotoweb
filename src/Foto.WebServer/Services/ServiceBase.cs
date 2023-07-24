@@ -3,8 +3,7 @@ using Microsoft.JSInterop;
 
 namespace Foto.WebServer.Services;
 
-public class ServiceBase()
+public class ServiceBase
 {
-    [Inject]
-    public JSRuntime? JsRuntime {get; set;}
+    [Inject] public JSRuntime? JsRuntime { get; set; }
 }
