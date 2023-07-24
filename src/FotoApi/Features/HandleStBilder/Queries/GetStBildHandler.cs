@@ -3,9 +3,9 @@ using FotoApi.Features.HandleImages.Exceptions;
 using FotoApi.Features.HandleStBilder.Dto;
 using FotoApi.Features.HandleStBilder.Exceptions;
 using FotoApi.Infrastructure.Repositories;
+using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 using FotoApi.Infrastructure.Security.Authorization;
 using FotoApi.Infrastructure.Validation.Exceptions;
-using StBildMapper = FotoApi.Features.HandleStBilder.Dto.StBildMapper;
 
 namespace FotoApi.Features.HandleStBilder.Queries;
 
@@ -16,7 +16,7 @@ public record GetStBildRequest(Guid Id) : ICurrentUser
 
 public class GetStBildHandler(PhotoServiceDbContext db) : IHandler<GetStBildRequest, StBildResponse>
 {
-    private readonly StBildMapper mapper = new();
+    private readonly StBildResponseMapper _responseMapper = new();
 
     public async Task<StBildResponse> Handle(GetStBildRequest request, CancellationToken cancellationToken)
     {
@@ -28,6 +28,6 @@ public class GetStBildHandler(PhotoServiceDbContext db) : IHandler<GetStBildRequ
         if (!request.CurrentUser.IsAdmin && stBild.OwnerReference != request.CurrentUser.Id)
             throw new ForbiddenException("User not authorized to get stbild information for this id");
         
-        return mapper.ToStBildResponse(stBild);
+        return _responseMapper.ToStBildResponse(stBild);
     }
 }

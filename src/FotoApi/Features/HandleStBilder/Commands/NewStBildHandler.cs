@@ -1,18 +1,17 @@
 ﻿using FotoApi.Features.HandleStBilder.Dto;
 using FotoApi.Features.Shared.Dto;
 using FotoApi.Infrastructure.Repositories;
-using StBildMapper = FotoApi.Features.HandleStBilder.Dto.StBildMapper;
+using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 
 namespace FotoApi.Features.HandleStBilder.Commands;
 
 public class NewStBildHandler(PhotoServiceDbContext db) : IHandler<NewStBildRequest, IdentityResponse>
 {
-    private readonly StBildMapper mapper = new();
+    private readonly StBildResponseMapper _responseMapper = new();
 
     public async Task<IdentityResponse> Handle(NewStBildRequest request, CancellationToken cancellationToken)
     {
-        var stBild = mapper.ToStBild(request);
-
+        var stBild = _responseMapper.ToStBild(request);
         await db.StBilder.AddAsync(
             stBild
         );

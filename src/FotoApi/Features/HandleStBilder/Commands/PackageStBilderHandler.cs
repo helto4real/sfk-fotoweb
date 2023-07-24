@@ -1,6 +1,7 @@
 ﻿using FotoApi.Abstractions;
 using FotoApi.Api;
 using FotoApi.Infrastructure.Repositories;
+using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 using FotoApi.Infrastructure.Security.Authorization;
 using FotoApi.Model;
 using MediatR;

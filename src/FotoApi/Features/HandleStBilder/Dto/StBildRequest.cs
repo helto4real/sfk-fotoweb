@@ -28,6 +28,7 @@ public class StBildRequestValidator : AbstractValidator<StBildRequest>
         RuleFor(x => x.AboutThePhotograper).MaximumLength(300).WithMessage("CameraBrand must be less than 50 characters");
         RuleFor(x => x.Time).NotEmpty().GreaterThanOrEqualTo(new DateTime(1900, 1, 1)).WithMessage("Time must be after 1900-01-01");
         RuleFor(x => x.Time).NotEmpty().LessThanOrEqualTo(DateTime.Now.AddDays(1)).WithMessage("Time cannot be in the future");
+        RuleFor(x => x.Time.Kind).Equal(DateTimeKind.Utc).WithMessage("Time must be in UTC");
     }
 }
 

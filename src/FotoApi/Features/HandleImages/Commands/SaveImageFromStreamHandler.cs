@@ -5,6 +5,7 @@ using FotoApi.Features.HandleStBilder.Commands;
 using FotoApi.Infrastructure.Repositories;
 using FotoApi.Infrastructure.Validation.Exceptions;
 using System.Net.Http.Json;
+using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 using MediatR;
 using Image = FotoApi.Model.Image;
 

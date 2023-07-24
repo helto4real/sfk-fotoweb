@@ -8,7 +8,6 @@ using FotoApi.Infrastructure.Security.Authorization;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using StBildMapper = FotoApi.Features.HandleStBilder.Dto.StBildMapper;
 
 namespace FotoApi.Api;
 

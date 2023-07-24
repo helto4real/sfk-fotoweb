@@ -1,6 +1,7 @@
 ﻿using FotoApi.Features.HandleStBilder.Dto;
 using FotoApi.Features.HandleStBilder.Exceptions;
 using FotoApi.Infrastructure.Repositories;
+using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 
 namespace FotoApi.Features.HandleStBilder.Commands;
 

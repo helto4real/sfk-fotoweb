@@ -95,6 +95,8 @@
     {
         _isSubmitting = true;
         StateHasChanged();
+        // The time needs to be in UTC format. 
+        _model.Time = _model.Time.ToUniversalTime();
         var (imageItem, error) = await ImageService.UploadImageWithMetadata(_model.ImageFile, _model.Title, _model, "st-bild");
         _isSubmitting = false;
         StateHasChanged();

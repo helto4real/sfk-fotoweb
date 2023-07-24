@@ -1,13 +1,15 @@
 ﻿using FotoApi.Features.HandleImages.Dto;
 using FotoApi.Features.HandleImages.Exceptions;
 using FotoApi.Infrastructure.Repositories;
+using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 using FotoApi.Infrastructure.Security.Authorization;
 using MediatR;
+using Wolverine;
 
 namespace FotoApi.Features.HandleImages.Commands;
 
 public class DeleteImageHandler(PhotoServiceDbContext db, IPhotoStore photoStore, CurrentUser currentUser,
-        IMediator mediator)
+        IMessageBus bus)
     : IHandler<Guid>
 {
     public async Task Handle(Guid id, CancellationToken cancellationToken)
@@ -24,7 +26,8 @@ public class DeleteImageHandler(PhotoServiceDbContext db, IPhotoStore photoStore
         {
             // Todo: Make this a background job
             photoStore.DeletePhoto(imageInfo.LocalFilePath);
-            await mediator.Publish(new ImageDeletedNotification(id), cancellationToken);
+            await bus.PublishAsync(new ImageDeletedNotification(id));
+            // await mediator.Publish(new ImageDeletedNotification(id), cancellationToken);
         }
         else
             throw new ImageNotFoundException(id);

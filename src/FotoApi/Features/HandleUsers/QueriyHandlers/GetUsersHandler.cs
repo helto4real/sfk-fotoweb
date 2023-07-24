@@ -11,7 +11,7 @@ public class GetUsersHandler(UserManager<User> userManager) : IEmptyRequestHandl
     public async Task<List<UserResponse>> Handle(CancellationToken cancellationToken)
     {
         var userResponseList = new List<UserResponse>();
-        foreach (var user in userManager.Users)
+        foreach (var user in userManager.Users.ToList())
         {
             var isAdmin = await userManager.IsInRoleAsync(user, "Admin");
             userResponseList.Add(_userMapper.ToUserResponse(user, isAdmin));

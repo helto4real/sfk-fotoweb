@@ -1,5 +1,6 @@
 ﻿using FotoApi.Features.HandleImages.Exceptions;
 using FotoApi.Infrastructure.Repositories;
+using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 using FotoApi.Infrastructure.Security.Authorization;
 using FotoApi.Infrastructure.Validation.Exceptions;
 

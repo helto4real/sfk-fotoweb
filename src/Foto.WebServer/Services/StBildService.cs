@@ -29,6 +29,10 @@ public class StBildService : IStBildService
         if (response.IsSuccessStatusCode)
         {
             var stBild = await response.Content.ReadFromJsonAsync<StBildInfo>();
+            if (stBild is not null)
+            {
+                stBild.Time = stBild.Time.ToLocalTime();
+            }
             return stBild;
         }
 
@@ -37,6 +41,7 @@ public class StBildService : IStBildService
 
     public async Task UpdateStBildAsync(StBildInfo stBild)
     {
+        stBild.Time = stBild.Time.ToUniversalTime();
         await _httpClient.PutAsJsonAsync($"/api/stbilder/{stBild.Id}", stBild);
     }
 
@@ -47,7 +52,14 @@ public class StBildService : IStBildService
         {
             var stBilder = await response.Content.ReadFromJsonAsync<List<StBildInfo>>();
             if (stBilder is not null)
+            {
+                foreach (var stBildInfo in stBilder)
+                {
+                    stBildInfo.Time = stBildInfo.Time.ToLocalTime();
+                }
+
                 return stBilder;
+            }
         }
 
         return new List<StBildInfo>();

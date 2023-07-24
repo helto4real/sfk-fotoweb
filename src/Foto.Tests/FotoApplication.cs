@@ -5,12 +5,12 @@ using System.Security.Cryptography;
 using FotoApi.Features.HandleUrlTokens;
 using FotoApi.Features.SendEmailNotifications;
 using FotoApi.Infrastructure.Repositories;
+using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 using FotoApi.Infrastructure.Security.Authentication;
 using FotoApi.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,7 +23,7 @@ namespace Foto.Tests;
 
 internal class FotoApplication : WebApplicationFactory<Program>
 {
-    private readonly SqliteConnection _sqliteConnection = new("Filename=:memory:");
+    // private readonly SqliteConnection _sqliteConnection = new("Filename=:memory:");
     public Mock<IMailSender> MailSenderMock => new();
     public Mock<IPhotoStore> PhotoStoreMock => new();
     public Mock<IMailQueue> MailQueue => new();
@@ -89,7 +89,7 @@ internal class FotoApplication : WebApplicationFactory<Program>
     protected override IHost CreateHost(IHostBuilder builder)
     {
         // Open the connection, this creates the SQLite in-memory database, which will persist until the connection is closed
-        _sqliteConnection.Open();
+        // _sqliteConnection.Open();
 
         builder.ConfigureServices(services =>
         {
@@ -98,10 +98,8 @@ internal class FotoApplication : WebApplicationFactory<Program>
             services.AddDbContextFactory<PhotoServiceDbContext>();
 
             // We need to replace the configuration for the DbContext to use a different configured database
-            services.AddDbContextOptions<PhotoServiceDbContext>(o => o.UseSqlite(_sqliteConnection)); 
-            // services.AddIdentityCore<User>(options => options.User.RequireUniqueEmail = true)
-            //     .AddRoles<Role>()
-            //     .AddEntityFrameworkStores<PhotoServiceDbContext>();
+            // services.AddDbContextOptions<PhotoServiceDbContext>(o => o.UseSqlite(_sqliteConnection)); 
+            
             // Lower the requirements for the tests
             services.Configure<IdentityOptions>(o =>
             {
@@ -149,7 +147,7 @@ internal class FotoApplication : WebApplicationFactory<Program>
 
     protected override void Dispose(bool disposing)
     {
-        _sqliteConnection?.Dispose();
+        // _sqliteConnection?.Dispose();
         base.Dispose(disposing);
     }
 

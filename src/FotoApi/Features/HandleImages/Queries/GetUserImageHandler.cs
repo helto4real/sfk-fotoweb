@@ -1,6 +1,7 @@
 ﻿using FotoApi.Features.HandleImages.Dto;
 using FotoApi.Features.HandleImages.Exceptions;
 using FotoApi.Infrastructure.Repositories;
+using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 using FotoApi.Infrastructure.Security.Authorization;
 
 namespace FotoApi.Features.HandleImages.Queries;

@@ -4,6 +4,7 @@ using FotoApi.Features.HandleUsers.Dto;
 using FotoApi.Features.HandleUsers.Exceptions;
 using FotoApi.Features.HandleUsers.Notifications;
 using FotoApi.Infrastructure.Repositories;
+using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 using FotoApi.Model;
 using MediatR;
 using Microsoft.AspNetCore.Identity;

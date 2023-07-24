@@ -2,6 +2,7 @@
 using FotoApi.Features.HandleUrlTokens.Exceptions;
 using FotoApi.Features.HandleUsers.Exceptions;
 using FotoApi.Infrastructure.Repositories;
+using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 using FotoApi.Infrastructure.Security.Authentication;
 using FotoApi.Infrastructure.Security.Authorization.Dto;
 using FotoApi.Model;

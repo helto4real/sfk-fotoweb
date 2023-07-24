@@ -1,10 +1,9 @@
 ﻿using FotoApi.Model;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
 using Image = FotoApi.Model.Image;
 
-namespace FotoApi.Infrastructure.Repositories;
+namespace FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 
 public class PhotoServiceDbContext: IdentityDbContext<User, Role, string>
 {
@@ -137,6 +136,28 @@ public class PhotoServiceDbContext: IdentityDbContext<User, Role, string>
         }
 
         return base.SaveChanges();
+    }
+
+    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = new CancellationToken())
+    {
+        var entries = ChangeTracker
+            .Entries()
+            .Where(e => e.Entity is TimeTrackedEntity && (
+                e.State == EntityState.Added
+                || e.State == EntityState.Modified));
+
+        var utcTimeNow = DateTime.UtcNow;
+        foreach (var entityEntry in entries)
+        {
+            ((TimeTrackedEntity)entityEntry.Entity).UpdatedDate = utcTimeNow;
+
+            if (entityEntry.State == EntityState.Added)
+            {
+                ((TimeTrackedEntity)entityEntry.Entity).CreatedDate = utcTimeNow;
+            }
+        }
+        
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
     }
 }
  
