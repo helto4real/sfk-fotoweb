@@ -24,7 +24,6 @@ spec:
           persistentVolumeClaim:
             claimName: nfs-fotowebb-db
       containers:
-        
         - name: fotowebb
           image: 'helto4real/fotowebb'
           env:
@@ -68,7 +67,17 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: fotowebb
-                  key: google-client-id            
+                  key: google-client-id
+            - name: ConnectionStrings__FotoApi
+              valueFrom:
+                secretKeyRef:
+                  name: fotowebb
+                  key: db-cs-fotoapi            
+            - name: ConnectionStrings__Messaging
+              valueFrom:
+                secretKeyRef:
+                  name: fotowebb
+                  key: db-cs-messaging            
             - name: EmailSettings__SmtpServer
               valueFrom:
                 secretKeyRef:

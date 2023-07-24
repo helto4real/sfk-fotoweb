@@ -132,6 +132,7 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseSerilogRequestLogging();
 
 await app.Services.GetRequiredService<MessagingDbContext>().Database.EnsureCreatedAsync();
+await app.Services.GetRequiredService<PhotoServiceDbContext>().Database.EnsureCreatedAsync();
 
 if (app.Environment.IsDevelopment())
 {
