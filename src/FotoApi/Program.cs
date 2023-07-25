@@ -44,7 +44,7 @@ var app = builder.Build();
 
 // This is needed for the integration test to work. It will not be a problem in production
 await app.Services.GetRequiredService<MessagingDbContext>().Database.EnsureCreatedAsync();
-// await app.Services.GetRequiredService<PhotoServiceDbContext>().Database.EnsureCreatedAsync();
+await app.Services.GetRequiredService<PhotoServiceDbContext>().Database.EnsureCreatedAsync();
 
 app.AddFotoApi();
 

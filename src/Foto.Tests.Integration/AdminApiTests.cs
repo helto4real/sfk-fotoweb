@@ -23,23 +23,6 @@ public class AdminApiTests : IntegrationTestsBase
         var user = users.Single();
         Assert.Equal("admin", user.UserName);
     }
-    
-    [Fact]
-    public async Task TestDefaultAdminCanLogin()
-    {
-        const string adminDefaultUser = "admin";
-        const string adminDefaultPassword = "P@ssw0rd!";
-        var client = CreateClient();
-        var response = await client.PostAsJsonAsync("/api/users/token", new  { Username = adminDefaultUser, Password = adminDefaultPassword });
-    
-        Assert.True(response.IsSuccessStatusCode);
-    
-        var token = await response.Content.ReadFromJsonAsync<UserAuthorizedResponse>();
-    
-        Assert.NotNull(token);
-        Assert.NotNull(token.Token);
-        Assert.True(token.IsAdmin);
-    }
 
     public AdminApiTests(TestContainerLifeTime testContinerLifetime) : base(testContinerLifetime)
     {

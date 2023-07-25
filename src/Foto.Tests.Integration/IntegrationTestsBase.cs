@@ -34,10 +34,6 @@ public class IntegrationTestsBase : IAsyncDisposable
 
         _fotoApplication = new(testContinerLifetime.Host, testContinerLifetime.Port, testContinerLifetime.UserName,
             testContinerLifetime.Password);
-        var db = _fotoApplication.Services.GetRequiredService<IDbContextFactory<PhotoServiceDbContext>>().CreateDbContext();
-        db.Database.Migrate();
-
-
     }
     public ValueTask DisposeAsync()
     {
