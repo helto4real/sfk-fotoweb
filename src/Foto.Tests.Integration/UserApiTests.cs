@@ -1,4 +1,4 @@
-﻿using Foto.Tests.TestContainer;
+﻿using Foto.Tests.Integration.TestContainer;
 using FotoApi;
 using FotoApi.Features.HandleUrlTokens;
 using FotoApi.Features.HandleUsers.Dto;
@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
-namespace Foto.Tests;
+namespace Foto.Tests.Integration;
 
 [Collection("Integration tests collection")]
 public class UserApiTests : IntegrationTestsBase
@@ -19,7 +19,7 @@ public class UserApiTests : IntegrationTestsBase
     [Fact]
     public async Task CanCreateAUser()
     {
-        await using var db = CreateTodoDbContext();
+        await using var db = CreateFotoAppDbContext();
         var urlToken = AddCreateUserToken(db);
         await PreRegisterUserAsync("fotoapiuser@somedomain.com");
         var client = CreateClient();
@@ -42,7 +42,7 @@ public class UserApiTests : IntegrationTestsBase
     {
         const string user = "appuser";
         const string password = "P@assw0rd1";
-        await using var db = CreateTodoDbContext();
+        await using var db = CreateFotoAppDbContext();
         await CreateUserAsync(user, password, "someuser@domain.com");
     
         var client = CreateClient();

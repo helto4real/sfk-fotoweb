@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace Foto.Tests;
+namespace Foto.Tests.Integration;
 //
 // public class TodoApiTests
 // {

@@ -2,7 +2,7 @@
 using DotNet.Testcontainers.Containers;
 using Microsoft.Extensions.Logging;
 
-namespace Foto.Tests.TestContainer;
+namespace Foto.Tests.Integration.TestContainer;
 
 public class TestContainer : DockerContainer
 {

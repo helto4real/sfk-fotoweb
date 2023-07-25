@@ -1,6 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Security.Cryptography;
-using Foto.Tests.TestContainer;
+using Foto.Tests.Integration.TestContainer;
 using FotoApi.Features.HandleUrlTokens;
 using FotoApi.Features.SendEmailNotifications;
 using FotoApi.Infrastructure.Repositories;
@@ -19,13 +19,11 @@ using Moq;
 using Npgsql;
 using Spectre.Console.Rendering;
 
-namespace Foto.Tests;
+namespace Foto.Tests.Integration;
 [Collection("Integration tests collection")]
 public class IntegrationTestsBase : IAsyncDisposable
 {
     private readonly TestContainerLifeTime _testContinerLifetime;
-    private readonly NpgsqlConnection _photoAppConnection;
-    private readonly NpgsqlConnection _messagingConnection;
     private FotoApplication _fotoApplication;
     public IntegrationTestsBase(TestContainerLifeTime testContinerLifetime)
     {
@@ -34,14 +32,16 @@ public class IntegrationTestsBase : IAsyncDisposable
         _fotoApplication = new(testContinerLifetime.Host, testContinerLifetime.Port, testContinerLifetime.UserName,
             testContinerLifetime.Password);
     }
-    public async ValueTask DisposeAsync()
+    public ValueTask DisposeAsync()
     {
         _fotoApplication.Dispose();
+        return ValueTask.CompletedTask;
     }
     
-    public PhotoServiceDbContext CreateTodoDbContext()
+    public PhotoServiceDbContext CreateFotoAppDbContext()
     {
         var db = _fotoApplication.Services.GetRequiredService<IDbContextFactory<PhotoServiceDbContext>>().CreateDbContext();
+        db.Database.Migrate();
         return db;
     }
     

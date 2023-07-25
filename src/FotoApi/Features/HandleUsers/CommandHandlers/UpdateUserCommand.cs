@@ -1,6 +1,6 @@
 ﻿namespace FotoApi.Features.HandleUsers.CommandHandlers;
 
-public class UpdateUserCommand : ICommand
+public class UpdateUserCommand
 {
     public string UserName { get; init; } = default!;
     public string FirstName { get; init; } = default!;

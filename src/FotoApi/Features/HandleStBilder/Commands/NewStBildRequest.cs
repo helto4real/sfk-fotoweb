@@ -4,7 +4,7 @@ using FotoApi.Infrastructure.Security.Authorization;
 
 namespace FotoApi.Features.HandleStBilder.Commands;
 
-public record NewStBildRequest : ICommand<IdentityResponse>
+public record NewStBildRequest
 {
     public Guid ImageReference { get; set; }
     public string OwnerReference { get; set; } = default!;

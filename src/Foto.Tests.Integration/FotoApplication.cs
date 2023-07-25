@@ -21,7 +21,7 @@ using Microsoft.Extensions.Hosting;
 using Moq;
 using Npgsql;
 
-namespace Foto.Tests;
+namespace Foto.Tests.Integration;
 
 internal class FotoApplication : WebApplicationFactory<Program>
 {
@@ -53,31 +53,8 @@ internal class FotoApplication : WebApplicationFactory<Program>
         return urlToken.Token;
     }
 
-    // protected override void ConfigureWebHost(IWebHostBuilder builder)
-    // {
-    //     var keyBytes = new byte[32];
-    //     RandomNumberGenerator.Fill(keyBytes);
-    //     var base64Key = Convert.ToBase64String(keyBytes);
-    //     
-    //     builder.ConfigureAppConfiguration(config =>
-    //     {
-    //         config.AddInMemoryCollection(new Dictionary<string, string?>
-    //         {
-    //             ["Authentication:Schemes:Bearer:SigningKeys:0:Issuer"] = "dotnet-user-jwts",
-    //             ["Authentication:Schemes:Bearer:SigningKeys:0:Value"] = base64Key,
-    //             ["ConnectionStrings:FotoApi"] = _photoAppConnectionString,
-    //             ["ConnectionStrings:Messaging"] = _messagingConnectionString
-    //         });
-    //     });
-    //     base.ConfigureWebHost(builder);
-    // }
-
     protected override IHost CreateHost(IHostBuilder builder)
     {
-        // Open the connection, this creates the SQLite in-memory database, which will persist until the connection is closed
-        // _photoAppConnection.Open();
-        // _messagingConnection.Open();
-
         builder.ConfigureServices(services =>
         {
             // We're going to use the factory from our tests
@@ -87,8 +64,6 @@ internal class FotoApplication : WebApplicationFactory<Program>
             // We need to replace the configuration for the DbContext to use a different configured database
             services.AddDbContextOptions<PhotoServiceDbContext>(o => o.UseNpgsql(_photoAppConnectionString)); 
             services.AddDbContextOptions<MessagingDbContext>(o => o.UseNpgsql(_messagingConnectionString)); 
-            // services.AddDbContextOptions<PhotoServiceDbContext>(o => o.UseNpgsql(_photoAppConnection)); 
-            // services.AddDbContextOptions<MessagingDbContext>(o => o.UseNpgsql(_messagingConnection)); 
             
             // Lower the requirements for the tests
             services.Configure<IdentityOptions>(o =>

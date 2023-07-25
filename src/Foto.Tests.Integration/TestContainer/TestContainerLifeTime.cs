@@ -1,4 +1,4 @@
-﻿namespace Foto.Tests.TestContainer;
+﻿namespace Foto.Tests.Integration.TestContainer;
 
 public class TestContainerLifeTime : IAsyncLifetime
 {

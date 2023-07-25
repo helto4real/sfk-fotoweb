@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FotoApi", "FotoApi\FotoApi.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Foto.WebServer", "Foto.WebServer\Foto.WebServer.csproj", "{ABC19D87-266A-4607-821B-49CE7E36D49E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Foto.Tests", "Foto.Tests\Foto.Tests.csproj", "{05BF63C3-8787-40FD-8F36-DA89637FE4D4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Foto.Tests.Integration", "Foto.Tests.Integration\Foto.Tests.Integration.csproj", "{05BF63C3-8787-40FD-8F36-DA89637FE4D4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

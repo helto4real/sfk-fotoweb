@@ -5,7 +5,7 @@ using FotoApi.Infrastructure.Security.Authorization;
 
 namespace FotoApi.Features.HandleImages.Commands;
 
-public class UpdateImageHandler(PhotoServiceDbContext db, IPhotoStore photoStore, CurrentUser currentUser)
+public class UpdateImageHandler(PhotoServiceDbContext db, CurrentUser currentUser)
     : IHandler<UpdateImageRequest>
 {
     public async Task Handle(UpdateImageRequest request, CancellationToken cancellationToken)

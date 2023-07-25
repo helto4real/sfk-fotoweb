@@ -4,7 +4,7 @@ using FotoApi.Infrastructure.Security.Authorization.Dto;
 
 namespace FotoApi.Infrastructure.Security.Authorization.Commands;
 
-public record LoginUserRequest(string UserName, string Password) : ICommand<UserAuthorizedResponse>;
+public record LoginUserRequest(string UserName, string Password);
 
 public class LoginUserCommandValidator : AbstractValidator<LoginUserRequest>
 {

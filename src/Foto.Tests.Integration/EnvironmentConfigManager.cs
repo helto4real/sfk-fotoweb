@@ -1,10 +1,7 @@
-﻿namespace Foto.Tests;
+﻿namespace Foto.Tests.Integration;
 
 public class EnvironmentConfigManager : IDisposable
 {
-    private readonly string _fotoAppConnectionString;
-    private readonly string _messagesConnectionString;
-
     public EnvironmentConfigManager(string fotoAppConnectionString, string messagesConnectionString)
     {
         Environment.SetEnvironmentVariable("ConnectionStrings__FotoApi", fotoAppConnectionString);

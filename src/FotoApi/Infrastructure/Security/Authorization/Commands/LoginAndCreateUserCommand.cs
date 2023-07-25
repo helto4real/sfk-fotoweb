@@ -2,7 +2,7 @@
 
 namespace FotoApi.Infrastructure.Security.Authorization.Commands;
 
-public record LoginAndCreateUserCommand : ICommand<UserAuthorizedResponse>
+public record LoginAndCreateUserCommand
 {
     public string UserName { get; init; } = default!;
 

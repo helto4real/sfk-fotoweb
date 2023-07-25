@@ -2,6 +2,6 @@
 
 namespace FotoApi.Features.HandleUsers.QueriyHandlers;
 
-public record GetUserFromUsernameQuery(string Username) : IQuery<UserResponse?>
+public record GetUserFromUsernameQuery(string Username)
 {
 }

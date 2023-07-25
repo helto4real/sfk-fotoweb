@@ -2,7 +2,7 @@
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Configurations;
 
-namespace Foto.Tests.TestContainer;
+namespace Foto.Tests.Integration.TestContainer;
 
 public class TestContainerConfiguration : ContainerConfiguration
 {

@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Foto.Tests;
+namespace Foto.Tests.Integration;
 
 internal static class DbContextExtensions
 {

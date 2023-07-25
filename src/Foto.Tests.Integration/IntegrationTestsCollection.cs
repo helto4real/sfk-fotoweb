@@ -1,6 +1,6 @@
-﻿using Foto.Tests.TestContainer;
+﻿using Foto.Tests.Integration.TestContainer;
 
-namespace Foto.Tests;
+namespace Foto.Tests.Integration;
 
 [CollectionDefinition("Integration tests collection")]
 public class IntegrationTestsCollection :  ICollectionFixture<TestContainerLifeTime>

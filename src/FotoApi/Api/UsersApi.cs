@@ -7,10 +7,8 @@ using FotoApi.Infrastructure.Pipelines;
 using FotoApi.Infrastructure.Security.Authentication.Model;
 using FotoApi.Infrastructure.Security.Authorization.Commands;
 using FotoApi.Infrastructure.Security.Authorization.Dto;
-using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using LoginUserRequest = FotoApi.Infrastructure.Security.Authorization.Commands.LoginUserRequest;
-using UserMapper = FotoApi.Features.HandleUsers.Dto.UserMapper;
 
 namespace FotoApi.Api;
 
