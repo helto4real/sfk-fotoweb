@@ -25,11 +25,10 @@ public class UserApiTests : IntegrationTestsBase
         var client = CreateClient();
         var response = await client.PostAsJsonAsync("/api/users", new NewUserRequest
         {
-            UserName = "fotoapiuser@somedomain.com", Password = "P@ssw0rd", FirstName = "Test", LastName = "Test", Email = "fotoapiuser@somedomain.com", UrlToken = urlToken
+            UserName = "fotoapiuser@somedomain.com", Password = "P@ssw0rd!", FirstName = "Test", LastName = "Test", Email = "fotoapiuser@somedomain.com", UrlToken = urlToken
         });
-
+        
         Assert.True(response.IsSuccessStatusCode);
-
 
         var user = db.Users.Single(n => n.UserName == "fotoapiuser@somedomain.com");
         Assert.NotNull(user);

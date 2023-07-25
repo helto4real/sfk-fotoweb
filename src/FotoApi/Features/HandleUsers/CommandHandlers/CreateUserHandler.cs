@@ -8,14 +8,15 @@ using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 using FotoApi.Model;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Wolverine;
 
 namespace FotoApi.Features.HandleUsers.CommandHandlers;
 
 public class CreateUserHandler(
         UserManager<User> userManager,
         PhotoServiceDbContext db,
-        ILogger<CreateUserHandler> logger,
-        IMediator mediator)
+        IMessageBus bus,
+        ILogger<CreateUserHandler> logger)
     : IHandler<NewUserRequest, UserResponse>
 {
     private readonly UserMapper _userMapper = new();
@@ -49,7 +50,7 @@ public class CreateUserHandler(
         var urlToken = db.UrlTokens.Add(newToken);
         await db.SaveChangesAsync(cancellationToken);
 
-        await mediator.Publish(new UserCreatedNotification(user.Email!, urlToken.Entity.Token), cancellationToken);
+        await bus.PublishAsync(new UserCreatedNotification(user.Email!, urlToken.Entity.Token));
         logger.LogInformation("Registrerat användare med användarnam {UserName}", request.UserName);
         return _userMapper.ToUserResponse(user, false);
     }

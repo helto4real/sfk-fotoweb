@@ -42,8 +42,8 @@ builder.UseFotoApi(connectionString, messagingConnectionString);
 
 var app = builder.Build();
 
-
-// await app.Services.GetRequiredService<MessagingDbContext>().Database.EnsureCreatedAsync();
+// This is needed for the integration test to work. It will not be a problem in production
+await app.Services.GetRequiredService<MessagingDbContext>().Database.EnsureCreatedAsync();
 // await app.Services.GetRequiredService<PhotoServiceDbContext>().Database.EnsureCreatedAsync();
 
 app.AddFotoApi();

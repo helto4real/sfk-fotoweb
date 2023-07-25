@@ -25,12 +25,19 @@ public class IntegrationTestsBase : IAsyncDisposable
 {
     private readonly TestContainerLifeTime _testContinerLifetime;
     private FotoApplication _fotoApplication;
+
+    internal FotoApplication App => _fotoApplication;
+    
     public IntegrationTestsBase(TestContainerLifeTime testContinerLifetime)
     {
         _testContinerLifetime = testContinerLifetime;
 
         _fotoApplication = new(testContinerLifetime.Host, testContinerLifetime.Port, testContinerLifetime.UserName,
             testContinerLifetime.Password);
+        var db = _fotoApplication.Services.GetRequiredService<IDbContextFactory<PhotoServiceDbContext>>().CreateDbContext();
+        db.Database.Migrate();
+
+
     }
     public ValueTask DisposeAsync()
     {
@@ -41,7 +48,6 @@ public class IntegrationTestsBase : IAsyncDisposable
     public PhotoServiceDbContext CreateFotoAppDbContext()
     {
         var db = _fotoApplication.Services.GetRequiredService<IDbContextFactory<PhotoServiceDbContext>>().CreateDbContext();
-        db.Database.Migrate();
         return db;
     }
     

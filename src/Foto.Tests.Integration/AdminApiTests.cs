@@ -29,7 +29,6 @@ public class AdminApiTests : IntegrationTestsBase
     {
         const string adminDefaultUser = "admin";
         const string adminDefaultPassword = "P@ssw0rd!";
-        await using var db = CreateFotoAppDbContext();
         var client = CreateClient();
         var response = await client.PostAsJsonAsync("/api/users/token", new  { Username = adminDefaultUser, Password = adminDefaultPassword });
     
