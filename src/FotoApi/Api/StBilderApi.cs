@@ -3,11 +3,11 @@ using FotoApi.Features.HandleStBilder.Dto;
 using FotoApi.Features.HandleStBilder.Queries;
 using FotoApi.Infrastructure.Api;
 using FotoApi.Infrastructure.ExceptionsHandling;
+using FotoApi.Infrastructure.Pipelines;
 using FotoApi.Infrastructure.Security.Authorization;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using StBildMapper = FotoApi.Features.HandleStBilder.Dto.StBildMapper;
 
 namespace FotoApi.Api;
 
@@ -26,76 +26,75 @@ public static class StBilderApi
         // Rate limit all of the APIs
         group.RequirePerUserRateLimit();
 
-        var mapper = new StBildMapper();
-        
-        // group.MapPost("/",
-        //     async Task<Results<Ok<IdentityResponse>, ValidationProblem>> 
-        //     (StBildRequest request, CurrentUser owner, IMediator mediator) =>
-        //     {
-        //         var command = mapper.ToNewStBildCommand(request, owner);
-        //         var result = await mediator.Send(command);
-        //         return TypedResults.Ok(result);
-        //     });
-        
         group.MapDelete("/{id:guid}", async Task<Results<Ok, NotFound<ErrorDetail>>> 
-            (Guid id, CurrentUser owner, IMediator mediator) =>
+            (Guid id, DeleteStBildHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
-            await mediator.Send(new DeleteStBildCommand(id, owner));
+            await pipe.Pipe(new DeleteStBildRequest(id), handler.Handle, ct);
             return TypedResults.Ok();
         });        
 
         group.MapPut("/{id:guid}", async Task<Results<Ok, NotFound<ErrorDetail>>> 
-            (Guid id, StBildRequest request, CurrentUser owner, IMediator mediator) =>
+            (StBildRequest request, UpdateStBildHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
-            var updateStBildCommand = mapper.ToStBildCommand(request, id);
-            await mediator.Send(updateStBildCommand);
+            await pipe.Pipe(request, handler.Handle, ct);
             return TypedResults.Ok();
         });         
+        
         group.MapGet("/{id:guid}", async Task<Results<Ok<StBildResponse>, NotFound<ErrorDetail>>> 
-            (Guid id, CurrentUser owner, IMediator mediator) =>
+            (Guid id,  GetStBildHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
-            var result = await mediator.Send(new GetStBildQuery(id, owner));
+            var result =await pipe.Pipe(new GetStBildRequest(id), handler.Handle, ct);
             return TypedResults.Ok(result);
         });        
         
         group.MapGet("/{showPackagedImages:bool}", async Task<Results<Ok<List<StBildResponse>>, NotFound<ErrorDetail>>> 
-            (bool showPackagedImages, CurrentUser owner, IMediator mediator) =>
+            (bool showPackagedImages, GetAllStBilderForCurrentUserHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
-            var result = await mediator.Send(new GetAllStBilderForCurrentUserQuery(showPackagedImages, owner));
+            var result =await pipe.Pipe(new GetAllStBilderForCurrentUserRequest(showPackagedImages), handler.Handle, ct);
             return TypedResults.Ok(result);
         });
 
         group.MapGet("/all/{showPackagedImages}", async Task<Results<Ok<List<StBildResponse>>, NotFound<ErrorDetail>>> 
-            (bool showPackagedImages, IMediator mediator) =>
+            (bool showPackagedImages, GetAllStBilderHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
-            var result = await mediator.Send(new GetAllStBilderQuery(showPackagedImages));
-            return TypedResults.Ok(result);
+            var response = await pipe.Pipe(showPackagedImages, handler.Handle, ct);
+            return TypedResults.Ok(response);
         });
         
         group.MapPost("/{stBildId}/acceptstatus/{stBildIsAccepted}", async Task<Results<
-            Ok, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> ([FromRoute] Guid stBildId, [FromRoute] bool stBildIsAccepted, IMediator mediator, CurrentUser owner) =>
+            Ok, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
+            ([FromRoute] Guid stBildId, [FromRoute] bool stBildIsAccepted, 
+                AcceptStBildHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
-            await mediator.Send(new AcceptStBildCommand(StBildId: stBildId, StBildAcceptStatus: stBildIsAccepted));
+            await pipe.Pipe(new AcceptStBildRequest(StBildId: stBildId, StBildAcceptStatus: stBildIsAccepted), handler.Handle, ct);
             return TypedResults.Ok();
         });
         
         group.MapGet("/packageble", async Task<Results<Ok<List<StBildResponse>>, NotFound<ErrorDetail>>> 
-            (CurrentUser owner, IMediator mediator) =>
+            (GetAllPackageStBilderQueryHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
-            var result = await mediator.Send(new GetAllPackageStBilderQuery(owner));
+            var result = await pipe.Pipe(handler.Handle, ct);
             return TypedResults.Ok(result);
         });
         
         group.MapPost("/package", async Task<Results<
-            Ok<bool>, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> (PackageStBildResquest request, IMediator mediator, CurrentUser owner) =>
+            Ok, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
+            (PackageStBildResquest request, PackageStBilderHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
-            var result = await mediator.Send(new PackageStBilderCommand(request.Ids, owner));
-            return TypedResults.Ok(result);
+            await pipe.Pipe(new PackageStBilderRequest(request.Ids), handler.Handle, ct);
+            return TypedResults.Ok();
         });
+        
         group.MapPost("{stBildId:guid}/acceptstatus/{stBildAcceptStatus:bool}", async Task<Results<
-            Ok, NotFound<ErrorDetail>>> (Guid stBildId, bool stBildAcceptStatus, PackageStBildResquest request, IMediator mediator, CurrentUser owner) =>
+            Ok, NotFound<ErrorDetail>>> 
+            (
+                Guid stBildId, 
+                bool stBildAcceptStatus, 
+                AcceptStBildHandler handler, 
+                FotoAppPipeline pipe, 
+                CancellationToken ct) =>
         {
-            await mediator.Send(new AcceptStBildCommand(stBildId, stBildAcceptStatus));
+            await pipe.Pipe(new AcceptStBildRequest(stBildId, stBildAcceptStatus), handler.Handle, ct);
             return TypedResults.Ok();
         });
         

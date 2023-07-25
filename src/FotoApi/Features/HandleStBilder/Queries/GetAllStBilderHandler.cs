@@ -1,25 +1,21 @@
 ﻿using FotoApi.Features.HandleStBilder.Dto;
 using FotoApi.Infrastructure.Repositories;
-using StBildMapper = FotoApi.Features.HandleStBilder.Dto.StBildMapper;
+using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 
 namespace FotoApi.Features.HandleStBilder.Queries;
 
-public class GetAllStBilderHandler : IQueryHandler<GetAllStBilderQuery, List<StBildResponse>>
+public class GetAllStBilderHandler(PhotoServiceDbContext db) : IHandler<bool, List<StBildResponse>>
 {
-    private readonly PhotoServiceDbContext _db;
-    private readonly StBildMapper _mapper = new();
-    public GetAllStBilderHandler(PhotoServiceDbContext db)
+    private readonly StBildResponseMapper _responseMapper = new();
+
+    public async Task<List<StBildResponse>> Handle(bool showPackagedImages, CancellationToken cancellationToken)
     {
-        _db = db;
-    }
-    public async Task<List<StBildResponse>> Handle(GetAllStBilderQuery request, CancellationToken cancellationToken)
-    {
-        return request.ShowPackagedImages ? 
-            await _db.StBilder
-                .Select(e => _mapper.ToStBildResponse(e))
+        return showPackagedImages ? 
+            await db.StBilder
+                .Select(e => _responseMapper.ToStBildResponse(e))
                 .ToListAsync(cancellationToken: cancellationToken) :
-            await _db.StBilder
-                .Where(e=> e.IsUsed == false).Select(e => _mapper.ToStBildResponse(e))
+            await db.StBilder
+                .Where(e=> e.IsUsed == false).Select(e => _responseMapper.ToStBildResponse(e))
                 .ToListAsync(cancellationToken: cancellationToken);
     }
 }

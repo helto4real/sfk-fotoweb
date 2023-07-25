@@ -1,4 +1,5 @@
 ﻿using FotoApi.Infrastructure.Repositories;
+using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 
 namespace FotoApi.Features.HandleUrlTokens;
 

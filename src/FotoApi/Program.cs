@@ -6,14 +6,16 @@ using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using FotoApi;
 using FotoApi.Api;
+using FotoApi.Features.HandleStBilder.Commands;
 using FotoApi.Features.HandleUrlTokens;
 using FotoApi.Features.SendEmailNotifications;
 using FotoApi.Infrastructure.Api;
 using FotoApi.Infrastructure.ExceptionsHandling;
 using FotoApi.Infrastructure.Logging;
 using FotoApi.Infrastructure.Repositories;
+using FotoApi.Infrastructure.Repositories.MessagingDbContext;
+using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 using FotoApi.Infrastructure.Security.Authentication;
-using FotoApi.Infrastructure.Security.Authentication.Model;
 using FotoApi.Infrastructure.Security.Authorization;
 using FotoApi.Infrastructure.Settings;
 using FotoApi.Infrastructure.Telemetry;
@@ -22,6 +24,10 @@ using FotoApi.Model;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.SignalR;
+using Oakton.Resources;
+using Wolverine;
+using Wolverine.EntityFrameworkCore;
+using Wolverine.Postgresql;
 
 [assembly: InternalsVisibleTo("Foto.Tests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
@@ -38,11 +44,24 @@ builder.Services.AddSignalR(o =>
 {
     o.AddFilter<AuthHubFilter>();
 });
+// The default username and password for the database is postgres/postgres for local dev only
+var connectionString = builder.Configuration.GetConnectionString("FotoApi") ?? "Host=127.0.0.1;Database=PhotoApp;Username=postgres;Password=postgres";
+var messagingConnectionString = builder.Configuration.GetConnectionString("Messaging") ?? "Host=127.0.0.1;Database=Messaging;Username=postgres;Password=postgres";
 
-var connectionString = builder.Configuration.GetConnectionString("FotoApi") ?? "Data Source=.db/PhotoService.db";
-builder.Services.AddSqlite<PhotoServiceDbContext>(connectionString);
+// Add the Wolverine library 
+builder.Host.UseWolverine(opts =>
+{
+    opts.PersistMessagesWithPostgresql(messagingConnectionString);
+    opts.UseEntityFrameworkCoreTransactions();
+    opts.Policies.UseDurableLocalQueues();
+    opts.Policies.AutoApplyTransactions();
+});
+builder.Host.UseResourceSetupOnStartup();
+builder.Services.AddNpgsql<PhotoServiceDbContext>(connectionString);
+builder.Services.AddNpgsql<MessagingDbContext>(messagingConnectionString);
 
 builder.Services.AddDbContext<PhotoServiceDbContext>();
+builder.Services.AddDbContext<MessagingDbContext>();
 
 builder.AddPhotoApiConfiguration();
 
@@ -93,9 +112,11 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.Get
     // .AddBehavior(typeof(IPipelineBehavior<, >),typeof(ValidationBehaviour<,>)));
     .AddOpenBehavior(typeof(ValidationBehavior<,>)));
 
+builder.Services.AddFotoAppHandlers();
+builder.Services.AddFotoAppPipelines();
+
 // add validators
-// builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-builder.Services.AddValidatorsFromAssemblyContaining<LoginUserRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<NewStBildRequestValidator>();
 // add implementation of ExceptionHandling middleware
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 
@@ -106,6 +127,9 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Add Serilog requests logging
 app.UseSerilogRequestLogging();
+
+await app.Services.GetRequiredService<MessagingDbContext>().Database.EnsureCreatedAsync();
+await app.Services.GetRequiredService<PhotoServiceDbContext>().Database.EnsureCreatedAsync();
 
 if (app.Environment.IsDevelopment())
 {

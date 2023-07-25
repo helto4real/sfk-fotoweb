@@ -1,30 +1,21 @@
 ﻿using FotoApi.Features.HandleImages.Exceptions;
 using FotoApi.Infrastructure.Repositories;
+using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 using FotoApi.Infrastructure.Security.Authorization;
 
 namespace FotoApi.Features.HandleImages.Commands;
 
-public class UpdateImageHandler : ICommandHandler<UpdateImageCommand>
+public class UpdateImageHandler(PhotoServiceDbContext db, IPhotoStore photoStore, CurrentUser currentUser)
+    : IHandler<UpdateImageRequest>
 {
-    private readonly PhotoServiceDbContext _db;
-    private readonly CurrentUser _owner;
-    private readonly IPhotoStore _photoStore;
-
-    public UpdateImageHandler(PhotoServiceDbContext db, IPhotoStore photoStore, CurrentUser owner)
+    public async Task Handle(UpdateImageRequest request, CancellationToken cancellationToken)
     {
-        _db = db;
-        _photoStore = photoStore;
-        _owner = owner;
-    }
-
-    public async Task Handle(UpdateImageCommand command, CancellationToken cancellationToken)
-    {
-        var rowsAffected = await _db.Images
-            .Where(t => t.Id == command.Id && (t.OwnerReference == command.Owner.Id || command.Owner.IsAdmin))
+        var rowsAffected = await db.Images
+            .Where(t => t.Id == request.Id && (t.OwnerReference == currentUser.Id || currentUser.IsAdmin))
             .ExecuteUpdateAsync(updates =>
-                updates.SetProperty(t => t.Title, command.Title));
+                updates.SetProperty(t => t.Title, request.Title));
 
         if (rowsAffected == 0)
-            throw new ImageNotFoundException(command.Id);
+            throw new ImageNotFoundException(request.Id);
     }
 }

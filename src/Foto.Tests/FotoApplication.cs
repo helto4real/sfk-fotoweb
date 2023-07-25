@@ -5,78 +5,45 @@ using System.Security.Cryptography;
 using FotoApi.Features.HandleUrlTokens;
 using FotoApi.Features.SendEmailNotifications;
 using FotoApi.Infrastructure.Repositories;
+using FotoApi.Infrastructure.Repositories.MessagingDbContext;
+using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 using FotoApi.Infrastructure.Security.Authentication;
 using FotoApi.Model;
+using Microsoft.Data.Sqlite;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Moq;
-
-
+using Npgsql;
 
 namespace Foto.Tests;
 
 internal class FotoApplication : WebApplicationFactory<Program>
 {
-    private readonly SqliteConnection _sqliteConnection = new("Filename=:memory:");
+    // private readonly NpgsqlConnection _photoAppConnection;
+    // private readonly NpgsqlConnection _messagingConnection;
+    private readonly string _photoAppConnectionString;
+    private readonly string _messagingConnectionString;
+    private readonly EnvironmentConfigManager _environmentConfigManager;
     public Mock<IMailSender> MailSenderMock => new();
     public Mock<IPhotoStore> PhotoStoreMock => new();
     public Mock<IMailQueue> MailQueue => new();
     
-    public PhotoServiceDbContext CreateTodoDbContext()
+    public FotoApplication(string host, uint port, string username, string password)
     {
-        var db = Services.GetRequiredService<IDbContextFactory<PhotoServiceDbContext>>().CreateDbContext();
-        db.Database.EnsureCreated();
-        // db.Database.Migrate();
-        return db;
+        // _photoAppConnection = new($"Host={host}:{port};Database=PhotoApp;Username={username};Password={password}");
+        // _messagingConnection = new($"Host={host}:{port};Database=Messaging;Username={username};Password={password}");
+        _photoAppConnectionString = $"Host={host}:{port};Database=PhotoApp;Username={username};Password={password}";
+        _messagingConnectionString = $"Host={host}:{port};Database=Messaging;Username={username};Password={password}";
+        // Hack to make the real app use correct connection strings
+        _environmentConfigManager = new(_photoAppConnectionString, _messagingConnectionString);
     }
 
-    public async Task CreateUserAsync(string username, string? password = null)
-    {
-        using var scope = Services.CreateScope();
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-        var newUser = new User { UserName = username };
-        var result = await userManager.CreateAsync(newUser, password ?? Guid.NewGuid().ToString());
-        Assert.True(result.Succeeded);
-    }
-    public async Task PreRegisterUserAsync(string username, string? password = null)
-    {
-        using var scope = Services.CreateScope();
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-        var newUser = new User { UserName = username, Email = username, RefreshToken = "", RefreshTokenExpirationDate = DateTime.MinValue};
-        var result = await userManager.CreateAsync(newUser);
-        Assert.True(result.Succeeded);
-    }
-    
-    // public async Task AddDefaultAdmin()
-    // {
-    //     using var scope = Services.CreateScope();
-    //     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-    //     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
-    //     var role = roleManager.CreateAsync(new Role { Name = "Admin" });
-    //     
-    //     var newUser = new User { UserName = "admin", Email = "admin@somedomain.com", RefreshToken = "", RefreshTokenExpirationDate = DateTime.MinValue};
-    //     var result = await userManager.CreateAsync(newUser, "P@ssw0rd!");
-    //     if (result.Succeeded)
-    //     {
-    //         await userManager.AddToRoleAsync(newUser, "Admin");
-    //     }
-    //     Assert.True(result.Succeeded);
-    // }
-
-    public HttpClient CreateClient(string id, bool isAdmin = false)
-    {
-        return CreateDefaultClient(new AuthHandler(req =>
-        {
-            var token = CreateToken(id, isAdmin);
-            req.Headers.Authorization = new AuthenticationHeaderValue(JwtBearerDefaults.AuthenticationScheme, token);
-        }));
-    }
 
     public string AddCreateUserToken(PhotoServiceDbContext db)
     {
@@ -86,22 +53,43 @@ internal class FotoApplication : WebApplicationFactory<Program>
         return urlToken.Token;
     }
 
+    // protected override void ConfigureWebHost(IWebHostBuilder builder)
+    // {
+    //     var keyBytes = new byte[32];
+    //     RandomNumberGenerator.Fill(keyBytes);
+    //     var base64Key = Convert.ToBase64String(keyBytes);
+    //     
+    //     builder.ConfigureAppConfiguration(config =>
+    //     {
+    //         config.AddInMemoryCollection(new Dictionary<string, string?>
+    //         {
+    //             ["Authentication:Schemes:Bearer:SigningKeys:0:Issuer"] = "dotnet-user-jwts",
+    //             ["Authentication:Schemes:Bearer:SigningKeys:0:Value"] = base64Key,
+    //             ["ConnectionStrings:FotoApi"] = _photoAppConnectionString,
+    //             ["ConnectionStrings:Messaging"] = _messagingConnectionString
+    //         });
+    //     });
+    //     base.ConfigureWebHost(builder);
+    // }
+
     protected override IHost CreateHost(IHostBuilder builder)
     {
         // Open the connection, this creates the SQLite in-memory database, which will persist until the connection is closed
-        _sqliteConnection.Open();
+        // _photoAppConnection.Open();
+        // _messagingConnection.Open();
 
         builder.ConfigureServices(services =>
         {
-            // services.AddSqlite<PhotoServiceDbContext>("Filename=:memory:");
             // We're going to use the factory from our tests
             services.AddDbContextFactory<PhotoServiceDbContext>();
+            services.AddDbContextFactory<MessagingDbContext>();
 
             // We need to replace the configuration for the DbContext to use a different configured database
-            services.AddDbContextOptions<PhotoServiceDbContext>(o => o.UseSqlite(_sqliteConnection)); 
-            // services.AddIdentityCore<User>(options => options.User.RequireUniqueEmail = true)
-            //     .AddRoles<Role>()
-            //     .AddEntityFrameworkStores<PhotoServiceDbContext>();
+            services.AddDbContextOptions<PhotoServiceDbContext>(o => o.UseNpgsql(_photoAppConnectionString)); 
+            services.AddDbContextOptions<MessagingDbContext>(o => o.UseNpgsql(_messagingConnectionString)); 
+            // services.AddDbContextOptions<PhotoServiceDbContext>(o => o.UseNpgsql(_photoAppConnection)); 
+            // services.AddDbContextOptions<MessagingDbContext>(o => o.UseNpgsql(_messagingConnection)); 
+            
             // Lower the requirements for the tests
             services.Configure<IdentityOptions>(o =>
             {
@@ -131,13 +119,14 @@ internal class FotoApplication : WebApplicationFactory<Program>
             config.AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["Authentication:Schemes:Bearer:SigningKeys:0:Issuer"] = "dotnet-user-jwts",
-                ["Authentication:Schemes:Bearer:SigningKeys:0:Value"] = base64Key
+                ["Authentication:Schemes:Bearer:SigningKeys:0:Value"] = base64Key,
+                ["ConnectionStrings:FotoApi"] = _photoAppConnectionString,
+                ["ConnectionStrings:Messaging"] = _messagingConnectionString
             });
         });
 
         return base.CreateHost(builder);
     }
-
     private string CreateToken(string id, bool isAdmin = false)
     {
         // Read the user JWTs configuration for testing so unit tests can generate
@@ -149,7 +138,9 @@ internal class FotoApplication : WebApplicationFactory<Program>
 
     protected override void Dispose(bool disposing)
     {
-        _sqliteConnection?.Dispose();
+        _environmentConfigManager.Dispose();
+        // _photoAppConnection.Dispose();
+        // _messagingConnection.Dispose();
         base.Dispose(disposing);
     }
 

@@ -1,3 +1,17 @@
-﻿namespace FotoApi.Features.HandleUsers.Dto;
+﻿using FluentValidation;
+
+namespace FotoApi.Features.HandleUsers.Dto;
 
 public record EmailRequest(string Email);
+
+public class EmailRequestValidator : AbstractValidator<EmailRequest>
+{
+    public EmailRequestValidator()
+    {
+        RuleFor(x => x.Email)
+            .NotEmpty()
+            .WithMessage("Avändarnamn i form av e-post måste anges")
+            .EmailAddress()
+            .WithMessage("Användarnamn måste vara en giltig e-postadress");
+    }
+}

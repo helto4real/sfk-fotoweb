@@ -33,3 +33,15 @@ spec:
   resources:
     requests:
       storage: 5Gi
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nfs-fotowebb-postgres
+spec:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteMany #  must be the same as PersistentVolume
+  resources:
+    requests:
+      storage: 10Gi

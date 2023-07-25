@@ -1,28 +1,22 @@
-﻿using FotoApi.Features.Shared.Dto;
+﻿using FotoApi.Features.HandleStBilder.Dto;
+using FotoApi.Features.Shared.Dto;
 using FotoApi.Infrastructure.Repositories;
-using StBildMapper = FotoApi.Features.HandleStBilder.Dto.StBildMapper;
+using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 
 namespace FotoApi.Features.HandleStBilder.Commands;
 
-public class NewStBildHandler : ICommandHandler<NewStBildCommand, IdentityResponse>
+public class NewStBildHandler(PhotoServiceDbContext db) : IHandler<NewStBildRequest, IdentityResponse>
 {
-    private readonly PhotoServiceDbContext _db;
-    private readonly StBildMapper mapper = new();
+    private readonly StBildResponseMapper _responseMapper = new();
 
-    public NewStBildHandler(PhotoServiceDbContext db)
+    public async Task<IdentityResponse> Handle(NewStBildRequest request, CancellationToken cancellationToken)
     {
-        _db = db;
-    }
-
-    public async Task<IdentityResponse> Handle(NewStBildCommand request, CancellationToken cancellationToken)
-    {
-        var stBild = mapper.ToStBild(request);
-
-        await _db.StBilder.AddAsync(
+        var stBild = _responseMapper.ToStBild(request);
+        await db.StBilder.AddAsync(
             stBild
         );
 
-        await _db.SaveChangesAsync();
+        await db.SaveChangesAsync();
 
         return new IdentityResponse(stBild.Id);
     }

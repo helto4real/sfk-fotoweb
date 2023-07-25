@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using Foto.WebServer.Dto;
+﻿using Foto.WebServer.Dto;
 
 namespace Foto.WebServer.Services;
 
@@ -14,5 +13,4 @@ public interface IAdminService
     ValueTask DeleteToken(Guid tokenId);
     Task<UrlToken?> AddTokenByTokenType(UrlTokenType tokenType);
     Task<(User?, ErrorDetail?)> PreCreateUserAsync(string? email);
-    
 }

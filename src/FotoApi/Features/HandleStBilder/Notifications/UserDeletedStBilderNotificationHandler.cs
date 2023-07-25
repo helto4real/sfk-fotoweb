@@ -1,6 +1,7 @@
 ﻿using FotoApi.Features.HandleUsers;
 using FotoApi.Features.HandleUsers.Notifications;
 using FotoApi.Infrastructure.Repositories;
+using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 using MediatR;
 
 namespace FotoApi.Features.HandleStBilder.Notifications;

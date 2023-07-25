@@ -3,6 +3,7 @@ using FotoApi.Features.HandleImages.Dto;
 using FotoApi.Features.HandleImages.Queries;
 using FotoApi.Infrastructure.Api;
 using FotoApi.Infrastructure.ExceptionsHandling;
+using FotoApi.Infrastructure.Pipelines;
 using FotoApi.Infrastructure.Security.Authorization;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -36,27 +37,28 @@ internal static class PhotoImagesApi
         // Validate the parameters
 
         group.MapGet("user",
-            async Task<Ok<List<ImageResponse>>>(CurrentUser owner, IMediator mediator) =>
+            async Task<Ok<List<ImageResponse>>>
+                (GetAllImagesForUserHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
             {
-                var result = await mediator.Send(new GetAllImagesForUserQuery(owner));
+                var result = await pipe.Pipe(handler.Handle, ct);
                 return TypedResults.Ok(result);
             });
 
         group.MapGet("/{id:guid}",
             async Task<Results<Ok<ImageResponse>, NotFound<ErrorDetail>>> 
-                (Guid id, CurrentUser owner, IMediator mediator) =>
+                (Guid id, GetUserImageHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
             {
-                var result = await mediator.Send(new GetUserImageQuery(id, owner));
+                var result = await pipe.Pipe(id, handler.Handle, ct);
                 return TypedResults.Ok(result);
             });
         
         // Get image stream by id
-        group.MapGet("image/{id:guid}",
-                async Task<IResult> (Guid id, CurrentUser owner, HttpRequest req, IMediator mediator) =>
+        group.MapGet("image/{id:guid}", async Task<IResult> 
+                (Guid id, HttpRequest req, GetImageStreamHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
                 {
                     var isThumbnail = req.Query.ContainsKey("thumb");
 
-                    var file = await mediator.Send(new GetImageStreamQuery(id, owner, isThumbnail));
+                    var file = await pipe.Pipe(new GetImageStreamQuery(id, isThumbnail), handler.Handle, ct);
                     
                     return Results.Stream(file, "image/jpeg");
                 })
@@ -67,7 +69,7 @@ internal static class PhotoImagesApi
 
         group.MapPost("/",
             async Task<Results<Created<ImageResponse>, BadRequest<ErrorDetail>>>
-                (HttpContext ctx, IFormFile file, CurrentUser owner, IMediator mediator) =>
+                (HttpContext ctx, IFormFile file, SaveImageFromStreamHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
             {
                 // The image always needs to contain metadata
                 if (!ctx.Request.Form.ContainsKey("title"))
@@ -81,26 +83,26 @@ internal static class PhotoImagesApi
                 
                 var title = ctx.Request.Form["title"];
     
-                var result = await mediator.Send(new SaveImageFromStreamCommand(
+                var result = await pipe.Pipe(new SaveImageFromStreamRequest(
                     file.OpenReadStream(), title.ToString(), metadataType, 
-                    metadata, file.FileName, owner));
+                    metadata, file.FileName), handler.Handle, ct);
 
-                return TypedResults.Created($"/image/{result.Id}", result);
+                return TypedResults.Created($"/api/images/{result.Id}", result);
             });
 
         group.MapPut("{id:guid}",
             async Task<Results<Ok, NotFound<ErrorDetail>>> (Guid id, ImageRequest request,
-                CurrentUser owner, IMediator mediator) =>
+                UpdateImageHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
             {
-                await mediator.Send(new UpdateImageCommand(id, request.Title, request.FileName, owner));
+                await pipe.Pipe(new UpdateImageRequest(id, request.Title, request.FileName), handler.Handle, ct);
                 return TypedResults.Ok();
             });
 
         group.MapDelete("{id:guid}",
             async Task<Results<Ok, NotFound<ErrorDetail>>> 
-                (Guid id, CurrentUser owner, IMediator mediator) =>
+                (Guid id, DeleteImageHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
             {
-                await mediator.Send(new DeleteImageCommand(id, owner));
+                await pipe.Pipe(id, handler.Handle, ct);
                 return TypedResults.Ok();
             });
 

@@ -1,30 +1,29 @@
-﻿using FotoApi.Features.HandleImages.Exceptions;
+﻿using FotoApi.Abstractions;
+using FotoApi.Features.HandleImages.Exceptions;
 using FotoApi.Infrastructure.Repositories;
+using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
+using FotoApi.Infrastructure.Security.Authorization;
 
 namespace FotoApi.Features.HandleStBilder.Commands;
 
-public class DeleteStBildHandler : ICommandHandler<DeleteStBildCommand>
+public record DeleteStBildRequest(Guid Id) : ICurrentUser
 {
-    private readonly PhotoServiceDbContext _db;
+    public CurrentUser CurrentUser { get; set; } = default!;
+}
 
-    public DeleteStBildHandler(PhotoServiceDbContext db)
+public class DeleteStBildHandler(PhotoServiceDbContext db) : IHandler<DeleteStBildRequest>
+{
+    public async Task Handle(DeleteStBildRequest request, CancellationToken cancellationToken)
     {
-        _db = db;
-    }
-
-    public async Task Handle(DeleteStBildCommand command, CancellationToken cancellationToken)
-    {
-        var imageInfo = await _db.StBilder.FindAsync(command.Id);
+        var imageInfo = await db.StBilder.FindAsync(request.Id);
         if (imageInfo == null)
-            throw new ImageNotFoundException(command.Id);
+            throw new ImageNotFoundException(request.Id);
 
-        var rowsAffected = await _db.StBilder
-            .Where(t => t.Id == command.Id && (t.OwnerReference == command.Owner.Id || command.Owner.IsAdmin))
-            .ExecuteDeleteAsync();
+        var rowsAffected = await db.StBilder
+            .Where(t => t.Id == request.Id && (t.OwnerReference == request.CurrentUser.Id || request.CurrentUser.IsAdmin))
+            .ExecuteDeleteAsync(cancellationToken: cancellationToken);
 
         if (rowsAffected == 0)
-            throw new ImageNotFoundException(command.Id);
-
-        await _db.SaveChangesAsync();
+            throw new ImageNotFoundException(request.Id);
     }
 }

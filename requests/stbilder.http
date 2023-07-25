@@ -1,7 +1,7 @@
 ### Create a user
 # @password = P@ssw0rd!
 
-# POST http://localhost:5000/users
+# POST https://localhost:8001/users
 # Content-Type: application/json
 
 # {
@@ -24,7 +24,7 @@ Content-Type: application/json
 
 ### Create a todo
 # @name createstbild
-POST http://localhost:5000/api/stbilder
+POST https://localhost:8001/api/stbilder
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -49,11 +49,15 @@ Content-Type: application/json
 @st-bild-ir = {{createstbild.response.body.id}}
 
 ### Delete st bild
-DELETE http://localhost:5000/stbilder/{{st-bild-ir}}
+DELETE https://localhost:8001/stbilder/{{st-bild-ir}}
 Authorization: Bearer {{token}}
 
 ### Get st bild
-GET http://localhost:5000/stbilder/{{st-bild-ir}}
+GET https://localhost:8001/stbilder/{{st-bild-ir}}
+Authorization: Bearer {{token}}
+
+### Get st bild
+GET https://localhost:8001/api/stbilder/5f14577e-2176-43a1-a62d-c286a5394a8a
 Authorization: Bearer {{token}}
 
 ### Get all bild

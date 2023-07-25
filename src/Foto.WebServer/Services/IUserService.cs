@@ -1,6 +1,4 @@
-﻿using Foto.WebServer.Dto;
-
-namespace Foto.WebServer.Services;
+﻿namespace Foto.WebServer.Services;
 
 public interface IUserService
 {

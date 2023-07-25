@@ -1,4 +1,4 @@
-﻿using FotoApi.Features.HandleUsers.Commands;
+﻿using FotoApi.Features.HandleUsers.CommandHandlers;
 using FotoApi.Model;
 using Riok.Mapperly.Abstractions;
 
@@ -18,5 +18,5 @@ public partial class UserMapper
 
     public partial UpdateUserCommand ToEditUserCommand(UserRequest request);
 
-    public partial CreateUserCommand ToCreateUserCommand(NewUserRequest request);
+    public partial CreateUserRequest ToCreateUserCommand(NewUserRequest request);
 }

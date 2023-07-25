@@ -1,12 +1,15 @@
-﻿using FotoApi.Features.HandleUsers.Commands;
+﻿using FotoApi.Features.HandleUsers.CommandHandlers;
 using FotoApi.Features.HandleUsers.Dto;
+using FotoApi.Features.HandleUsers.QueriyHandlers;
 using FotoApi.Features.Shared.Dto;
 using FotoApi.Infrastructure.ExceptionsHandling;
+using FotoApi.Infrastructure.Pipelines;
 using FotoApi.Infrastructure.Security.Authentication.Model;
 using FotoApi.Infrastructure.Security.Authorization.Commands;
 using FotoApi.Infrastructure.Security.Authorization.Dto;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
+using LoginUserRequest = FotoApi.Infrastructure.Security.Authorization.Commands.LoginUserRequest;
 using UserMapper = FotoApi.Features.HandleUsers.Dto.UserMapper;
 
 namespace FotoApi.Api;
@@ -19,44 +22,45 @@ public static class UsersApi
 
         group.WithTags("Users");
 
-        var userMapper = new UserMapper();
         var authMapper = new LoginMapper();
         // Creates a new user if a valid token is provided
         group.MapPost("/", async Task<Results<Ok<UserResponse>, BadRequest<ErrorDetail>>> (
             NewUserRequest request, 
-            IMediator mediator) =>
+            CreateUserHandler handler, 
+            FotoAppPipeline pipe, 
+            CancellationToken ct) =>
         {
-            var result = await mediator.Send(userMapper.ToCreateUserCommand(request));
-            return TypedResults.Ok(result);
+            var response = await pipe.Pipe(request, handler.Handle, ct);
+            return TypedResults.Ok(response);
         });
         
         group.MapPost("/create", async Task<Results<Ok<UserAuthorizedResponse>, BadRequest<ErrorDetail>>> (
             NewUserRequest request, 
-            IMediator mediator) =>
+            LoginAndCreateUserHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
-            var result = await mediator.Send(authMapper.ToLoginAndCreateUserCommand(request));
-            return TypedResults.Ok(result);
+            var response = await pipe.Pipe(authMapper.ToLoginAndCreateUserCommand(request), handler.Handle, ct);
+            return TypedResults.Ok(response);
         });
 
         group.MapPost("/token", async Task<Results<Ok<UserAuthorizedResponse>, BadRequest<ErrorDetail>>> 
-            (LoginUserRequest request, IMediator mediator) =>
+            (LoginUserRequest request, LoginUserHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
-            var result = await mediator.Send(new LoginUserCommand(request.UserName, request.Password));
-            return TypedResults.Ok(result);
+            var response = await pipe.Pipe(request, handler.Handle, ct);
+            return TypedResults.Ok(response);
         }); 
         
         group.MapPost("/token/refresh", async Task<Results<Ok<UserAuthorizedResponse>, BadRequest<ErrorDetail>>> 
-            (RefreshTokenRequest request, IMediator mediator) =>
+            (RefreshTokenRequest request, RefreshTokenHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
-            var result = await mediator.Send(new RefreshTokenCommand(request.RefreshToken, request.UserName));
-            return TypedResults.Ok(result);
+            var response = await pipe.Pipe(request, handler.Handle, ct);
+            return TypedResults.Ok(response);
         });
         
         group.MapPost("/bytoken", async Task<Results<Ok<UserResponse>, BadRequest<ErrorDetail>>> 
-            (TokenRequest request, IMediator mediator) =>
+            (TokenRequest request, GetUserFromTokenHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
-            var result = await mediator.Send(new GetUserFromTokenQuery(request.Token));
-            return TypedResults.Ok(result);
+            var response = await pipe.Pipe(request.Token, handler.Handle, ct);
+            return TypedResults.Ok(response);    
         });
 
         group.MapPost("/token/{provider}", async Task<Results<
@@ -65,16 +69,17 @@ public static class UsersApi
             BadRequest<ErrorDetail>>> (
             string provider,
             LoginExternalUserRequest request,
-            IMediator mediator
+            LoginExternalUserHandler handler, 
+            FotoAppPipeline pipe, 
+            CancellationToken ct
         ) =>
         {
-            var result = await mediator.Send(new LoginExternalUserCommand(
+            var response = await pipe.Pipe(new LoginExternalUserCommand(
                 UserName: request.UserName, 
                 Provider: provider, 
                 ProviderKey: request.ProviderKey, 
-                UrlToken: request.UrlToken));
-                
-            return TypedResults.Ok(result);
+                UrlToken: request.UrlToken), handler.Handle, ct);
+            return TypedResults.Ok(response);    
         });
 
         return group;
