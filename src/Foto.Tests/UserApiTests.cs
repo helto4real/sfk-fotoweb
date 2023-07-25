@@ -1,6 +1,11 @@
-﻿using FotoApi;
+﻿using Foto.Tests.TestContainer;
+using FotoApi;
+using FotoApi.Features.HandleUrlTokens;
 using FotoApi.Features.HandleUsers.Dto;
 using FotoApi.Features.SendEmailNotifications;
+using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
+using FotoApi.Infrastructure.Security.Authorization.Dto;
+using FotoApi.Model;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,16 +13,16 @@ using Moq;
 
 namespace Foto.Tests;
 
-public class UserApiTests
+[Collection("Integration tests collection")]
+public class UserApiTests : IntegrationTestsBase
 {
     [Fact]
     public async Task CanCreateAUser()
     {
-        await using var application = new FotoApplication();
-        await using var db = application.CreateTodoDbContext();
-        var urlToken = application.AddCreateUserToken(db);
-        await application.PreRegisterUserAsync("fotoapiuser@somedomain.com");
-        var client = application.CreateClient();
+        await using var db = CreateTodoDbContext();
+        var urlToken = AddCreateUserToken(db);
+        await PreRegisterUserAsync("fotoapiuser@somedomain.com");
+        var client = CreateClient();
         var response = await client.PostAsJsonAsync("/api/users", new NewUserRequest
         {
             UserName = "fotoapiuser@somedomain.com", Password = "P@ssw0rd", FirstName = "Test", LastName = "Test", Email = "fotoapiuser@somedomain.com", UrlToken = urlToken
@@ -32,6 +37,31 @@ public class UserApiTests
         Assert.Equal("fotoapiuser@somedomain.com", user.UserName);
     }
 
+    [Fact]
+    public async Task CanGetATokenForValidUser()
+    {
+        const string user = "appuser";
+        const string password = "P@assw0rd1";
+        await using var db = CreateTodoDbContext();
+        await CreateUserAsync(user, password, "someuser@domain.com");
+    
+        var client = CreateClient();
+        var response = await client.PostAsJsonAsync("/api/users/token", new  { Username = user, Password = password });
+    
+        Assert.True(response.IsSuccessStatusCode);
+    
+        var token = await response.Content.ReadFromJsonAsync<UserAuthorizedResponse>();
+    
+        Assert.NotNull(token);
+    
+        // Check that the token is indeed valid
+    
+        var req = new HttpRequestMessage(HttpMethod.Get, "/api/images/user");
+        req.Headers.Authorization = new("Bearer", token.Token);
+        response = await client.SendAsync(req);
+    
+        Assert.True(response.IsSuccessStatusCode);
+    }
     // [Fact]
     // public async Task MissingUserOrPasswordReturnsBadRequest()
     // {
@@ -94,30 +124,6 @@ public class UserApiTests
     //     Assert.Equal(new[] { $"The Username field is required." }, problemDetails.Errors["Username"]);
     // }
     //
-    // [Fact]
-    // public async Task CanGetATokenForValidUser()
-    // {
-    //     await using var application = new TodoApplication();
-    //     await using var db = application.CreateTodoDbContext();
-    //     await application.CreateUserAsync("todouser", "p@assw0rd1");
-    //
-    //     var client = application.CreateClient();
-    //     var response = await client.PostAsJsonAsync("/users/token", new NewUserInfo { Username = "todouser", Password = "p@assw0rd1" });
-    //
-    //     Assert.True(response.IsSuccessStatusCode);
-    //
-    //     var token = await response.Content.ReadFromJsonAsync<AuthToken>();
-    //
-    //     Assert.NotNull(token);
-    //
-    //     // Check that the token is indeed valid
-    //
-    //     var req = new HttpRequestMessage(HttpMethod.Get, "/todos");
-    //     req.Headers.Authorization = new("Bearer", token.Token);
-    //     response = await client.SendAsync(req);
-    //
-    //     Assert.True(response.IsSuccessStatusCode);
-    // }
     //
     // [Fact]
     // public async Task CanGetATokenForExternalUser()
@@ -161,4 +167,14 @@ public class UserApiTests
     //
     //     Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     // }
+     public string AddCreateUserToken(PhotoServiceDbContext db)
+     {
+         var urlToken = UrlTokenCreator.CreateUrlTokenFromUrlTokenType(UrlTokenType.AllowAddUser);
+         db.UrlTokens.Add(urlToken);
+         db.SaveChanges();
+         return urlToken.Token;
+     }
+    public UserApiTests(TestContainerLifeTime testContinerLifetime) : base(testContinerLifetime)
+    {
+    }
 }
