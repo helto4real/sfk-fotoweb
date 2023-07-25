@@ -42,8 +42,6 @@ public class IntegrationTestsBase : IAsyncDisposable
     public PhotoServiceDbContext CreateTodoDbContext()
     {
         var db = _fotoApplication.Services.GetRequiredService<IDbContextFactory<PhotoServiceDbContext>>().CreateDbContext();
-        db.Database.EnsureCreated();
-        // db.Database.Migrate();
         return db;
     }
     

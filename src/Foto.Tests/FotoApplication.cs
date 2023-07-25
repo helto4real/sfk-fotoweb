@@ -11,6 +11,7 @@ using FotoApi.Infrastructure.Security.Authentication;
 using FotoApi.Model;
 using Microsoft.Data.Sqlite;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +29,7 @@ internal class FotoApplication : WebApplicationFactory<Program>
     // private readonly NpgsqlConnection _messagingConnection;
     private readonly string _photoAppConnectionString;
     private readonly string _messagingConnectionString;
+    private readonly EnvironmentConfigManager _environmentConfigManager;
     public Mock<IMailSender> MailSenderMock => new();
     public Mock<IPhotoStore> PhotoStoreMock => new();
     public Mock<IMailQueue> MailQueue => new();
@@ -38,6 +40,8 @@ internal class FotoApplication : WebApplicationFactory<Program>
         // _messagingConnection = new($"Host={host}:{port};Database=Messaging;Username={username};Password={password}");
         _photoAppConnectionString = $"Host={host}:{port};Database=PhotoApp;Username={username};Password={password}";
         _messagingConnectionString = $"Host={host}:{port};Database=Messaging;Username={username};Password={password}";
+        // Hack to make the real app use correct connection strings
+        _environmentConfigManager = new(_photoAppConnectionString, _messagingConnectionString);
     }
 
 
@@ -48,6 +52,25 @@ internal class FotoApplication : WebApplicationFactory<Program>
         db.SaveChanges();
         return urlToken.Token;
     }
+
+    // protected override void ConfigureWebHost(IWebHostBuilder builder)
+    // {
+    //     var keyBytes = new byte[32];
+    //     RandomNumberGenerator.Fill(keyBytes);
+    //     var base64Key = Convert.ToBase64String(keyBytes);
+    //     
+    //     builder.ConfigureAppConfiguration(config =>
+    //     {
+    //         config.AddInMemoryCollection(new Dictionary<string, string?>
+    //         {
+    //             ["Authentication:Schemes:Bearer:SigningKeys:0:Issuer"] = "dotnet-user-jwts",
+    //             ["Authentication:Schemes:Bearer:SigningKeys:0:Value"] = base64Key,
+    //             ["ConnectionStrings:FotoApi"] = _photoAppConnectionString,
+    //             ["ConnectionStrings:Messaging"] = _messagingConnectionString
+    //         });
+    //     });
+    //     base.ConfigureWebHost(builder);
+    // }
 
     protected override IHost CreateHost(IHostBuilder builder)
     {
@@ -96,7 +119,9 @@ internal class FotoApplication : WebApplicationFactory<Program>
             config.AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["Authentication:Schemes:Bearer:SigningKeys:0:Issuer"] = "dotnet-user-jwts",
-                ["Authentication:Schemes:Bearer:SigningKeys:0:Value"] = base64Key
+                ["Authentication:Schemes:Bearer:SigningKeys:0:Value"] = base64Key,
+                ["ConnectionStrings:FotoApi"] = _photoAppConnectionString,
+                ["ConnectionStrings:Messaging"] = _messagingConnectionString
             });
         });
 
@@ -113,6 +138,7 @@ internal class FotoApplication : WebApplicationFactory<Program>
 
     protected override void Dispose(bool disposing)
     {
+        _environmentConfigManager.Dispose();
         // _photoAppConnection.Dispose();
         // _messagingConnection.Dispose();
         base.Dispose(disposing);

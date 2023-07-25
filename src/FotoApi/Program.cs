@@ -59,10 +59,7 @@ builder.Host.UseWolverine(opts =>
 builder.Host.UseResourceSetupOnStartup();
 builder.Services.AddNpgsql<PhotoServiceDbContext>(connectionString);
 builder.Services.AddNpgsql<MessagingDbContext>(messagingConnectionString);
-// builder.Services.AddSqlite<MessagingDbContext>(messagingConnectionString);
 
-// builder.Services.AddDbContextWithWolverineIntegration<PhotoServiceDbContext>(x => x.UseSqlite(connectionString));
-// builder.Services.AddDbContextWithWolverineIntegration<MessagingDbContext>(x => x.UseNpgsql(messagingConnectionString));
 builder.Services.AddDbContext<PhotoServiceDbContext>();
 builder.Services.AddDbContext<MessagingDbContext>();
 

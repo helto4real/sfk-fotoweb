@@ -3,6 +3,7 @@ using FotoApi.Model;
 
 namespace Foto.Tests;
 
+[Collection("Integration tests collection")]
 public class AdminApiTests : IntegrationTestsBase
 {
     [Fact]
