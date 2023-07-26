@@ -11,11 +11,11 @@ public class PhotoServiceDbContext: IdentityDbContext<User, Role, string>
     {
         
     }
-    public DbSet<UrlToken> UrlTokens => Set<UrlToken>();
-    public DbSet<Image> Images => Set<Image>();
-    public DbSet<StBild> StBilder => Set<StBild>();
-    public DbSet<StPackage> StPackage => Set<StPackage>();
-    public DbSet<StPackageItem> StPackageItem => Set<StPackageItem>();
+    public virtual DbSet<UrlToken> UrlTokens => Set<UrlToken>();
+    public virtual DbSet<Image> Images => Set<Image>();
+    public virtual DbSet<StBild> StBilder => Set<StBild>();
+    public virtual DbSet<StPackage> StPackage => Set<StPackage>();
+    public virtual DbSet<StPackageItem> StPackageItem => Set<StPackageItem>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

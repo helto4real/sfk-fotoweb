@@ -12,13 +12,14 @@ public class UpdateUserHandler(UserManager<User> userManager) : IHandler<UserReq
         var user = await userManager.FindByNameAsync(request.UserName);
 
         if (user is null) throw new UserNotFoundException(request.UserName);
+        var isCurrentAdmin = await userManager.IsInRoleAsync(user, "Admin");
         // Todo: make user updateable here
-        if (request.IsAdmin)
+        if (request.IsAdmin && !isCurrentAdmin)
         {
             var roleResult = await userManager.AddToRoleAsync(user, "Admin");
             if (!roleResult.Succeeded) throw new UserException(@"Failed to add user {request.UserName} to admin role");
         }
-        else
+        else if (!request.IsAdmin && isCurrentAdmin)
         {
             var roleResult = await userManager.RemoveFromRoleAsync(user, "Admin");
             if (!roleResult.Succeeded)
