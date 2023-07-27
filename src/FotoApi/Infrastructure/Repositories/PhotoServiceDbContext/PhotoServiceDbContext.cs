@@ -19,6 +19,11 @@ public class PhotoServiceDbContext: IdentityDbContext<User, Role, string>
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        builder.Entity<Member>(e =>
+        {
+            e.HasKey(k => k.Id);
+            
+        });
        
         builder.Entity<UrlToken>(e =>
         {
@@ -101,9 +106,37 @@ public class PhotoServiceDbContext: IdentityDbContext<User, Role, string>
                     NormalizedName = "ADMIN", 
                     Id = adminRoleId,
                     ConcurrencyStamp = adminRoleId,
+                });        
+        
+        builder.Entity<Role>()
+            .HasData(
+                new Role
+                { 
+                    Name = "Member",
+                    NormalizedName = "MEMBER", 
+                    Id = Guid.NewGuid().ToString(),
+                    ConcurrencyStamp = Guid.NewGuid().ToString(),
                 });
-        
-        
+
+        builder.Entity<Role>()
+            .HasData(
+                new Role
+                { 
+                    Name = "CompetitionAdministrator",
+                    NormalizedName = "COMPETITIONADMINISTRATOR", 
+                    Id = Guid.NewGuid().ToString(),
+                    ConcurrencyStamp = Guid.NewGuid().ToString(),
+                });
+      
+        builder.Entity<Role>()
+            .HasData(
+                new Role
+                { 
+                    Name = "StbildAdministrator",
+                    NormalizedName = "STBILDADMINISTRATOR", 
+                    Id = Guid.NewGuid().ToString(),
+                    ConcurrencyStamp = Guid.NewGuid().ToString(),
+                });
         
         builder.Entity<IdentityUserRole<string>>()
             .HasData(

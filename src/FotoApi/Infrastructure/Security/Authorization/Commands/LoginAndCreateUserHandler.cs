@@ -10,11 +10,11 @@ public class LoginAndCreateUserHandler(
         ITokenService tokenService, 
         CreateUserHandler createUserHandler,
         FotoAppPipeline pipe) 
-    : IHandler<LoginAndCreateUserCommand, UserAuthorizedResponse>
+    : IHandler<LoginAndCreateUserRequest, UserAuthorizedResponse>
 {
     private readonly LoginMapper _mapper = new();
 
-    public async Task<UserAuthorizedResponse> Handle(LoginAndCreateUserCommand request, CancellationToken cancellationToken)
+    public async Task<UserAuthorizedResponse> Handle(LoginAndCreateUserRequest request, CancellationToken cancellationToken)
     {
         var result = await pipe.Pipe(_mapper.ToCreateUserCommand(request),
             createUserHandler.Handle, cancellationToken);

@@ -4,11 +4,12 @@ using FotoApi.Features.HandleUsers.QueriyHandlers;
 using FotoApi.Features.Shared.Dto;
 using FotoApi.Infrastructure.ExceptionsHandling;
 using FotoApi.Infrastructure.Pipelines;
-using FotoApi.Infrastructure.Security.Authentication.Model;
+using FotoApi.Infrastructure.Security.Authentication.Dto;
+using FotoApi.Infrastructure.Security.Authorization;
 using FotoApi.Infrastructure.Security.Authorization.Commands;
 using FotoApi.Infrastructure.Security.Authorization.Dto;
 using Microsoft.AspNetCore.Http.HttpResults;
-using LoginUserRequest = FotoApi.Infrastructure.Security.Authorization.Commands.LoginUserRequest;
+using LoginUserRequest = FotoApi.Infrastructure.Security.Authorization.Dto.LoginUserRequest;
 
 namespace FotoApi.Api;
 
@@ -21,6 +22,47 @@ public static class UsersApi
         group.WithTags("Users");
 
         var authMapper = new LoginMapper();
+
+        // Get all users
+        group.MapGet("/", async Task<Results<Ok<List<UserResponse>>, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
+            (GetUsersHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
+        {
+            var result = await pipe.Pipe(handler.Handle, ct);
+            return TypedResults.Ok(result);
+        }).RequireAuthorization("AdminPolicy"); 
+        
+        // Edit user
+        group.MapPut("user", async Task<Results<
+                Ok, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
+            (UserRequest request, UpdateUserHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
+        {
+            await pipe.Pipe(request, handler.Handle, ct);
+            return TypedResults.Ok();
+        }).RequireAuthorization("AdminPolicy");
+        
+        // Precreate user by providing the email address of users that are allowed to register
+        group.MapPost("precreate", async Task<Results<
+                Ok<UserResponse>, BadRequest<ErrorDetail>, BadRequest<ErrorDetail>>> 
+            (EmailRequest request, PreCreateUserHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
+        {
+            var response = await pipe.Pipe(request, handler.Handle, ct);
+            return TypedResults.Ok(response);
+        }).RequireAuthorization("AdminPolicy");
+        
+        group.MapGet("user/{userName}", async Task<Results<Ok<UserResponse>, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
+            (string userName, GetUserFromUsernameHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
+        {
+            var response = await pipe.Pipe(userName, handler.Handle, ct);
+            return TypedResults.Ok(response);
+        }).RequireAuthorization("AdminPolicy");
+        
+        group.MapDelete("user/{username}", async Task<Results<Ok, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
+            (string username, DeleteUserHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
+        {
+            await pipe.Pipe(username, handler.Handle, ct);
+            return TypedResults.Ok();
+        }).RequireAuthorization("AdminPolicy");
+        
         // Creates a new user if a valid token is provided
         group.MapPost("/", async Task<Results<Ok<UserResponse>, BadRequest<ErrorDetail>>> (
             NewUserRequest request, 

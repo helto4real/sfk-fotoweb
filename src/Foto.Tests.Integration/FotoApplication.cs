@@ -36,14 +36,11 @@ internal class FotoApplication : WebApplicationFactory<Program>
     
     public FotoApplication(string host, uint port, string username, string password)
     {
-        // _photoAppConnection = new($"Host={host}:{port};Database=PhotoApp;Username={username};Password={password}");
-        // _messagingConnection = new($"Host={host}:{port};Database=Messaging;Username={username};Password={password}");
         _photoAppConnectionString = $"Host={host}:{port};Database=PhotoApp;Username={username};Password={password}";
         _messagingConnectionString = $"Host={host}:{port};Database=Messaging;Username={username};Password={password}";
-        // Hack to make the real app use correct connection strings
+        // Hack to make the real API use correct connection strings
         _environmentConfigManager = new(_photoAppConnectionString, _messagingConnectionString);
     }
-
 
     public string AddCreateUserToken(PhotoServiceDbContext db)
     {

@@ -1,11 +1,10 @@
-﻿using FotoApi.Features.HandleStBilder.Commands;
-using FotoApi.Features.HandleStBilder.Dto;
-using FotoApi.Features.HandleStBilder.Queries;
+﻿using FotoApi.Features.HandleSubmissions.HandleStBilder.Commands;
+using FotoApi.Features.HandleSubmissions.HandleStBilder.Dto;
+using FotoApi.Features.HandleSubmissions.HandleStBilder.Queries;
 using FotoApi.Infrastructure.Api;
 using FotoApi.Infrastructure.ExceptionsHandling;
 using FotoApi.Infrastructure.Pipelines;
 using FotoApi.Infrastructure.Security.Authorization;
-using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,41 +25,41 @@ public static class StBilderApi
         // Rate limit all of the APIs
         group.RequirePerUserRateLimit();
 
-        group.MapDelete("/{id:guid}", async Task<Results<Ok, NotFound<ErrorDetail>>> 
+        group.MapGet("/", async Task<Results<Ok<List<StBildResponse>>, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
+            (bool showPackagedImages, GetAllStBilderHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
+        {
+            var response = await pipe.Pipe(showPackagedImages, handler.Handle, ct);
+            return TypedResults.Ok(response);
+        }).RequireAuthorization("AdminPolicy", "StBildAdministratiorPolicy");
+        
+        group.MapDelete("/{id:guid}", async Task<Results<Ok, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
             (Guid id, DeleteStBildHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
             await pipe.Pipe(new DeleteStBildRequest(id), handler.Handle, ct);
             return TypedResults.Ok();
         });        
 
-        group.MapPut("/{id:guid}", async Task<Results<Ok, NotFound<ErrorDetail>>> 
+        group.MapPut("/{id:guid}", async Task<Results<Ok, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
             (StBildRequest request, UpdateStBildHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
             await pipe.Pipe(request, handler.Handle, ct);
             return TypedResults.Ok();
         });         
         
-        group.MapGet("/{id:guid}", async Task<Results<Ok<StBildResponse>, NotFound<ErrorDetail>>> 
+        group.MapGet("/{id:guid}", async Task<Results<Ok<StBildResponse>, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
             (Guid id,  GetStBildHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
             var result =await pipe.Pipe(new GetStBildRequest(id), handler.Handle, ct);
             return TypedResults.Ok(result);
         });        
         
-        group.MapGet("/{showPackagedImages:bool}", async Task<Results<Ok<List<StBildResponse>>, NotFound<ErrorDetail>>> 
+        group.MapGet("user/{showPackagedImages:bool}", async Task<Results<Ok<List<StBildResponse>>, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
             (bool showPackagedImages, GetAllStBilderForCurrentUserHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
             var result =await pipe.Pipe(new GetAllStBilderForCurrentUserRequest(showPackagedImages), handler.Handle, ct);
             return TypedResults.Ok(result);
         });
 
-        group.MapGet("/all/{showPackagedImages}", async Task<Results<Ok<List<StBildResponse>>, NotFound<ErrorDetail>>> 
-            (bool showPackagedImages, GetAllStBilderHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
-        {
-            var response = await pipe.Pipe(showPackagedImages, handler.Handle, ct);
-            return TypedResults.Ok(response);
-        });
-        
         group.MapPost("/{stBildId}/acceptstatus/{stBildIsAccepted}", async Task<Results<
             Ok, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
             ([FromRoute] Guid stBildId, [FromRoute] bool stBildIsAccepted, 
@@ -70,7 +69,7 @@ public static class StBilderApi
             return TypedResults.Ok();
         });
         
-        group.MapGet("/packageble", async Task<Results<Ok<List<StBildResponse>>, NotFound<ErrorDetail>>> 
+        group.MapGet("/packageble", async Task<Results<Ok<List<StBildResponse>>, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
             (GetAllPackageStBilderQueryHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
             var result = await pipe.Pipe(handler.Handle, ct);
@@ -86,7 +85,7 @@ public static class StBilderApi
         });
         
         group.MapPost("{stBildId:guid}/acceptstatus/{stBildAcceptStatus:bool}", async Task<Results<
-            Ok, NotFound<ErrorDetail>>> 
+            Ok, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
             (
                 Guid stBildId, 
                 bool stBildAcceptStatus, 
@@ -97,8 +96,7 @@ public static class StBilderApi
             await pipe.Pipe(new AcceptStBildRequest(stBildId, stBildAcceptStatus), handler.Handle, ct);
             return TypedResults.Ok();
         });
-        
-     
+
         return group;
     }
 }

@@ -12,6 +12,6 @@ public class UserCreatedNotificationHandler(IMailSender emailSender,
     public async Task Handle(UserCreatedNotification notification, CancellationToken cancellationToken)
     {
         await emailSender.SendEmailConfirmationAsync(notification.Email, notification.Token,
-            apiSettingsOptions.Value.PhotoWebUri);
+            apiSettingsOptions.Value.PhotoWebUri, cancellationToken);
     }
 }

@@ -9,7 +9,7 @@ namespace FotoApi.Infrastructure.Security.Authorization.Dto;
 [Mapper]
 public partial class LoginMapper
 {
-    public partial NewUserRequest ToCreateUserCommand(LoginAndCreateUserCommand request);
+    public partial NewUserRequest ToCreateUserCommand(LoginAndCreateUserRequest request);
 
     public UserAuthorizedResponse ToUserAuthorizedResponse(UserResponse userResponse, string token)
     {
@@ -19,6 +19,6 @@ public partial class LoginMapper
     }
     private partial UserAuthorizedResponse ToUserAuthorizedResponse(UserResponse userResponse);
 
-    public partial LoginAndCreateUserCommand ToLoginAndCreateUserCommand(NewUserRequest request);
+    public partial LoginAndCreateUserRequest ToLoginAndCreateUserCommand(NewUserRequest request);
 
 }

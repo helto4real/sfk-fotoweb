@@ -6,7 +6,7 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @inherits AuthorizedBasePage
 @attribute [Authorize(Roles = "Admin")]
-@inject IAdminService AdminService
+@inject IUserService UserService
 
 <div class="container d-flex flex-column justify-content-center align-items-center">
     <div class="row row-cols-auto align-items-center">
@@ -51,7 +51,7 @@
     {
         if (firstRender)
         {
-            foreach (var user in await AdminService.GetAllUsers())
+            foreach (var user in await UserService.GetAllUsers())
             {
                 _users.Add(new UserInfo{Username = user.UserName, IsAdmin = user.IsAdmin});
             }

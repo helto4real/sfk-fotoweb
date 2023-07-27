@@ -37,7 +37,7 @@ internal static class PhotoImagesApi
         // Validate the parameters
 
         group.MapGet("user",
-            async Task<Ok<List<ImageResponse>>>
+            async Task<Results<Ok<List<ImageResponse>>, BadRequest<ErrorDetail>>>
                 (GetAllImagesForUserHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
             {
                 var result = await pipe.Pipe(handler.Handle, ct);
@@ -45,7 +45,7 @@ internal static class PhotoImagesApi
             });
 
         group.MapGet("/{id:guid}",
-            async Task<Results<Ok<ImageResponse>, NotFound<ErrorDetail>>> 
+            async Task<Results<Ok<ImageResponse>, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
                 (Guid id, GetUserImageHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
             {
                 var result = await pipe.Pipe(id, handler.Handle, ct);
@@ -57,9 +57,7 @@ internal static class PhotoImagesApi
                 (Guid id, HttpRequest req, GetImageStreamHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
                 {
                     var isThumbnail = req.Query.ContainsKey("thumb");
-
                     var file = await pipe.Pipe(new GetImageStreamQuery(id, isThumbnail), handler.Handle, ct);
-                    
                     return Results.Stream(file, "image/jpeg");
                 })
             .Produces(StatusCodes.Status200OK)
@@ -91,7 +89,7 @@ internal static class PhotoImagesApi
             });
 
         group.MapPut("{id:guid}",
-            async Task<Results<Ok, NotFound<ErrorDetail>>> (Guid id, ImageRequest request,
+            async Task<Results<Ok, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> (Guid id, ImageRequest request,
                 UpdateImageHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
             {
                 await pipe.Pipe(new UpdateImageRequest(id, request.Title, request.FileName), handler.Handle, ct);
@@ -99,7 +97,7 @@ internal static class PhotoImagesApi
             });
 
         group.MapDelete("{id:guid}",
-            async Task<Results<Ok, NotFound<ErrorDetail>>> 
+            async Task<Results<Ok, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
                 (Guid id, DeleteImageHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
             {
                 await pipe.Pipe(id, handler.Handle, ct);

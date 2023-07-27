@@ -1,5 +1,4 @@
-﻿using FotoApi.Features.HandleUrlTokens.Model;
-using FotoApi.Infrastructure.Repositories;
+﻿using FotoApi.Features.HandleUrlTokens.Dto;
 using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 
 namespace FotoApi.Features.HandleUrlTokens.CommandHandlers;

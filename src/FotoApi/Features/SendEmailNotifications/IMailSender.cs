@@ -2,14 +2,14 @@
 
 public interface IMailSender
 {
-    Task SendEmailAsync(MailInfo mailInfo);
+    Task SendEmailAsync(MailInfo mailInfo, CancellationToken ct);
 }
 
 internal interface IMailQueue
 {
-    Task AddToQueue(MailInfo mailInfo);
+    Task AddToQueueAsync(MailInfo mailInfo, CancellationToken ct);
     bool HasItemsInQueue();
-    Task<MailInfo> GetNextFromQueue();
+    Task<MailInfo> GetNextFromQueueAsync(CancellationToken ct);
 }
 
 public record MailInfo(string Email, string Subject, string Message);

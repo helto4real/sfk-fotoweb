@@ -12,9 +12,9 @@ internal class MailSender : IMailSender, IMailQueue
         _logger = logger;
     }
 
-    public async Task AddToQueue(MailInfo mailInfo)
+    public async Task AddToQueueAsync(MailInfo mailInfo, CancellationToken ct)
     {
-        await _mailQueue.Writer.WriteAsync(mailInfo);
+        await _mailQueue.Writer.WriteAsync(mailInfo, ct);
     }
 
     public bool HasItemsInQueue()
@@ -22,13 +22,13 @@ internal class MailSender : IMailSender, IMailQueue
         return _mailQueue.Reader.TryRead(out _);
     }
 
-    public async Task<MailInfo> GetNextFromQueue()
+    public async Task<MailInfo> GetNextFromQueueAsync(CancellationToken ct)
     {
-        return await _mailQueue.Reader.ReadAsync();
+        return await _mailQueue.Reader.ReadAsync(ct);
     }
 
-    public Task SendEmailAsync(MailInfo mailInfo)
+    public Task SendEmailAsync(MailInfo mailInfo, CancellationToken ct)
     {
-        return AddToQueue(mailInfo);
+        return AddToQueueAsync(mailInfo, ct);
     }
 }

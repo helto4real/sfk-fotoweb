@@ -1,7 +1,7 @@
 ﻿using FotoApi.Infrastructure.Repositories;
 using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 using FotoApi.Infrastructure.Security.Authentication;
-using FotoApi.Infrastructure.Security.Authentication.Model;
+using FotoApi.Infrastructure.Security.Authentication.Dto;
 using FotoApi.Infrastructure.Security.Authorization.Dto;
 using FotoApi.Infrastructure.Security.Authorization.Exceptions;
 using FotoApi.Model;

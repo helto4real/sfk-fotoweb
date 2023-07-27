@@ -25,7 +25,6 @@ public class HandleExpiredUrlTokensService : IHandleExpiredUrlTokensService
         var dbContext = _scope.ServiceProvider.GetService<PhotoServiceDbContext>();
 
         _db = dbContext ?? throw new InvalidOperationException("Failed to create db context");
-        // _db.Database.EnsureCreated();
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -41,10 +40,12 @@ public class HandleExpiredUrlTokensService : IHandleExpiredUrlTokensService
 
     public async Task StopAsync(CancellationToken cancellationToken)
     {
-        _scope.Dispose();
-        _logger.LogInformation("Exit ExpiredTokensManager");
         if (!_cancelSource.IsCancellationRequested)
             await _cancelSource.CancelAsync();
+        
+        _scope.Dispose();
+        
+        _logger.LogInformation("ExpiredTokensManager - Waiting for background thread to exit");
 
         if (_backgroundTask is not null)
             await _backgroundTask;
@@ -60,7 +61,7 @@ public class HandleExpiredUrlTokensService : IHandleExpiredUrlTokensService
                 await Task.Delay(TimeSpan.FromMinutes(RemoveInterval), _combinedCancellationToken);
             }
         }
-        catch (TaskCanceledException)
+        catch (OperationCanceledException)
         {
             // No action needed            
         }
@@ -72,7 +73,7 @@ public class HandleExpiredUrlTokensService : IHandleExpiredUrlTokensService
 
     private async Task RemoveExpiredTokens()
     {
-        var expiredTokens = await _db.UrlTokens.Where(token => token.ExpirationDate < DateTime.UtcNow).ToListAsync();
+        var expiredTokens = await _db.UrlTokens.Where(token => token.ExpirationDate < DateTime.UtcNow).ToListAsync(_combinedCancellationToken);
         _db.UrlTokens.RemoveRange(expiredTokens);
         await _db.SaveChangesAsync(_combinedCancellationToken);
         if (expiredTokens.Count > 0)

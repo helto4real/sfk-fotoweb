@@ -47,7 +47,7 @@ public class StBildService : IStBildService
     public async Task<List<StBildInfo>> GetStBilderForCurrentUser(bool showPackagedImages)
     {
         var response = await _signInService.RefreshTokenOnExpired(async () =>
-            await _httpClient.GetAsync($"/api/stbilder/{showPackagedImages}"));
+            await _httpClient.GetAsync($"/api/stbilder/user/{showPackagedImages}"));
         if (response.IsSuccessStatusCode)
         {
             var stBilder = await response.Content.ReadFromJsonAsync<List<StBildInfo>>();
@@ -65,7 +65,7 @@ public class StBildService : IStBildService
     public async Task<List<StBildInfo>> GetStBilder(bool showPackagedImages)
     {
         var response = await _signInService.RefreshTokenOnExpired(async () =>
-            await _httpClient.GetAsync($"/api/stbilder/all/{showPackagedImages}"));
+            await _httpClient.GetAsync($"/api/stbilder/{showPackagedImages}"));
         if (response.IsSuccessStatusCode)
         {
             var stBilder = await response.Content.ReadFromJsonAsync<List<StBildInfo>>();

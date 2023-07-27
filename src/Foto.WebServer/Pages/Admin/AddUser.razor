@@ -8,7 +8,7 @@
 @inherits AuthorizedBasePage
 @attribute [Authorize(Roles = "Admin")]
 
-@inject IAdminService AdminService
+@inject IUserService UserService
 <div class="container d-flex flex-column justify-content-center align-items-center">
     <div class="row row-cols-auto align-items-center">
         <h2>Lägg till användare</h2>
@@ -59,7 +59,7 @@
     
     private async Task HandleValidSubmit()
     {
-        var user = _responseHandler.CheckResponse(await AdminService.PreCreateUserAsync(NewUserModel.Email));
+        var user = _responseHandler.CheckResponse(await UserService.PreCreateUserAsync(NewUserModel.Email));
         if (user is not null)
         {
             _preCreatedUserNames.Add(user.UserName);

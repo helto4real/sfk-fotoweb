@@ -12,7 +12,7 @@ public class UserRequest
     public bool IsAdmin { get; set; }
 }
 
-public class UserRequestValidator : AbstractValidator<UpdateUserCommand>
+public class UserRequestValidator : AbstractValidator<UpdateUserRequest>
 {
     public UserRequestValidator()
     {

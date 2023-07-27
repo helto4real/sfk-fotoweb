@@ -67,6 +67,7 @@
   <ItemGroup>
     <Folder Include=".images\uploaded_images\" />
     <Folder Include=".images\user_images\" />
+    <Folder Include="Features\HandleSubmissions\" />
     <Folder Include="Infrastructure\Repositories\PhotoServiceDbContext\Migrations\" />
   </ItemGroup>
   

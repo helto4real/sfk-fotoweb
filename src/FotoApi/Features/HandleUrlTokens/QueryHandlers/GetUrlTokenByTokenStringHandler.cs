@@ -1,7 +1,7 @@
-﻿using FotoApi.Features.HandleUrlTokens.Exceptions;
-using FotoApi.Features.HandleUrlTokens.Model;
-using FotoApi.Infrastructure.Repositories;
+﻿using FotoApi.Features.HandleUrlTokens.Dto;
+using FotoApi.Features.HandleUrlTokens.Exceptions;
 using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
+using UrlTokenMapper = FotoApi.Features.HandleUrlTokens.Dto.UrlTokenMapper;
 
 namespace FotoApi.Features.HandleUrlTokens.QueryHandlers;
 

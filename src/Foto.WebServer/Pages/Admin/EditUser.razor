@@ -6,7 +6,7 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @inherits AuthorizedBasePage
 @attribute [Authorize(Roles = "Admin")]
-@inject IAdminService AdminService
+@inject IUserService UserService
 @inject IJSRuntime JsRuntime
 
 <div class="container d-flex flex-column justify-content-center align-items-center">
@@ -58,7 +58,7 @@ else
     {
         if (firstRender)
         {
-            User = await AdminService.GetUserByUsernameAsync(UserName);
+            User = await UserService.GetUserByUsernameAsync(UserName);
             StateHasChanged();
         }
         await base.OnAfterRenderAsync(firstRender);
@@ -73,7 +73,7 @@ else
         }
     // Save the newUser changes here
 
-        if (!await AdminService.UpdateUserAsync(User))
+        if (!await UserService.UpdateUserAsync(User))
         {
     // Todo: show error
             return;
@@ -88,7 +88,7 @@ else
         var confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"Är du säker på att du vill ta bort användaren {UserName}? Detta kommar ta bort all information och bilder om användaren!");
         if (confirmed)
         {
-            await AdminService.DeleteUserAsync(UserName);
+            await UserService.DeleteUserAsync(UserName);
             // Navigate back to the newUser list page
             NavigationManager?.NavigateTo("/admin/users/list");
         }

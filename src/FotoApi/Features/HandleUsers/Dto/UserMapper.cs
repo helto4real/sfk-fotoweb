@@ -16,7 +16,7 @@ public partial class UserMapper
 
     private partial UserResponse _ToUserResponse(User user);
 
-    public partial UpdateUserCommand ToEditUserCommand(UserRequest request);
+    public partial UpdateUserRequest ToEditUserCommand(UserRequest request);
 
     public partial CreateUserRequest ToCreateUserCommand(NewUserRequest request);
 }
