@@ -1,0 +1,52 @@
+@api_url = https://localhost:8001/api
+
+# @name gettoken
+POST https://localhost:8001/api/users/token
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "password": "P@ssw0rd!",
+    "admin": "true"
+}
+
+### Get token
+@token = {{gettoken.response.body.token}}
+
+### Get all members
+GET {{api_url}}/members
+Authorization: Bearer {{token}}
+
+### Create member
+# @name create_member
+POST {{api_url}}/members
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "email": "someuser@somedomain.com",
+  "phoneNumber": "070-1234567",
+  "firstName": "FirstName",
+  "lastName": "LastName",
+  "address": "Street 1",
+  "zipCode": "999"
+}
+
+### Get the member id
+@member_id = {{create_member.response.body.id}}
+
+### Get member
+GET {{api_url}}/members/{{member_id}}
+Authorization: Bearer {{token}}
+
+### Delete member
+DELETE {{api_url}}/members/{{member_id}}
+Authorization: Bearer {{token}}
+
+### Deavtivate member
+Get {{api_url}}/members/{{member_id}}/deactivate
+Authorization: Bearer {{token}}
+
+### Activate member
+Get {{api_url}}/members/{{member_id}}/activate
+Authorization: Bearer {{token}}
