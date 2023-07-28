@@ -12,9 +12,9 @@ namespace FotoApi.Infrastructure.Security.Authorization.Commands;
 public class RefreshTokenHandler(PhotoServiceDbContext db, ITokenService tokenService, UserManager<User> userManager)
     : IHandler<RefreshTokenRequest, UserAuthorizedResponse?>
 {
-    public async Task<UserAuthorizedResponse?> Handle(RefreshTokenRequest request, CancellationToken cancellationToken)
+    public async Task<UserAuthorizedResponse?> Handle(RefreshTokenRequest request, CancellationToken ct)
     {
-        var user = await db.Users.FirstOrDefaultAsync(u => u.UserName == request.UserName && u.RefreshToken == request.RefreshToken, cancellationToken);
+        var user = await db.Users.FirstOrDefaultAsync(u => u.UserName == request.UserName && u.RefreshToken == request.RefreshToken, ct);
         if (user is null)
         {
             throw new RefreshTokenNotFoundOrWrongException();
@@ -23,7 +23,7 @@ public class RefreshTokenHandler(PhotoServiceDbContext db, ITokenService tokenSe
         user.RefreshToken = refreshToken;
         user.RefreshTokenExpirationDate = expireTime;
         db.Users.Update(user);
-        await db.SaveChangesAsync(cancellationToken);
+        await db.SaveChangesAsync(ct);
         var isAdmin = await userManager.IsInRoleAsync(user, "Admin");
         return new UserAuthorizedResponse
         {

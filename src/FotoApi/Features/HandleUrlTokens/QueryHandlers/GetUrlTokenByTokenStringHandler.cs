@@ -15,9 +15,9 @@ public class GetUrlTokenByTokenStringHandler : IHandler<string, UrlTokenResponse
         _db = db;
     }
 
-    public async Task<UrlTokenResponse> Handle(string token, CancellationToken cancellationToken)
+    public async Task<UrlTokenResponse> Handle(string token, CancellationToken ct)
     {
-        var urlToken = await _db.UrlTokens.FirstOrDefaultAsync(e => e.Token == token, cancellationToken: cancellationToken);
+        var urlToken = await _db.UrlTokens.FirstOrDefaultAsync(e => e.Token == token, cancellationToken: ct);
 
         if (urlToken is null)
             throw new UrlTokenNotFoundException(token);

@@ -16,7 +16,7 @@ public class GetStBildHandler(PhotoServiceDbContext db) : IHandler<GetStBildRequ
 {
     private readonly StBildResponseMapper _responseMapper = new();
 
-    public async Task<StBildResponse> Handle(GetStBildRequest request, CancellationToken cancellationToken)
+    public async Task<StBildResponse> Handle(GetStBildRequest request, CancellationToken ct)
     {
         var stBild = await db.StBilder.FindAsync(request.Id);
 
@@ -25,7 +25,7 @@ public class GetStBildHandler(PhotoServiceDbContext db) : IHandler<GetStBildRequ
 
         if (!request.CurrentUser.IsAdmin && stBild.OwnerReference != request.CurrentUser.Id)
             throw new ForbiddenException("User not authorized to get stbild information for this id");
-        
+
         return _responseMapper.ToStBildResponse(stBild);
     }
 }

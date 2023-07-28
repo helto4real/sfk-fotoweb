@@ -16,6 +16,7 @@ public class UserDeletedStBilderNotificationHandler(PhotoServiceDbContext db,
             logger.LogInformation($"Removing {userImages.Count()} StBilder belonging to user {notification.UserName}");
             db.StBilder.RemoveRange(userImages);
         }
+
         return Task.CompletedTask;
     }
 }

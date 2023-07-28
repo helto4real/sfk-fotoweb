@@ -12,15 +12,16 @@ public record DeleteStBildRequest(Guid Id) : ICurrentUser
 
 public class DeleteStBildHandler(PhotoServiceDbContext db) : IHandler<DeleteStBildRequest>
 {
-    public async Task Handle(DeleteStBildRequest request, CancellationToken cancellationToken)
+    public async Task Handle(DeleteStBildRequest request, CancellationToken ct)
     {
         var imageInfo = await db.StBilder.FindAsync(request.Id);
         if (imageInfo == null)
             throw new ImageNotFoundException(request.Id);
 
         var rowsAffected = await db.StBilder
-            .Where(t => t.Id == request.Id && (t.OwnerReference == request.CurrentUser.Id || request.CurrentUser.IsAdmin))
-            .ExecuteDeleteAsync(cancellationToken: cancellationToken);
+            .Where(t => t.Id == request.Id &&
+                        (t.OwnerReference == request.CurrentUser.Id || request.CurrentUser.IsAdmin))
+            .ExecuteDeleteAsync(ct);
 
         if (rowsAffected == 0)
             throw new ImageNotFoundException(request.Id);

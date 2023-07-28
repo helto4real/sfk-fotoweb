@@ -25,9 +25,12 @@ public class NewStBildRequestValidator : AbstractValidator<NewStBildRequest>
             .WithMessage("Description cannot be empty and must be less than 300 characters");
         RuleFor(x => x.Name).NotEmpty().MaximumLength(50)
             .WithMessage("Name cannot be empty and must be less than 50 characters");
-        RuleFor(x => x.AboutThePhotograper).MaximumLength(300).WithMessage("CameraBrand must be less than 50 characters");
-        RuleFor(x => x.Time).NotEmpty().GreaterThanOrEqualTo(new DateTime(1900, 1, 1)).WithMessage("Time must be after 1900-01-01");
-        RuleFor(x => x.Time).NotEmpty().LessThanOrEqualTo(DateTime.Now.AddDays(1)).WithMessage("Time cannot be in the future");
+        RuleFor(x => x.AboutThePhotograper).MaximumLength(300)
+            .WithMessage("CameraBrand must be less than 50 characters");
+        RuleFor(x => x.Time).NotEmpty().GreaterThanOrEqualTo(new DateTime(1900, 1, 1))
+            .WithMessage("Time must be after 1900-01-01");
+        RuleFor(x => x.Time).NotEmpty().LessThanOrEqualTo(DateTime.Now.AddDays(1))
+            .WithMessage("Time cannot be in the future");
         RuleFor(x => x.Time.Kind).Equal(DateTimeKind.Utc).WithMessage("Time must be in UTC");
     }
 }

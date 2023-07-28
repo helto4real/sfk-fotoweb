@@ -8,12 +8,12 @@ public interface IBaseHandler { }
 
 public interface IHandler<in TCommand, TResponse> : IBaseHandler
 {
-    public Task<TResponse> Handle(TCommand command, CancellationToken cancellationToken = default);
+    public Task<TResponse> Handle(TCommand command, CancellationToken ct = default);
 }
 
 public interface IHandler<in TCommand> : IBaseHandler
 {
-    public Task Handle(TCommand command, CancellationToken cancellationToken = default);
+    public Task Handle(TCommand command, CancellationToken ct = default);
 }
 
 public interface IEmptyRequestHandler<TResult> : IBaseHandler

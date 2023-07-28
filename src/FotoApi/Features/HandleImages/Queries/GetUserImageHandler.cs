@@ -10,7 +10,7 @@ public class GetUserImageHandler(PhotoServiceDbContext db, CurrentUser currentUs
 {
     private readonly ImagesMapper _mapper = new();
 
-    public async Task<ImageResponse> Handle(Guid imageId, CancellationToken cancellationToken)
+    public async Task<ImageResponse> Handle(Guid imageId, CancellationToken ct)
     {
         return await db.Images.FindAsync(imageId) switch
         {

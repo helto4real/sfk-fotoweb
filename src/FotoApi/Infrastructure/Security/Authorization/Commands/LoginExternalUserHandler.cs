@@ -16,7 +16,7 @@ public class LoginExternalUserHandler(UserManager<User> userManager,
         PhotoServiceDbContext db)
     : IHandler<LoginExternalUserCommand, UserAuthorizedResponse>
 {
-    public async Task<UserAuthorizedResponse> Handle(LoginExternalUserCommand command, CancellationToken cancellationToken)
+    public async Task<UserAuthorizedResponse> Handle(LoginExternalUserCommand command, CancellationToken ct)
     {
         var loginUser = await userManager.FindByLoginAsync(command.Provider, command.ProviderKey);
         

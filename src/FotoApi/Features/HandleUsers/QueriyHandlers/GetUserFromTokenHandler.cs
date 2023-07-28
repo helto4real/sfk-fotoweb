@@ -11,7 +11,7 @@ public class GetUserFromTokenHandler(ITokenService tokenService, UserManager<Use
 {
     private readonly UserMapper _userMapper = new();
 
-    public async Task<UserResponse> Handle(string token, CancellationToken cancellationToken)
+    public async Task<UserResponse> Handle(string token, CancellationToken ct)
     {
         var userId = tokenService.GetUserIdByAccessTokenAsync(token);
         if (userId == null)

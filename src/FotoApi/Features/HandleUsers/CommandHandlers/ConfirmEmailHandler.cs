@@ -9,9 +9,9 @@ namespace FotoApi.Features.HandleUsers.CommandHandlers;
 
 public class ConfirmEmailHandler(PhotoServiceDbContext db, UserManager<User> userManager) : IHandler<string>
 {
-    public async Task Handle(string token, CancellationToken cancellationToken)
+    public async Task Handle(string token, CancellationToken ct)
     {
-        var urlToken = await db.UrlTokens.FirstOrDefaultAsync(n => n.Token == token, cancellationToken: cancellationToken);
+        var urlToken = await db.UrlTokens.FirstOrDefaultAsync(n => n.Token == token, cancellationToken: ct);
 
         if (urlToken is null)
             throw new UrlTokenNotFoundException(token);
@@ -26,6 +26,6 @@ public class ConfirmEmailHandler(PhotoServiceDbContext db, UserManager<User> use
 
         db.UrlTokens.Remove(urlToken);
 
-        await db.SaveChangesAsync(cancellationToken);
+        await db.SaveChangesAsync(ct);
     }
 }

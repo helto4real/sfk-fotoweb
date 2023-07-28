@@ -2,12 +2,9 @@
 using FotoApi.Features.HandleImages.Dto;
 using FotoApi.Features.HandleImages.Exceptions;
 using FotoApi.Infrastructure.Repositories;
-using FotoApi.Infrastructure.Validation.Exceptions;
-using System.Net.Http.Json;
 using FotoApi.Features.HandleSubmissions.HandleStBilder.Commands;
 using FotoApi.Features.HandleSubmissions.HandleStBilder.Dto;
 using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
-using MediatR;
 using Image = FotoApi.Model.Image;
 
 namespace FotoApi.Features.HandleImages.Commands;
@@ -18,7 +15,7 @@ public class SaveImageFromStreamHandler(PhotoServiceDbContext db, IPhotoStore ph
     private readonly ImagesMapper _mapper = new();
     private readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
 
-    public async Task<ImageResponse> Handle(SaveImageFromStreamRequest request, CancellationToken cancellationToken)
+    public async Task<ImageResponse> Handle(SaveImageFromStreamRequest request, CancellationToken ct)
     {
         var metadata = GetMetadataFromMetadataType(request.MetadataType, request.Metadata);
         
@@ -53,14 +50,14 @@ public class SaveImageFromStreamHandler(PhotoServiceDbContext db, IPhotoStore ph
         db.Images.Add(photoImage);
         
 
-        await db.SaveChangesAsync(cancellationToken);
+        await db.SaveChangesAsync(ct);
 
         // Todo: Send to handlers for metadata, this is kinda hacky right now, can we really have this dependency?
         if (metadata is NewStBildRequest stBildCommand)
         {
             stBildCommand.OwnerReference = request.CurrentUser.Id;
             stBildCommand.ImageReference = photoImage.Id;
-            await handler.Handle(stBildCommand, cancellationToken);
+            await handler.Handle(stBildCommand, ct);
         }
         
         return _mapper.ToImageResponse(photoImage);

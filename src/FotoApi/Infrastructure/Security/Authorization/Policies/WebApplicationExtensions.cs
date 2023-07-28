@@ -20,6 +20,7 @@ public static class WebApplicationExtensions
     {
         options.AddPolicy("AdminPolicy", policy =>
         {
+            policy.RequireAuthenticatedUser();
             policy.RequireRole("Admin");
         });
     }
@@ -28,7 +29,8 @@ public static class WebApplicationExtensions
     {
         options.AddPolicy("MemberPolicy", policy =>
         {
-            policy.RequireRole("Member");
+            policy.RequireAuthenticatedUser();
+            policy.RequireRole("Member", "Admin");
         });
     }
     
@@ -36,7 +38,8 @@ public static class WebApplicationExtensions
     {
         options.AddPolicy("CompetitionAdministratorsPolicy", policy =>
         {
-            policy.RequireRole("CompetitionAdministrator");
+            policy.RequireAuthenticatedUser();
+            policy.RequireRole("CompetitionAdministrator", "Admin");
         });
     }
     
@@ -44,7 +47,8 @@ public static class WebApplicationExtensions
     {
         options.AddPolicy("StBildAdministratiorPolicy", policy =>
         {
-            policy.RequireRole("StbildAdministrator");
+            policy.RequireAuthenticatedUser();
+            policy.RequireRole("StbildAdministrator", "Admin");
         });
     }
 }

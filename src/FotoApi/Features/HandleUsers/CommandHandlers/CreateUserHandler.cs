@@ -21,10 +21,10 @@ public class CreateUserHandler(
 {
     private readonly UserMapper _userMapper = new();
 
-    public async Task<UserResponse> Handle(NewUserRequest request, CancellationToken cancellationToken)
+    public async Task<UserResponse> Handle(NewUserRequest request, CancellationToken ct)
     {
         if (!await db.UrlTokens.AnyAsync(e =>
-                e.Token == request.UrlToken && e.UrlTokenType == UrlTokenType.AllowAddUser, cancellationToken: cancellationToken))
+                e.Token == request.UrlToken && e.UrlTokenType == UrlTokenType.AllowAddUser, cancellationToken: ct))
             throw new UrlTokenNotFoundException(request.UrlToken);
 
         var user = await userManager.FindByNameAsync(request.UserName);
@@ -48,7 +48,7 @@ public class CreateUserHandler(
         var newToken = UrlTokenCreator.CreateUrlTokenFromUrlTokenType(UrlTokenType.ConfirmEmail);
         newToken.Data = user.Id;
         var urlToken = db.UrlTokens.Add(newToken);
-        await db.SaveChangesAsync(cancellationToken);
+        await db.SaveChangesAsync(ct);
 
         await bus.PublishAsync(new UserCreatedNotification(user.Email!, urlToken.Entity.Token));
         logger.LogInformation("Registrerat användare med användarnam {UserName}", request.UserName);

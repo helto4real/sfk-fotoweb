@@ -14,10 +14,10 @@ public class LoginAndCreateUserHandler(
 {
     private readonly LoginMapper _mapper = new();
 
-    public async Task<UserAuthorizedResponse> Handle(LoginAndCreateUserRequest request, CancellationToken cancellationToken)
+    public async Task<UserAuthorizedResponse> Handle(LoginAndCreateUserRequest request, CancellationToken ct)
     {
         var result = await pipe.Pipe(_mapper.ToCreateUserCommand(request),
-            createUserHandler.Handle, cancellationToken);
+            createUserHandler.Handle, ct);
         var authorizedUserResponse =
             _mapper.ToUserAuthorizedResponse(result, tokenService.GenerateToken(result.UserName, result.IsAdmin));
         return authorizedUserResponse;

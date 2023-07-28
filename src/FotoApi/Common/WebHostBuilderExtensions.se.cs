@@ -1,7 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using FluentValidation;
 using FotoApi.Api;
-using FotoApi.Features.HandleSubmissions.HandleStBilder.Commands;
 using FotoApi.Features.HandleSubmissions.HandleStBilder.Dto;
 using FotoApi.Features.HandleUrlTokens;
 using FotoApi.Features.SendEmailNotifications;
@@ -67,6 +66,7 @@ internal static class WebHostBuilderExtensions_se
         app.MapAdmin();
         app.MapPublic();
         app.MapStBildApi();
+        app.MapMemberApi();
 
         // Configure the prometheus endpoint for scraping metrics
         app.MapPrometheusScrapingEndpoint();

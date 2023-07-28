@@ -8,7 +8,7 @@ namespace FotoApi.Features.HandleImages.Commands;
 public class UpdateImageHandler(PhotoServiceDbContext db, CurrentUser currentUser)
     : IHandler<UpdateImageRequest>
 {
-    public async Task Handle(UpdateImageRequest request, CancellationToken cancellationToken)
+    public async Task Handle(UpdateImageRequest request, CancellationToken ct)
     {
         var rowsAffected = await db.Images
             .Where(t => t.Id == request.Id && (t.OwnerReference == currentUser.Id || currentUser.IsAdmin))

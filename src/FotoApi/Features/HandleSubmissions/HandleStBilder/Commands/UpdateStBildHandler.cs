@@ -6,13 +6,10 @@ namespace FotoApi.Features.HandleSubmissions.HandleStBilder.Commands;
 
 public class UpdateStBildHandler(PhotoServiceDbContext db) : IHandler<StBildRequest>
 {
-    public async Task Handle(StBildRequest request, CancellationToken cancellationToken)
+    public async Task Handle(StBildRequest request, CancellationToken ct)
     {
         var stBild = await db.StBilder.FindAsync(request.Id);
-        if (stBild == null)
-        {
-            throw new StBildNotFoundException(request.Id);
-        }
+        if (stBild == null) throw new StBildNotFoundException(request.Id);
         stBild.Title = request.Title;
         stBild.Name = request.Name;
         stBild.Location = request.Location;
@@ -20,7 +17,7 @@ public class UpdateStBildHandler(PhotoServiceDbContext db) : IHandler<StBildRequ
         stBild.Description = request.Description;
         stBild.AboutThePhotograper = request.AboutThePhotograper;
         stBild.IsAccepted = request.IsAccepted;
-        
-        await db.SaveChangesAsync(cancellationToken);
+
+        await db.SaveChangesAsync(ct);
     }
 }

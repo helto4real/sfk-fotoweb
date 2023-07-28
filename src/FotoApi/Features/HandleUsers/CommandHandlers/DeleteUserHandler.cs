@@ -9,7 +9,7 @@ namespace FotoApi.Features.HandleUsers.CommandHandlers;
 
 public class DeleteUserHandler(UserManager<User> userManager, IMessageBus bus) : IHandler<string>
 {
-    public async Task Handle(string username, CancellationToken cancellationToken)
+    public async Task Handle(string username, CancellationToken ct)
     {
         var user = await userManager.FindByNameAsync(username);
 

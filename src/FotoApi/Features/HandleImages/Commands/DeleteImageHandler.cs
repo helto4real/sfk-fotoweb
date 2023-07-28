@@ -12,7 +12,7 @@ public class DeleteImageHandler(PhotoServiceDbContext db, IPhotoStore photoStore
         IMessageBus bus)
     : IHandler<Guid>
 {
-    public async Task Handle(Guid id, CancellationToken cancellationToken)
+    public async Task Handle(Guid id, CancellationToken ct)
     {
         var imageInfo = await db.Images.FindAsync(id);
         if (imageInfo == null)
@@ -20,7 +20,7 @@ public class DeleteImageHandler(PhotoServiceDbContext db, IPhotoStore photoStore
 
         var rowsAffected = await db.Images
             .Where(t => t.Id == id && (t.OwnerReference == currentUser.Id || currentUser.IsAdmin))
-            .ExecuteDeleteAsync(cancellationToken: cancellationToken);
+            .ExecuteDeleteAsync(cancellationToken: ct);
 
         if (rowsAffected > 0)
         {

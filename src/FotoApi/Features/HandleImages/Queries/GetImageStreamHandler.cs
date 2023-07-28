@@ -11,7 +11,7 @@ public record GetImageStreamQuery(Guid Id, bool IsThumbnail);
 public class GetImageStreamHandler(PhotoServiceDbContext db, IPhotoStore photoStore)
     : IHandler<GetImageStreamQuery, FileStream>
 {
-    public async Task<FileStream> Handle(GetImageStreamQuery query, CancellationToken cancellationToken)
+    public async Task<FileStream> Handle(GetImageStreamQuery query, CancellationToken ct)
     {
         var imageInfo = await db.Images.FindAsync(query.Id);
 

@@ -7,7 +7,7 @@ namespace FotoApi.Features.HandleUsers.CommandHandlers;
 
 public class UpdateUserHandler(UserManager<User> userManager) : IHandler<UserRequest>
 {
-    public async Task Handle(UserRequest request, CancellationToken cancellationToken)
+    public async Task Handle(UserRequest request, CancellationToken ct)
     {
         var user = await userManager.FindByNameAsync(request.UserName);
 

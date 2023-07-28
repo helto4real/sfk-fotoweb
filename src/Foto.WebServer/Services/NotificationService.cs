@@ -10,7 +10,7 @@ public class NotificationService<T>(NavigationManager navigationManager, IHttpCo
 {
     private NotificationEventHandler<T>? _callback;
     private HubConnection? _hubConnection;
-
+    private readonly CancellationTokenSource _cancelSource = new();
     public async Task RegisterCallback(NotificationEventHandler<T> callback, string topic)
     {
         var authResult = await accessor.HttpContext!.AuthenticateAsync();
@@ -32,13 +32,14 @@ public class NotificationService<T>(NavigationManager navigationManager, IHttpCo
             .WithAutomaticReconnect()
             .Build();
 
-        await _hubConnection.StartAsync();
+        await _hubConnection.StartAsync(_cancelSource.Token);
 
         _hubConnection.On<T>(topic, async message => { await _callback(message); });
     }
 
     public async ValueTask DisposeAsync()
     {
+        await _cancelSource.CancelAsync();
         if (_hubConnection is not null) await _hubConnection.DisposeAsync();
     }
 }

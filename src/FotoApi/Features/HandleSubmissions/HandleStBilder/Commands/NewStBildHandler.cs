@@ -8,7 +8,7 @@ public class NewStBildHandler(PhotoServiceDbContext db) : IHandler<NewStBildRequ
 {
     private readonly StBildResponseMapper _responseMapper = new();
 
-    public async Task<IdentityResponse> Handle(NewStBildRequest request, CancellationToken cancellationToken)
+    public async Task<IdentityResponse> Handle(NewStBildRequest request, CancellationToken ct)
     {
         var stBild = _responseMapper.ToStBild(request);
         await db.StBilder.AddAsync(

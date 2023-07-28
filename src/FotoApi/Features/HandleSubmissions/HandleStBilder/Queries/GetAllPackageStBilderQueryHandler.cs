@@ -10,6 +10,6 @@ public class GetAllPackageStBilderQueryHandler(PhotoServiceDbContext db) : IEmpt
     public async Task<List<StBildResponse>> Handle(CancellationToken cancellationToken)
     {
         return await db.StBilder.Where(b => b.IsAccepted && !b.IsUsed)
-            .Select(e => _responseMapper.ToStBildResponse(e)).ToListAsync(cancellationToken: cancellationToken);
+            .Select(e => _responseMapper.ToStBildResponse(e)).ToListAsync(cancellationToken);
     }
 }

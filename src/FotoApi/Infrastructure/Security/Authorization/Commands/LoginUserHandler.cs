@@ -8,7 +8,7 @@ namespace FotoApi.Infrastructure.Security.Authorization.Commands;
 
 public class LoginUserHandler(UserManager<User> userManager, ITokenService tokenService) : IHandler<LoginUserRequest, UserAuthorizedResponse>
 {
-    public async Task<UserAuthorizedResponse> Handle(LoginUserRequest request, CancellationToken cancellationToken)
+    public async Task<UserAuthorizedResponse> Handle(LoginUserRequest request, CancellationToken ct)
     {
         var user = await userManager.FindByNameAsync(request.UserName);
 

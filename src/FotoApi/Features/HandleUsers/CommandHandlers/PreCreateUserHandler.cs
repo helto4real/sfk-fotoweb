@@ -11,7 +11,7 @@ public class PreCreateUserHandler(UserManager<User> userManager,
 {
     private readonly UserMapper _userMapper = new();
 
-    public async Task<UserResponse> Handle(EmailRequest request, CancellationToken cancellationToken)
+    public async Task<UserResponse> Handle(EmailRequest request, CancellationToken ct)
     {
         // Check if user already exists, checking both to be sure
         if (await userManager.FindByEmailAsync(request.Email) is not null)

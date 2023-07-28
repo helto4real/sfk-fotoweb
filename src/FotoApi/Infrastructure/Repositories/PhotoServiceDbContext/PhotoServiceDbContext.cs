@@ -11,6 +11,7 @@ public class PhotoServiceDbContext: IdentityDbContext<User, Role, string>
     {
         
     }
+    public virtual DbSet<Member> Members => Set<Member>();
     public virtual DbSet<UrlToken> UrlTokens => Set<UrlToken>();
     public virtual DbSet<Image> Images => Set<Image>();
     public virtual DbSet<StBild> StBilder => Set<StBild>();
@@ -22,7 +23,9 @@ public class PhotoServiceDbContext: IdentityDbContext<User, Role, string>
         builder.Entity<Member>(e =>
         {
             e.HasKey(k => k.Id);
-            
+            e.Property(p => p.FirstName).IsRequired();
+            e.Property(p => p.LastName).IsRequired();
+            e.Property(p => p.OwnerReference).IsRequired();
         });
        
         builder.Entity<UrlToken>(e =>

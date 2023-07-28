@@ -55,6 +55,28 @@ public class IntegrationTestsBase : IAsyncDisposable
         var result = await userManager.CreateAsync(newUser, password ?? Guid.NewGuid().ToString());
         Assert.True(result.Succeeded);
     }
+
+    public async Task<Member> CreateMember(string email, bool active = true)
+    {
+        using var scope = _fotoApplication.Services.CreateScope();
+        var db = await scope.ServiceProvider.GetRequiredService<IDbContextFactory<PhotoServiceDbContext>>().CreateDbContextAsync();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+        
+        await CreateUserAsync(email, null, email);
+        var user = await userManager.FindByEmailAsync(email);
+        var member = new Member()
+        {
+            OwnerReference = user!.Id,
+            FirstName = "MemberFirstName",
+            LastName = "MemberLastName",
+            Address = "MemberStreet 1",
+            ZipCode = "9999",
+            IsActive = active
+        };
+        db.Members.Add(member);
+        await db.SaveChangesAsync();
+        return member;
+    }
     public async Task PreRegisterUserAsync(string username, string? password = null)
     {
         using var scope = _fotoApplication.Services.CreateScope();

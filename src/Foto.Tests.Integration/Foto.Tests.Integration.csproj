@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentAssertions" Version="6.11.0" />
     <PackageReference Include="Testcontainers" Version="3.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.0-preview.6.23329.11" />
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="8.0.0-preview.4.23259.3" />
@@ -16,6 +17,7 @@
     <PackageReference Include="xunit" Version="2.5.0-pre.22" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.0-pre.15" PrivateAssets="all" />
     <PackageReference Include="coverlet.collector" Version="6.0.0" PrivateAssets="all" />
+    <ProjectReference Include="..\Foto.WebServer\Foto.WebServer.csproj" />
     <ProjectReference Include="..\FotoApi\FotoApi.csproj" />
   </ItemGroup>
 
@@ -25,6 +27,7 @@
         <Using Include="System.Net" />
         <Using Include="Xunit" />
     </ItemGroup>
+
 
 
 

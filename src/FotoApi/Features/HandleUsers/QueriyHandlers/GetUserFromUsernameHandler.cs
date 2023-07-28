@@ -9,7 +9,7 @@ public class GetUserFromUsernameHandler(UserManager<User> userManager) : IHandle
 {
     private readonly UserMapper _userMapper = new();
 
-    public async Task<UserResponse?> Handle(string username, CancellationToken cancellationToken)
+    public async Task<UserResponse?> Handle(string username, CancellationToken ct)
     {
         var user = await userManager.FindByNameAsync(username);
 
