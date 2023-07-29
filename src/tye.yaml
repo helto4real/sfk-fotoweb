@@ -13,17 +13,17 @@ services:
   bindings:
   - port: 5001
     protocol: https
-  volumes:
-    - source: FotoApi/.db
-      target: /app/.db
+  # volumes:
+  #   - source: FotoApi/.db
+  #     target: /app/.db
 #  - port: 5000
 #    protocol: http
 #    name: http
-- name: foto-web-server
-  project: Foto.Web/Server/Foto.Web.Server.csproj
-  env:
-    - ASPNETCORE_ENVIRONMENT="Development"
-  bindings:
-  - port: 44399
-    protocol: https
+# - name: foto-web-server
+#   project: Foto.Web/Server/Foto.Web.Server.csproj
+#   env:
+#     - ASPNETCORE_ENVIRONMENT="Development"
+#   bindings:
+#   - port: 44399
+#     protocol: https
 

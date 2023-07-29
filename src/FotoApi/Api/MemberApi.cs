@@ -45,6 +45,13 @@ public static class MemberApi
             return TypedResults.Ok(response);
         }).RequireAuthorization("AdminPolicy");
 
+        group.MapPut("/", async Task<Results<Ok<MemberResponse>, BadRequest<ErrorDetail>>>
+            (MemberRequest request, UpdateMembersHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
+        {
+            var response = await pipe.Pipe(request, handler.Handle, ct);
+            return TypedResults.Ok(response);
+        });
+
         group.MapDelete("/{memberId:guid}", async Task<Results<Ok, BadRequest<ErrorDetail>>>
             (Guid memberId, DeleteMemberHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {

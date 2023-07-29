@@ -1,8 +1,8 @@
 ﻿namespace FotoApi.Infrastructure.Validation.Exceptions
 {
-    public abstract class ApplicationException : Exception
+    public abstract class ApiException : Exception
     {
-        protected ApplicationException(string title, string message)
+        protected ApiException(string title, string message)
             : base(message) =>
             Title = title;
 

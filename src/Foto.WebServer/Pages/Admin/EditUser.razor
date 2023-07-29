@@ -45,7 +45,7 @@
 }
 else
 {
-    <div class="alert alert-danger">"Något gick fel, prova att logga in igen!"</div>
+    <div class="alert alert-danger">@(_responseHandler.Message)</div>
 }
 
 @code
@@ -53,6 +53,8 @@ else
     [Parameter]
     public string UserName { get; set; } = string.Empty;
     private UserInfo? User { get; set; } = new();
+    
+    private readonly ResponseHandler _responseHandler = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

@@ -1,0 +1,71 @@
+﻿@page "/admin/members/manage"
+
+@layout MainLayout
+@using Foto.WebServer.Services
+@using Blazored.FluentValidation
+@using Foto.WebServer.Dto
+@using Microsoft.AspNetCore.Authorization
+@inherits AuthorizedBasePage
+@inject IMemberService MemberService;
+@attribute [Authorize(Roles = "Admin")]
+
+<div class="container d-flex flex-column justify-content-center align-items-center mb-3">
+    <div class="row row-cols-auto align-items-center">
+        <h2>Hantera medlemmar</h2>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row g-3 mb-5 justify-content-center align-items-center">
+        <div class="col col-8" style="max-width: 500px;">
+            <table class="table table-striped table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">Namn</th>
+                    <th scope="col">E-post</th>
+                    <th scope="col">
+                        <NavLink href="/admin/members/register">
+                            <button type="button" class="btn btn btn-primary">Lägg till</button>
+                        </NavLink>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var member in _members)
+                {
+                    <tr >
+                        <td>@($"{member.FirstName} {member.LastName}")</td>
+                        <td>@member.Email</td>
+                        <td><NavLink href="@GetMemberEditLink(member.Id)"><span>Redigera</span></NavLink></td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@if (_responseHandler.HasAlert)
+{
+    <div class="alert alert-danger">@_responseHandler.Message</div>
+}
+
+@code {
+    private List<MemberInfo> _members = new();
+    private readonly ResponseHandler _responseHandler = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var result = await MemberService.ListMembersAsync();
+            _members = _responseHandler.CheckResponse(result) ?? _members;
+            StateHasChanged();
+        }
+    }
+
+    string GetMemberEditLink(Guid id)
+    {
+        return $"/admin/members/register/{id}";
+    }
+}

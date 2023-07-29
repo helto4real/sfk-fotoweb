@@ -21,7 +21,6 @@ public class MemberServiceTests : IntegrationTestsBase
         var memberService = new MemberService(
             client,
             options,
-            new Mock<IHttpContextAccessor>().Object,
             new FakeSignInService(),
             new Mock<ILogger<AdminService>>().Object
         );
@@ -33,7 +32,9 @@ public class MemberServiceTests : IntegrationTestsBase
             FirstName: "MemberName",
             LastName: "MemberLastName",
             Address: "MemberStreet 1",
-            ZipCode: "9999"));
+            ZipCode: "9999",
+            City: "MemberCity",
+            Roles: new List<RoleInfo> {new(){Name = "Member"}}));
         
         // Assert
         error.Should().BeNull();
@@ -43,6 +44,7 @@ public class MemberServiceTests : IntegrationTestsBase
         member.Email.Should().Be("somemember@domain.com");
         member.Address.Should().Be("MemberStreet 1");
         member.ZipCode.Should().Be("9999");
+        member.City.Should().Be("MemberCity");
         member.PhoneNumber.Should().Be("12345678");
         member.IsActive.Should().BeTrue();
         member.UserName.Should().Be("somemember@domain.com");
@@ -59,7 +61,6 @@ public class MemberServiceTests : IntegrationTestsBase
         var memberService = new MemberService(
             client,
             options,
-            new Mock<IHttpContextAccessor>().Object,
             new FakeSignInService(),
             new Mock<ILogger<AdminService>>().Object
         );
@@ -72,7 +73,10 @@ public class MemberServiceTests : IntegrationTestsBase
             FirstName: "MemberName",
             LastName: "MemberLastName",
             Address: "MemberStreet 1",
-            ZipCode: "9999"));
+            ZipCode: "9999",
+            City: "MemberCity",
+            Roles: new List<RoleInfo> {new(){Name = "Member"}}));
+
         
         // Assert
         error.Should().BeNull();
@@ -82,11 +86,61 @@ public class MemberServiceTests : IntegrationTestsBase
         member.Email.Should().Be(existingUserEmail);
         member.Address.Should().Be("MemberStreet 1");
         member.ZipCode.Should().Be("9999");
+        member.City.Should().Be("MemberCity");
         member.PhoneNumber.Should().Be("12345678");
         member.IsActive.Should().BeTrue();
         member.UserName.Should().Be(existingUserEmail);
+        member.Roles.Should().HaveCount(1);
+        member.Roles.First().Name.Should().Be("Member");
     }
 
+    [Fact]
+    public async Task UpdateMemberShouldReturnUpdatedUser()
+    {
+        // Arrange
+        var updatedMemberEmail = "updated_user_member@domain.com";
+        
+        var client = CreateClient("admin", true);
+        var options = Options.Create(new AppSettings() { FotoApiUrl = client.BaseAddress!.ToString() });
+        var memberService = new MemberService(
+            client,
+            options,
+            new FakeSignInService(),
+            new Mock<ILogger<AdminService>>().Object
+        );
+
+        var member = await CreateMember(updatedMemberEmail);
+        
+        // Act
+        var (updatedMember, error) = await memberService.UpdateMemberAsync(new UpdateMemberInfo(
+        
+            member.Id,
+            "new_updated_email@domain.com",
+            "070-7654321",
+            "MemberNameUpdated",
+            "MemberLastNameUpdated",
+            "MemberStreet 2",
+            "123456",
+            "MemberCityUpdated",
+            new List<RoleInfo> {new(){Name = "Admin"}}
+        ));
+        
+        // Assert
+        error.Should().BeNull();
+        updatedMember.Should().NotBeNull();
+        updatedMember!.FirstName.Should().Be("MemberNameUpdated");
+        updatedMember.LastName.Should().Be("MemberLastNameUpdated");
+        updatedMember.Email.Should().Be("new_updated_email@domain.com");
+        updatedMember.Address.Should().Be("MemberStreet 2");
+        updatedMember.ZipCode.Should().Be("123456");
+        updatedMember.City.Should().Be("MemberCityUpdated");
+        updatedMember.PhoneNumber.Should().Be("070-7654321");
+        updatedMember.IsActive.Should().BeTrue();
+        updatedMember.UserName.Should().Be(updatedMemberEmail);
+        updatedMember.Roles.Should().HaveCount(1);
+        updatedMember.Roles.First().Name.Should().Be("Admin");
+    }
+    
     [Fact]
     public async Task CreateMemberShouldReturnErrorWhenMemberAlreadyExists()
     {
@@ -99,7 +153,6 @@ public class MemberServiceTests : IntegrationTestsBase
         var memberService = new MemberService(
             client,
             options,
-            new Mock<IHttpContextAccessor>().Object,
             new FakeSignInService(),
             new Mock<ILogger<AdminService>>().Object
         );
@@ -111,7 +164,9 @@ public class MemberServiceTests : IntegrationTestsBase
             FirstName: "MemberName",
             LastName: "MemberLastName",
             Address: "MemberStreet 1",
-            ZipCode: "9999"));
+            ZipCode: "9999",
+            City: "MemberCity",
+            Roles: new List<RoleInfo> {new(){Name = "Member"}}));
         
         // Assert
         error.Should().NotBeNull();
@@ -134,7 +189,6 @@ public class MemberServiceTests : IntegrationTestsBase
         var memberService = new MemberService(
             client,
             options,
-            new Mock<IHttpContextAccessor>().Object,
             new FakeSignInService(),
             new Mock<ILogger<AdminService>>().Object
         );
@@ -160,7 +214,6 @@ public class MemberServiceTests : IntegrationTestsBase
         var memberService = new MemberService(
             client,
             options,
-            new Mock<IHttpContextAccessor>().Object,
             new FakeSignInService(),
             new Mock<ILogger<AdminService>>().Object
         );
@@ -174,6 +227,7 @@ public class MemberServiceTests : IntegrationTestsBase
         member.Email.Should().Be(existingMemberEmail);
         member.Address.Should().Be("MemberStreet 1");
         member.ZipCode.Should().Be("9999");
+        member.City.Should().Be("MemberCity");
         member.FirstName.Should().Be("MemberFirstName");
         member.LastName.Should().Be("MemberLastName");
         member.IsActive.Should().BeTrue();
@@ -191,7 +245,6 @@ public class MemberServiceTests : IntegrationTestsBase
         var memberService = new MemberService(
             client,
             options,
-            new Mock<IHttpContextAccessor>().Object,
             new FakeSignInService(),
             new Mock<ILogger<AdminService>>().Object
         );
@@ -216,7 +269,6 @@ public class MemberServiceTests : IntegrationTestsBase
         var memberService = new MemberService(
             client,
             options,
-            new Mock<IHttpContextAccessor>().Object,
             new FakeSignInService(),
             new Mock<ILogger<AdminService>>().Object
         );
@@ -240,7 +292,6 @@ public class MemberServiceTests : IntegrationTestsBase
         var memberService = new MemberService(
             client,
             options,
-            new Mock<IHttpContextAccessor>().Object,
             new FakeSignInService(),
             new Mock<ILogger<AdminService>>().Object
         );
@@ -266,7 +317,6 @@ public class MemberServiceTests : IntegrationTestsBase
         var memberService = new MemberService(
             client,
             options,
-            new Mock<IHttpContextAccessor>().Object,
             new FakeSignInService(),
             new Mock<ILogger<AdminService>>().Object
         );
@@ -290,7 +340,6 @@ public class MemberServiceTests : IntegrationTestsBase
         var memberService = new MemberService(
             client,
             options,
-            new Mock<IHttpContextAccessor>().Object,
             new FakeSignInService(),
             new Mock<ILogger<AdminService>>().Object
         );
@@ -312,10 +361,10 @@ public class MemberServiceTests : IntegrationTestsBase
         var memberService = new MemberService(
             client,
             options,
-            new Mock<IHttpContextAccessor>().Object,
             new FakeSignInService(),
             new Mock<ILogger<AdminService>>().Object
         );
+        
         // Act
         var error = await memberService.DeleteMemberByIdAsync(nonExistingMemberId);
         

@@ -7,6 +7,20 @@ public class ResponseHandler
     public string? Message { get; set; }
     public bool HasAlert => Message is not null;
 
+    public bool CheckResponse(ErrorDetail? result) 
+    {
+        if (result is null)
+        {
+            Clear();
+            return true;
+        }
+        else
+        {
+            Message = result.Detail;
+            return false;
+        }
+    }
+
     public T? CheckResponse<T>((T?, ErrorDetail?) result) where T : class
     {
         if (result.Item1 is not null && result.Item2 is null)

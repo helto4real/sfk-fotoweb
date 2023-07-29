@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Collections.ObjectModel;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Foto.WebServer.Dto;
 using Microsoft.Extensions.Options;
@@ -7,7 +8,6 @@ namespace Foto.WebServer.Services;
 
 public class AdminService : IAdminService
 {
-    private readonly IHttpContextAccessor _accessor;
     private readonly AppSettings _appSettings;
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
@@ -17,12 +17,10 @@ public class AdminService : IAdminService
     public AdminService(
         HttpClient httpClient,
         IOptions<AppSettings> appSettings,
-        IHttpContextAccessor accessor,
         ISignInService signInService,
         ILogger<AdminService> logger)
     {
         _httpClient = httpClient;
-        _accessor = accessor;
         _appSettings = appSettings.Value;
         _signInService = signInService;
         _logger = logger;
@@ -63,7 +61,16 @@ public class AdminService : IAdminService
         return await response.Content.ReadFromJsonAsync<UrlToken>(_jsonOptions);
     }
 
-    
+    public async Task<(ReadOnlyCollection<RoleInfo>?, ErrorDetail?)> GetRolesAsync()
+    {
+        var response = await _signInService.RefreshTokenOnExpired(async () =>
+            await _httpClient.GetAsync($"api/admin/roles"));
+        var result = await HandleResponse(response);
+        if (result is not null) return (null, result);
+        var member = await response.Content.ReadFromJsonAsync<List<RoleInfo>>();
+        return (member!.AsReadOnly(), null);
+    }
+
 
     private async Task<ErrorDetail?> HandleResponse(HttpResponseMessage response)
     {

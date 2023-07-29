@@ -1,6 +1,6 @@
 ﻿namespace FotoApi.Infrastructure.Validation.Exceptions
 {
-    public class ForbiddenException : ApplicationException
+    public class ForbiddenException : ApiException
     {
         public ForbiddenException(string message)
             : base("Forbidden", message)

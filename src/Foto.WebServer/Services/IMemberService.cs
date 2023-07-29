@@ -7,29 +7,30 @@ namespace Foto.WebServer.Services;
 
 public interface IMemberService
 {
-    
+    Task<(MemberInfo?, ErrorDetail?)> CreateMemberAsync(NewMemberInfo newMemberInfo);
+    Task<(MemberInfo?, ErrorDetail?)> UpdateMemberAsync(UpdateMemberInfo memberInfo);
+    Task<(List<MemberInfo>?, ErrorDetail?)> ListMembersAsync();
+    Task<(MemberInfo?, ErrorDetail?)> GetMemberByIdAsync(Guid memberId);
+    Task<ErrorDetail?> DeleteMemberByIdAsync(Guid memberId);
+    Task<ErrorDetail?> ActivateMemberByIdAsync(Guid memberId);
+    Task<ErrorDetail?> DeactivateMemberByIdAsync(Guid memberId);
 }
 
 public class MemberService : IMemberService
 {
     private readonly HttpClient _httpClient;
-    private readonly IHttpContextAccessor _accessor;
-    private readonly AppSettings _appSettings;
     private readonly ISignInService _signInService;
     private readonly ILogger<AdminService> _logger;
 
     public MemberService(HttpClient httpClient,
         IOptions<AppSettings> appSettings,
-        IHttpContextAccessor accessor,
         ISignInService signInService,
         ILogger<AdminService> logger)
     {
         _httpClient = httpClient;
-        _accessor = accessor;
-        _appSettings = appSettings.Value;
         _signInService = signInService;
         _logger = logger;
-        httpClient.BaseAddress = new Uri(_appSettings.FotoApiUrl);
+        httpClient.BaseAddress = new Uri(appSettings.Value.FotoApiUrl);
         httpClient.DefaultRequestHeaders.Add("User-Agent", "FotoWebbServer");
     }
     public async Task<(MemberInfo?, ErrorDetail?)> CreateMemberAsync(NewMemberInfo newMemberInfo)
@@ -52,7 +53,7 @@ public class MemberService : IMemberService
         return (members, null);
     }
     
-    public async Task<(MemberInfo? member, ErrorDetail? error)> GetMemberByIdAsync(Guid memberId)
+    public async Task<(MemberInfo?, ErrorDetail?)> GetMemberByIdAsync(Guid memberId)
     {
         var response = await _signInService.RefreshTokenOnExpired(async () =>
             await _httpClient.GetAsync($"api/members/{memberId}"));
@@ -90,4 +91,13 @@ public class MemberService : IMemberService
         return null;
     }
 
+    public async Task<(MemberInfo?, ErrorDetail?)> UpdateMemberAsync(UpdateMemberInfo memberInfo)
+    {
+        var response = await _signInService.RefreshTokenOnExpired(async () =>
+            await _httpClient.PutAsJsonAsync("api/members", memberInfo));
+        var result = await HandleResponse(response);
+        if (result is not null) return (null, result);
+        var member = await response.Content.ReadFromJsonAsync<MemberInfo>();
+        return (member, null);
+    }
 }

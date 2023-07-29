@@ -1,0 +1,238 @@
+﻿@page "/admin/members/register/{memberId:guid}"
+@page "/admin/members/register"
+
+@layout MainLayout
+@using Foto.WebServer.Services
+@using Blazored.FluentValidation
+@using Foto.WebServer.Dto
+@using Microsoft.AspNetCore.Authorization
+@using System.Collections.ObjectModel
+@inherits AuthorizedBasePage
+@inject IMemberService MemberService;
+@inject IAdminService AdminService;
+@attribute [Authorize(Roles = "Admin")]
+
+<div class="container d-flex flex-column justify-content-center align-items-center">
+    <div class="row row-cols-auto align-items-center">
+        <h2>Registrera medlem</h2>
+    </div>
+</div>
+<div class="container">
+    <div class="row g-3 mb-5 justify-content-center align-items-center">
+        <div class="col col-8" style="max-width: 300px;">
+            <CvEditForm id="uploadForm" Model="_member" class="form" OnValidSubmit="@HandleValidSubmit" Context="NewContext">
+                <FluentValidationValidator/>
+                <div class="form-group mt-1">
+                    <label for="given-name">Förnamn:</label>
+                    <InputText id="given-name" class="form-control" autocomplete="given-name" @bind-Value="@_member.FirstName"/>
+                    <ValidationMessage For="@(() => _member.FirstName)"/>
+                </div>
+                <div class="form-group mt-1">
+                    <label for="family-name">Efternamn:</label>
+                    <InputText id="family-name" class="form-control" autocomplete="family-name" @bind-Value="@_member.LastName"/>
+                    <ValidationMessage For="@(() => _member.LastName)"/>
+                </div>
+                <div class="form-group mt-1">
+                    <label for="email">E-post:</label>
+                    <InputText id="email" class="form-control" @bind-Value="@_member.Email"/>
+                    <ValidationMessage For="@(() => _member.Email)"/>
+                </div>
+                <div class="form-group mt-1">
+                    <label for="phonenumber">Telefonnummer:</label>
+                    <InputText id="phonenumber" class="form-control" @bind-Value="@_member.PhoneNumber"/>
+                    <ValidationMessage For="@(() => _member.PhoneNumber)"/>
+                </div>
+                <div class="form-group mt-1">
+                    <label for="address">Adress:</label>
+                    <InputText id="address" class="form-control" @bind-Value="@_member.Address"/>
+                    <ValidationMessage For="@(() => _member.Address)"/>
+                </div>
+                <div class="form-group mt-1">
+                    <label for="zip">Postkod:</label>
+                    <InputText id="zip" class="form-control" @bind-Value="@_member.ZipCode"/>
+                    <ValidationMessage For="@(() => _member.ZipCode)"/>
+                </div>                
+                <div class="form-group mt-1">
+                    <label for="city">Postadress:</label>
+                    <InputText id="city" class="form-control" @bind-Value="@_member.City"/>
+                    <ValidationMessage For="@(() => _member.City)"/>
+                </div>
+                <div class="form-group mt-1">
+                    <label for="status">Status:</label>
+                    <span id="status" class="form-control">@(_member.IsActive ? "Aktiv" : "Inaktiv")</span>
+                </div>
+                <div class="form-group mt-1">
+                    <label>Roller:</label>
+                    @if (_roles is not null)
+                    {
+                        @foreach (var role in _roles)
+                        {
+                            <div>
+                                @if(_member.Roles.Any(r => r.Name == role.Name))
+                                {
+                                    <input class="form-check-input" type="checkbox" id="@role.Name" checked @onchange="eventArgs => {OnRoleSelectChangedAsync(role.Name, eventArgs);}"/> 
+                                }
+                                else
+                                {
+                                    <input class="form-check-input" type="checkbox" id="@role.Name" unchecked @onchange="eventArgs => {OnRoleSelectChangedAsync(role.Name, eventArgs);}"/> 
+                                }
+                                <label style="margin-left: 8px">@GetRoleName(role.Name)</label>
+                            </div>
+                        }
+                    }
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <button type="submit" class="btn btn-primary">Spara</button>
+                    <button type="button" class="btn btn-secondary" @onclick="OnCancel">Avbryt</button>
+                    @if (MemberId != Guid.Empty)
+                    {
+                        if (_member.IsActive)
+                        {
+                            <button type="button" class="btn btn-danger" @onclick="OnDeactivateAsync">Avaktivera</button>
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn btn-primary" @onclick="OnActivateAsync">Aktivera</button>
+                        }
+                    }
+                </div>
+            </CvEditForm>
+        </div>
+    </div>
+</div>
+
+@if (_responseHandler.HasAlert)
+{
+    <div class="alert alert-danger">@_responseHandler.Message</div>
+}
+
+@code {
+    
+    [Parameter]
+    public Guid MemberId { get; set; }
+    
+    private MemberInfo _member = new();
+    
+    private readonly ResponseHandler _responseHandler = new();
+    private List<RoleInfo>? _roles;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (MemberId != Guid.Empty && _member.Id == Guid.Empty)
+            {
+                var memberTask = MemberService.GetMemberByIdAsync(MemberId);
+                var rolesTask = AdminService.GetRolesAsync();
+                await Task.WhenAll(memberTask, rolesTask);
+                var result = memberTask.Result;
+                _member = _responseHandler.CheckResponse(result) ?? _member;
+                var rolesResult = rolesTask.Result;
+                _roles = _responseHandler.CheckResponse(rolesResult)?.ToList() ?? _roles;
+                
+            }
+            else
+            {
+                // Add default role
+                _member.Roles.Add(new RoleInfo(){Name = "Member"});
+            }
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (MemberId == Guid.Empty)
+        {
+            var result = await MemberService.CreateMemberAsync(
+                new NewMemberInfo(
+                    _member.Email,
+                    _member.PhoneNumber,
+                    _member.FirstName,
+                    _member.LastName,
+                    _member.Address,
+                    _member.ZipCode,
+                    _member.City,
+                    _member.Roles
+                )
+                );
+            _member = _responseHandler.CheckResponse(result) ?? _member;
+            MemberId = _member.Id;
+        }
+        else
+        {
+            var result = await MemberService.UpdateMemberAsync(
+                new UpdateMemberInfo(
+                    _member.Id,
+                    _member.Email,
+                    _member.PhoneNumber,
+                    _member.FirstName,
+                    _member.LastName,
+                    _member.Address,
+                    _member.ZipCode,
+                    _member.City,
+                    _member.Roles
+                    )
+                );
+            _member = _responseHandler.CheckResponse(result) ?? _member;
+        }
+        NavigationManager?.NavigateTo("/admin/members/manage");
+    }
+
+    private Task OnCancel()
+    {
+        NavigationManager?.NavigateTo("/admin/members/manage");
+        return Task.CompletedTask;
+    }
+
+    private async Task OnDeactivateAsync()
+    {
+        var result = await MemberService.DeactivateMemberByIdAsync(_member.Id);
+        if (_responseHandler.CheckResponse(result))
+        {
+            _member.IsActive = false;
+        }
+        StateHasChanged();
+    }
+
+    private async Task OnActivateAsync()
+    {
+        var result = await MemberService.DeactivateMemberByIdAsync(_member.Id);
+        if (_responseHandler.CheckResponse(result))
+        {
+            _member.IsActive = true;
+        }
+        StateHasChanged();
+    }
+
+    // private async Task OnDeleteUserAsync()
+    // {
+    //     var result = await MemberService.DeleteMemberByIdAsync(_member.Id);
+    //     if (_responseHandler.CheckResponse(result))
+    //     {
+    //         NavigationManager?.NavigateTo("/admin/members/manage");            
+    //     }
+    // }
+    private string GetRoleName(string role) =>
+        role switch
+        {
+            "Admin" => "Administratör",
+            "Member" => "Medlem",
+            "StbildAdministrator" => "ST-Administratör",
+            "CompetitionAdministrator" => "Tävlingsadministratör",
+            _ => "Okänd roll"
+        };
+
+    private void OnRoleSelectChangedAsync(string role, ChangeEventArgs arg)
+    {
+        if (arg.Value is bool value)
+        {
+            _member.Roles.RemoveAll(r => r.Name == role);
+            if (value)
+            {
+                _member.Roles.Add(new RoleInfo(){Name = role});
+            }
+        }
+    }
+
+}

@@ -64,6 +64,8 @@ builder.Services.AddHttpClient<IUserService, UserService>()
     .AddHttpMessageHandler(sp => sp.GetRequiredService<AuthorizedHttpClientHandler>());
 builder.Services.AddHttpClient<IAdminService, AdminService>()
     .AddHttpMessageHandler(sp => sp.GetRequiredService<AuthorizedHttpClientHandler>());
+builder.Services.AddHttpClient<IMemberService, MemberService>()
+    .AddHttpMessageHandler(sp => sp.GetRequiredService<AuthorizedHttpClientHandler>());
 builder.Services.AddHttpClient<IStBildService, StBildService>()
     .AddHttpMessageHandler(sp => sp.GetRequiredService<AuthorizedHttpClientHandler>());
 builder.Services.AddHttpClient<IImageService, ImageService>()

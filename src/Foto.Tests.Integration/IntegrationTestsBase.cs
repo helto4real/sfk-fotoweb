@@ -47,22 +47,24 @@ public class IntegrationTestsBase : IAsyncDisposable
         return db;
     }
     
-    public async Task CreateUserAsync(string username, string? password = null, string? email = null, string? refreshToken=null)
+    public async Task CreateUserAsync(string username, string? password = null, string? email = null, string? refreshToken=null, List<string>? roles = null)
     {
         using var scope = _fotoApplication.Services.CreateScope();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
         var newUser = new User { UserName = username, Email = email, RefreshToken = refreshToken??Guid.NewGuid().ToString()};
         var result = await userManager.CreateAsync(newUser, password ?? Guid.NewGuid().ToString());
         Assert.True(result.Succeeded);
+        var roleResult = await userManager.AddToRolesAsync(newUser, roles ?? new List<string> {"Member"});
+        Assert.True(roleResult.Succeeded);
     }
 
-    public async Task<Member> CreateMember(string email, bool active = true)
+    public async Task<Member> CreateMember(string email, bool active = true, List<string>? roles = null)
     {
         using var scope = _fotoApplication.Services.CreateScope();
         var db = await scope.ServiceProvider.GetRequiredService<IDbContextFactory<PhotoServiceDbContext>>().CreateDbContextAsync();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
         
-        await CreateUserAsync(email, null, email);
+        await CreateUserAsync(email, null, email, roles: roles);
         var user = await userManager.FindByEmailAsync(email);
         var member = new Member()
         {
@@ -71,6 +73,7 @@ public class IntegrationTestsBase : IAsyncDisposable
             LastName = "MemberLastName",
             Address = "MemberStreet 1",
             ZipCode = "9999",
+            City = "MemberCity",
             IsActive = active
         };
         db.Members.Add(member);
