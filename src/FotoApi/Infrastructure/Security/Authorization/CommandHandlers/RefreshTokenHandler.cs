@@ -1,5 +1,4 @@
-﻿using FotoApi.Infrastructure.Repositories;
-using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
+﻿using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 using FotoApi.Infrastructure.Security.Authentication;
 using FotoApi.Infrastructure.Security.Authentication.Dto;
 using FotoApi.Infrastructure.Security.Authorization.Dto;
@@ -7,7 +6,7 @@ using FotoApi.Infrastructure.Security.Authorization.Exceptions;
 using FotoApi.Model;
 using Microsoft.AspNetCore.Identity;
 
-namespace FotoApi.Infrastructure.Security.Authorization.Commands;
+namespace FotoApi.Infrastructure.Security.Authorization.CommandHandlers;
 
 public class RefreshTokenHandler(PhotoServiceDbContext db, ITokenService tokenService, UserManager<User> userManager)
     : IHandler<RefreshTokenRequest, UserAuthorizedResponse?>

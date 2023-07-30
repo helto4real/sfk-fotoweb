@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace FotoApi.Model;
+﻿namespace FotoApi.Model;
 
 public record Member : TimeTrackedEntity
 {

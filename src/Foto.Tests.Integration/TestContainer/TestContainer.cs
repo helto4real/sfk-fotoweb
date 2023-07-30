@@ -1,5 +1,4 @@
-﻿using DotNet.Testcontainers.Configurations;
-using DotNet.Testcontainers.Containers;
+﻿using DotNet.Testcontainers.Containers;
 using Microsoft.Extensions.Logging;
 
 namespace Foto.Tests.Integration.TestContainer;

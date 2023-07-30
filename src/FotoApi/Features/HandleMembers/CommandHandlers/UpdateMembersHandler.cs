@@ -1,9 +1,9 @@
-﻿using FotoApi.Api;
-using FotoApi.Features.HandleMembers.Dto;
+﻿using FotoApi.Features.HandleMembers.Dto;
 using FotoApi.Features.HandleMembers.Exceptions;
 using FotoApi.Features.HandleUsers.Exceptions;
 using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 using FotoApi.Infrastructure.Security.Authorization;
+using FotoApi.Infrastructure.Security.Authorization.Dto;
 using FotoApi.Infrastructure.Security.Authorization.Exceptions;
 using FotoApi.Model;
 using Microsoft.AspNetCore.Identity;

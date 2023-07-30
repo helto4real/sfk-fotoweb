@@ -5,9 +5,9 @@ using FotoApi.Infrastructure.Api;
 using FotoApi.Infrastructure.ExceptionsHandling;
 using FotoApi.Infrastructure.Pipelines;
 using FotoApi.Infrastructure.Security.Authorization;
-using FotoApi.Model;
+using FotoApi.Infrastructure.Security.Authorization.Dto;
+using FotoApi.Infrastructure.Security.Authorization.QueryHandlers;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Identity;
 
 namespace FotoApi.Api;
 
@@ -62,28 +62,4 @@ public static class AdminApi
        
         return group;
     }
-}
-
-public class GetRolesHandler(RoleManager<Role> roleManager) : IEmptyRequestHandler<List<RoleResponse>>
-{
-    public async Task<List<RoleResponse>> Handle(CancellationToken cancellationToken = default)
-    {
-        var result = from r in roleManager.Roles
-            orderby r.SortOrder
-            select new RoleResponse
-            {
-                Name = r.Name ?? string.Empty,
-            }; 
-        return await result.ToListAsync(cancellationToken);
-    }
-}
-
-public record RoleResponse
-{
-    public string Name { get; init; }
-}
-
-public record RoleRequest
-{
-    public string Name { get; init; }
 }

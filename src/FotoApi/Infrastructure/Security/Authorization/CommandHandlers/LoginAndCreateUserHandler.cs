@@ -2,9 +2,8 @@
 using FotoApi.Infrastructure.Pipelines;
 using FotoApi.Infrastructure.Security.Authentication;
 using FotoApi.Infrastructure.Security.Authorization.Dto;
-using MediatR;
 
-namespace FotoApi.Infrastructure.Security.Authorization.Commands;
+namespace FotoApi.Infrastructure.Security.Authorization.CommandHandlers;
 
 public class LoginAndCreateUserHandler(
         ITokenService tokenService, 

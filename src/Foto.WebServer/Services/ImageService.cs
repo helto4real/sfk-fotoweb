@@ -6,15 +6,12 @@ namespace Foto.WebServer.Services;
 
 public class ImageService : IImageService
 {
-    private readonly IHttpContextAccessor _accessor;
     private readonly HttpClient _httpClient;
 
     public ImageService(
-        HttpClient httpClient, IOptions<AppSettings> appSettings,
-        IHttpContextAccessor accessor)
+        HttpClient httpClient, IOptions<AppSettings> appSettings)
     {
         _httpClient = httpClient;
-        _accessor = accessor;
         httpClient.BaseAddress = new Uri(appSettings.Value.FotoApiUrl);
         httpClient.DefaultRequestHeaders.Add("User-Agent", "FotoWebbServer");
     }

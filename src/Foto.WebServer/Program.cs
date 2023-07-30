@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 using Blazored.LocalStorage;
 using BlazorStrap;
 using FluentValidation;
-using Foto.WebServer;
 using Foto.WebServer.Api;
 using Foto.WebServer.Authentication;
 using Foto.WebServer.Dto;

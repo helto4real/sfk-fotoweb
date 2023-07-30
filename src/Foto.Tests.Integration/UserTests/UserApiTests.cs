@@ -1,15 +1,9 @@
 ﻿using Foto.Tests.Integration.TestContainer;
-using FotoApi;
 using FotoApi.Features.HandleUrlTokens;
 using FotoApi.Features.HandleUsers.Dto;
-using FotoApi.Features.SendEmailNotifications;
 using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 using FotoApi.Infrastructure.Security.Authorization.Dto;
 using FotoApi.Model;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-using Moq;
 
 namespace Foto.Tests.Integration;
 

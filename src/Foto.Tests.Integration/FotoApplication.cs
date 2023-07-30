@@ -1,7 +1,6 @@
 ﻿using System.Data;
-using System.Net.Http.Headers;
-using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
+using Foto.Tests.Integration.Web.Services;
 using FotoApi.Features.HandleUrlTokens;
 using FotoApi.Features.SendEmailNotifications;
 using FotoApi.Infrastructure.Repositories;
@@ -9,9 +8,6 @@ using FotoApi.Infrastructure.Repositories.MessagingDbContext;
 using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 using FotoApi.Infrastructure.Security.Authentication;
 using FotoApi.Model;
-using Microsoft.Data.Sqlite;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +15,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Moq;
-using Npgsql;
 
 namespace Foto.Tests.Integration;
 
@@ -30,8 +25,8 @@ internal class FotoApplication : WebApplicationFactory<Program>
     private readonly string _photoAppConnectionString;
     private readonly string _messagingConnectionString;
     private readonly EnvironmentConfigManager _environmentConfigManager;
+    public FakePhotostore PhotoStoreMock { get; } = new();
     public Mock<IMailSender> MailSenderMock => new();
-    public Mock<IPhotoStore> PhotoStoreMock => new();
     public Mock<IMailQueue> MailQueue => new();
     
     public FotoApplication(string host, uint port, string username, string password)
@@ -45,6 +40,7 @@ internal class FotoApplication : WebApplicationFactory<Program>
     public string AddCreateUserToken(PhotoServiceDbContext db)
     {
         var urlToken = UrlTokenCreator.CreateUrlTokenFromUrlTokenType(UrlTokenType.AllowAddUser);
+        
         db.UrlTokens.Add(urlToken);
         db.SaveChanges();
         return urlToken.Token;

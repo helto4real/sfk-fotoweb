@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using Foto.WebServer.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;

@@ -1,18 +1,10 @@
-﻿using System.Xml.XPath;
-using FotoApi.Features.HandleMembers;
-using FotoApi.Features.HandleMembers.CommandHandlers;
+﻿using FotoApi.Features.HandleMembers.CommandHandlers;
 using FotoApi.Features.HandleMembers.Dto;
 using FotoApi.Features.HandleMembers.QueryHandlers;
-using FotoApi.Features.HandleUsers.Exceptions;
 using FotoApi.Infrastructure.Api;
 using FotoApi.Infrastructure.ExceptionsHandling;
 using FotoApi.Infrastructure.Pipelines;
-using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
-using FotoApi.Infrastructure.Security.Authorization;
-using FotoApi.Infrastructure.Validation.Exceptions;
-using FotoApi.Model;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Identity;
 
 namespace FotoApi.Api;
 

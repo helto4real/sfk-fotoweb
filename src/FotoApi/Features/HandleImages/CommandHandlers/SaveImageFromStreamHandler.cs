@@ -1,13 +1,13 @@
 ﻿using System.Text.Json;
 using FotoApi.Features.HandleImages.Dto;
 using FotoApi.Features.HandleImages.Exceptions;
-using FotoApi.Infrastructure.Repositories;
 using FotoApi.Features.HandleSubmissions.HandleStBilder.Commands;
 using FotoApi.Features.HandleSubmissions.HandleStBilder.Dto;
+using FotoApi.Infrastructure.Repositories;
 using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 using Image = FotoApi.Model.Image;
 
-namespace FotoApi.Features.HandleImages.Commands;
+namespace FotoApi.Features.HandleImages.CommandHandlers;
 
 public class SaveImageFromStreamHandler(PhotoServiceDbContext db, IPhotoStore photoStore, NewStBildHandler handler)
     : IHandler<SaveImageFromStreamRequest, ImageResponse>

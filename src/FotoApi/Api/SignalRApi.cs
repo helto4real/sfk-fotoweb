@@ -1,10 +1,4 @@
-﻿using FotoApi.Features.SignalR;
-using MediatR;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-
-namespace FotoApi.Api;
+﻿namespace FotoApi.Api;
 
 using Microsoft.AspNetCore.SignalR;
 

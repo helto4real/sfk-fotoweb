@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using FotoApi.Features.HandleUsers.CommandHandlers;
 
 namespace FotoApi.Features.HandleUsers.Dto;
 

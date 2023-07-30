@@ -1,6 +1,4 @@
-﻿using System.Security.Claims;
-using Blazored.LocalStorage;
-using Foto.WebServer.Authentication;
+﻿using Foto.WebServer.Authentication;
 using Foto.WebServer.Dto;
 using Foto.WebServer.Services;
 using Microsoft.AspNetCore.Authentication;

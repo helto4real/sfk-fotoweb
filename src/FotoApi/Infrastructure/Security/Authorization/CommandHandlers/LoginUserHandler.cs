@@ -1,10 +1,9 @@
-﻿using FotoApi.Abstractions.Messaging;
-using FotoApi.Infrastructure.Security.Authentication;
+﻿using FotoApi.Infrastructure.Security.Authentication;
 using FotoApi.Infrastructure.Security.Authorization.Dto;
 using FotoApi.Model;
 using Microsoft.AspNetCore.Identity;
 
-namespace FotoApi.Infrastructure.Security.Authorization.Commands;
+namespace FotoApi.Infrastructure.Security.Authorization.CommandHandlers;
 
 public class LoginUserHandler(UserManager<User> userManager, ITokenService tokenService) : IHandler<LoginUserRequest, UserAuthorizedResponse>
 {

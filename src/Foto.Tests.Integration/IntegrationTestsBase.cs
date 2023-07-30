@@ -1,23 +1,12 @@
 ﻿using System.Net.Http.Headers;
-using System.Security.Cryptography;
 using Foto.Tests.Integration.TestContainer;
-using FotoApi.Features.HandleUrlTokens;
-using FotoApi.Features.SendEmailNotifications;
-using FotoApi.Infrastructure.Repositories;
-using FotoApi.Infrastructure.Repositories.MessagingDbContext;
 using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 using FotoApi.Infrastructure.Security.Authentication;
 using FotoApi.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Moq;
-using Npgsql;
-using Spectre.Console.Rendering;
 
 namespace Foto.Tests.Integration;
 [Collection("Integration tests collection")]
@@ -58,7 +47,7 @@ public class IntegrationTestsBase : IAsyncDisposable
         Assert.True(roleResult.Succeeded);
     }
 
-    public async Task<Member> CreateMember(string email, bool active = true, List<string>? roles = null)
+    public async Task<Member> CreateMemberAsync(string email, bool active = true, List<string>? roles = null)
     {
         using var scope = _fotoApplication.Services.CreateScope();
         var db = await scope.ServiceProvider.GetRequiredService<IDbContextFactory<PhotoServiceDbContext>>().CreateDbContextAsync();

@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
-using FotoApi.Infrastructure.Security.Authorization;
 
-namespace FotoApi.Features.HandleImages.Commands;
+namespace FotoApi.Features.HandleImages.CommandHandlers;
 
 public record UpdateImageRequest(Guid Id, string Title, string FileName);
 

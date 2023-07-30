@@ -1,7 +1,6 @@
 ﻿using FotoApi.Features.HandleUsers.Exceptions;
 using FotoApi.Features.HandleUsers.Notifications;
 using FotoApi.Model;
-using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Wolverine;
 

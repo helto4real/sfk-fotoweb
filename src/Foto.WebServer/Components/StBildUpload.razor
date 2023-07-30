@@ -1,6 +1,7 @@
 ﻿@using Blazored.FluentValidation
 @using FluentValidation
 @using System.Globalization
+@using System.Text.Json.Serialization
 @using Foto.WebServer.Dto
 @using Foto.WebServer.Services
 @inject IImageService ImageService
@@ -155,6 +156,7 @@
         public string Description { get; set; } = default!;
         public string AboutThePhotograper { get; set; } = default!;
         
+        [JsonIgnore]
         public IBrowserFile? ImageFile
         {
             get => _imageFile;

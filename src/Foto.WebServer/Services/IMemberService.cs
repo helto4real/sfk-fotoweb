@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using BlazorStrap.Shared.InternalComponents;
-using Foto.WebServer.Dto;
+﻿using Foto.WebServer.Dto;
 using Microsoft.Extensions.Options;
 
 namespace Foto.WebServer.Services;

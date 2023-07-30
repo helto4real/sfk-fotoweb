@@ -1,6 +1,4 @@
-﻿using System.Security.Principal;
-
-namespace Foto.WebServer.Authentication;
+﻿namespace Foto.WebServer.Authentication;
 
 public enum UserRoles
 {

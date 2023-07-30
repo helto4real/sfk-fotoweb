@@ -1,18 +1,11 @@
-﻿using FotoApi.Features.HandleImages.Commands;
+﻿using FotoApi.Features.HandleImages.CommandHandlers;
 using FotoApi.Features.HandleImages.Dto;
-using FotoApi.Features.HandleImages.Queries;
+using FotoApi.Features.HandleImages.QueryHandlers;
 using FotoApi.Infrastructure.Api;
 using FotoApi.Infrastructure.ExceptionsHandling;
 using FotoApi.Infrastructure.Pipelines;
 using FotoApi.Infrastructure.Security.Authorization;
-using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Jpeg;
-using SixLabors.ImageSharp.Processing;
-using SixLabors.ImageSharp.Processing.Processors.Transforms;
 
 namespace FotoApi;
 

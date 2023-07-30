@@ -1,14 +1,9 @@
-﻿using BlazorStrap.V5;
-using BlazorStrap;
-using FluentValidation;
+﻿using FluentValidation;
 using FluentValidation.Results;
 using Foto.WebServer.Authentication;
 using Foto.WebServer.Dto;
 using Foto.WebServer.Services;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;

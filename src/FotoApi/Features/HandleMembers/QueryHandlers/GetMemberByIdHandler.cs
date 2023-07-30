@@ -1,13 +1,11 @@
-﻿using FotoApi.Api;
-using FotoApi.Features.HandleMembers.Dto;
+﻿using FotoApi.Features.HandleMembers.Dto;
 using FotoApi.Features.HandleMembers.Exceptions;
 using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
-using FotoApi.Model;
-using Microsoft.AspNetCore.Identity;
+using FotoApi.Infrastructure.Security.Authorization.Dto;
 
 namespace FotoApi.Features.HandleMembers.QueryHandlers;
 
-public class GetMemberByIdHandler(PhotoServiceDbContext db, UserManager<User> userManager) : IHandler<Guid, MemberResponse>
+public class GetMemberByIdHandler(PhotoServiceDbContext db) : IHandler<Guid, MemberResponse>
 {
     public async Task<MemberResponse> Handle(Guid memberId, CancellationToken ct = default)
     {
@@ -34,7 +32,7 @@ public class GetMemberByIdHandler(PhotoServiceDbContext db, UserManager<User> us
                     join userRole in db.UserRoles
                         on role.Id equals userRole.RoleId
                     where userRole.UserId == user.Id
-                    select new RoleResponse {Name = role.Name}).ToList()
+                    select new RoleResponse {Name = role.Name!}).ToList()
             };
         return await members.SingleAsync(ct);
     }

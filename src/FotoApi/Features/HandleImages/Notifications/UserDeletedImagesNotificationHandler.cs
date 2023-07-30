@@ -1,9 +1,6 @@
-﻿using FotoApi.Features.HandleImages.Dto;
-using FotoApi.Features.HandleUsers;
-using FotoApi.Features.HandleUsers.Notifications;
+﻿using FotoApi.Features.HandleUsers.Notifications;
 using FotoApi.Infrastructure.Repositories;
 using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
-using MediatR;
 using Wolverine.Attributes;
 
 namespace FotoApi.Features.HandleImages.Notifications;

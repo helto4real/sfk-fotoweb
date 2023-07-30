@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
-
 namespace Foto.Tests.Integration;
 //
 // public class TodoApiTests

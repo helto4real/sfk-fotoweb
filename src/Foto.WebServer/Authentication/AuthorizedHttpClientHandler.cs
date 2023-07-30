@@ -1,8 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using Foto.WebServer.Services;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.JSInterop;
 
 namespace Foto.WebServer.Authentication;
 

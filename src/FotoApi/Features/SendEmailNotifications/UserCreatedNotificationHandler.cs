@@ -1,8 +1,6 @@
 ﻿using FotoApi.Features.HandleUsers.Notifications;
 using FotoApi.Infrastructure.Settings;
-using MediatR;
 using Microsoft.Extensions.Options;
-using Wolverine.Attributes;
 
 namespace FotoApi.Features.SendEmailNotifications;
 

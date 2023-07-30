@@ -1,4 +1,4 @@
-﻿using FotoApi.Api;
+﻿using FotoApi.Infrastructure.Security.Authorization.Dto;
 
 namespace FotoApi.Features.HandleMembers.Dto;
 

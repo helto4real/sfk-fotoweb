@@ -1,9 +1,8 @@
 ﻿using FotoApi.Features.HandleImages.Exceptions;
-using FotoApi.Infrastructure.Repositories;
 using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 using FotoApi.Infrastructure.Security.Authorization;
 
-namespace FotoApi.Features.HandleImages.Commands;
+namespace FotoApi.Features.HandleImages.CommandHandlers;
 
 public class UpdateImageHandler(PhotoServiceDbContext db, CurrentUser currentUser)
     : IHandler<UpdateImageRequest>

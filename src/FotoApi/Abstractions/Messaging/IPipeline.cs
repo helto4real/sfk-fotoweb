@@ -1,6 +1,4 @@
-﻿using Elasticsearch.Net;
-
-namespace FotoApi.Abstractions.Messaging;
+﻿namespace FotoApi.Abstractions.Messaging;
 
 public interface IPipeline
 

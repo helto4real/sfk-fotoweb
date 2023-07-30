@@ -12,8 +12,8 @@ public class GetAllMembersHandler(PhotoServiceDbContext db) : IEmptyRequestHandl
                 on member.OwnerReference equals user.Id
             select new MemberListItemResponse
             {
-                UserName = user.UserName,
-                Email = user.Email,
+                UserName = user.UserName!,
+                Email = user.Email!,
                 FirstName = member.FirstName,
                 LastName = member.LastName,
                 Id = member.Id,

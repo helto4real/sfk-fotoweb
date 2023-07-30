@@ -1,8 +1,5 @@
 ﻿using Foto.Tests.Integration.TestContainer;
-using FotoApi.Infrastructure.Security.Authorization.Dto;
 using FotoApi.Model;
-using Microsoft.EntityFrameworkCore;
-using NuGet.Frameworks;
 
 namespace Foto.Tests.Integration;
 

@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using FotoApi.Abstractions.Messaging;
 using MediatR;
 
 namespace FotoApi.Infrastructure.Validation;

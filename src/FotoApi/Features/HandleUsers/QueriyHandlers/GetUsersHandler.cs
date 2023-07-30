@@ -1,5 +1,4 @@
 ﻿using FotoApi.Features.HandleUsers.Dto;
-using FotoApi.Infrastructure.Repositories;
 using FotoApi.Model;
 using Microsoft.AspNetCore.Identity;
 

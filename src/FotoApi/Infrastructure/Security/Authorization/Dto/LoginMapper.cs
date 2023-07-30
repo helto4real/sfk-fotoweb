@@ -1,7 +1,4 @@
-﻿using FotoApi.Features.HandleUsers.CommandHandlers;
-using FotoApi.Features.HandleUsers.Dto;
-using FotoApi.Infrastructure.Security.Authorization.Commands;
-using MediatR;
+﻿using FotoApi.Features.HandleUsers.Dto;
 using Riok.Mapperly.Abstractions;
 
 namespace FotoApi.Infrastructure.Security.Authorization.Dto;

@@ -1,8 +1,8 @@
-﻿using FotoApi.Api;
-using FotoApi.Features.HandleMembers.Dto;
+﻿using FotoApi.Features.HandleMembers.Dto;
 using FotoApi.Features.HandleUsers.Exceptions;
 using FotoApi.Features.Shared.Exceptions;
 using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
+using FotoApi.Infrastructure.Security.Authorization.Dto;
 using FotoApi.Model;
 using Microsoft.AspNetCore.Identity;
 
@@ -54,16 +54,13 @@ public class CreateMembersHandler
             IsActive = member.IsActive,
             Roles = request.Roles.Select(n => new RoleResponse(){Name = n.Name}).ToList()
         };
-
-
-       
     }
     
     async Task AddRolesToUser(UserManager<User> userManager, User user, List<RoleRequest> roles)
     {
         var currentRoles = await userManager.GetRolesAsync(user);
         var rolesToAdd = roles.Where(r => !currentRoles.Contains(r.Name)).ToList();
-        var rolesToDelete = currentRoles.Where(r => !roles.Select(r => r.Name).Contains(r)).ToList();
+        var rolesToDelete = currentRoles.Where(r => !roles.Select(n => n.Name).Contains(r)).ToList();
         
         if (rolesToAdd.Any())
         {
