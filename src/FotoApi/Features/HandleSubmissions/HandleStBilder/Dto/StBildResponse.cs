@@ -9,7 +9,7 @@ public class StBildResponse
     public string Description { get; init; } = default!;
     public Guid ImageReference { get; init; } = default!;
     public string Name { get; init; } = default!;
-    public string AboutThePhotograper { get; init; } = default!;
+    public string AboutThePhotographer { get; init; } = default!;
     public bool IsUsed { get; init; }
     public bool IsAccepted { get; init; }
 }

@@ -8,4 +8,9 @@ public class FakeSignInService : ISignInService
     {
         return func();
     }
+
+    public Task<bool> ValidateAccessTokenAndRefreshIfNeedAsync(HttpClient httpClient)
+    {
+        return Task.FromResult(true);
+    }
 }

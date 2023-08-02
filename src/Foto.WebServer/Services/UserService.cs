@@ -3,21 +3,20 @@ using Microsoft.Extensions.Options;
 
 namespace Foto.WebServer.Services;
 
-public class UserService : IUserService
+public class UserService : ServiceBase, IUserService
 {
     private readonly HttpClient _httpClient;
     private readonly ISignInService _signInService;
 
-    public UserService(HttpClient httpClient, ISignInService signInService, IOptions<AppSettings> appSettings)
+    public UserService(HttpClient httpClient, ISignInService signInService,
+        IOptions<AppSettings> appSettings, ILogger<UserService> logger) : base(logger)
     {
         _httpClient = httpClient;
         _signInService = signInService;
-        _appSettings = appSettings.Value;
-        httpClient.BaseAddress = new Uri(_appSettings.FotoApiUrl);
+        httpClient.BaseAddress = new Uri(appSettings.Value.FotoApiUrl);
         httpClient.DefaultRequestHeaders.Add("User-Agent", "FotoWebbServer");
     }
 
-    private AppSettings _appSettings { get; }
     public async Task<UserInfo?> GetUserByUsernameAsync(string username)
     {
         var response =
@@ -82,12 +81,5 @@ public class UserService : IUserService
         var escapedToken = Uri.EscapeDataString(token);
         var result = await _httpClient.GetAsync($@"api/public/confirmemail/{escapedToken}");
         return result.IsSuccessStatusCode;
-    }
-
-    public async Task<ErrorDetail?> HandleResponse(HttpResponseMessage response)
-    {
-        if (!response.IsSuccessStatusCode) return await response.Content.ReadFromJsonAsync<ErrorDetail>();
-
-        return null;
     }
 }

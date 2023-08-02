@@ -45,8 +45,8 @@
                 </div>
                 <div class="mb-3">
                     <label for="about" class="form-label">Om dig: (ålder, bostadsort, favoritmotiv, kameramärke, favoritfotograf, hemsida)</label>
-                    <InputTextArea  id="about" maxlength="300" type="title" class="form-control :invalid" @bind-Value="@_model.AboutThePhotograper"/>
-                    <ValidationMessage class="text-danger" For="@(() => _model.AboutThePhotograper)" />
+                    <InputTextArea  id="about" maxlength="300" type="title" class="form-control :invalid" @bind-Value="@_model.AboutThePhotographer"/>
+                    <ValidationMessage class="text-danger" For="@(() => _model.AboutThePhotographer)" />
                 </div>
                 <div class="mb-3">
                     <label for="location" class="form-label">Vart bilden är tagen: (t.ex. plats, närmaste stad)</label>
@@ -154,7 +154,7 @@
         public string Location { get; set; } = default!;
         public DateTime Time { get; set; } = new DateTime(2023, 1, 1);
         public string Description { get; set; } = default!;
-        public string AboutThePhotograper { get; set; } = default!;
+        public string AboutThePhotographer { get; set; } = default!;
         
         [JsonIgnore]
         public IBrowserFile? ImageFile
@@ -197,7 +197,7 @@
             RuleFor(x => x.Location)
                 .NotEmpty()
                 .WithMessage("Plats måste anges.");
-            RuleFor(x => x.AboutThePhotograper)
+            RuleFor(x => x.AboutThePhotographer)
                 .NotEmpty()
                 .WithMessage("Om fotografen måste anges.");
             RuleFor(x => x.Time)

@@ -15,7 +15,7 @@ public class UpdateStBildHandler(PhotoServiceDbContext db) : IHandler<StBildRequ
         stBild.Location = request.Location;
         stBild.Time = request.Time;
         stBild.Description = request.Description;
-        stBild.AboutThePhotograper = request.AboutThePhotograper;
+        stBild.AboutThePhotographer = request.AboutThePhotographer;
         stBild.IsAccepted = request.IsAccepted;
 
         await db.SaveChangesAsync(ct);

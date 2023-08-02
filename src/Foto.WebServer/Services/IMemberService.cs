@@ -14,7 +14,7 @@ public interface IMemberService
     Task<ErrorDetail?> DeactivateMemberByIdAsync(Guid memberId);
 }
 
-public class MemberService : IMemberService
+public class MemberService : ServiceBase, IMemberService
 {
     private readonly HttpClient _httpClient;
     private readonly ISignInService _signInService;
@@ -23,7 +23,7 @@ public class MemberService : IMemberService
     public MemberService(HttpClient httpClient,
         IOptions<AppSettings> appSettings,
         ISignInService signInService,
-        ILogger<AdminService> logger)
+        ILogger<AdminService> logger) : base(logger)
     {
         _httpClient = httpClient;
         _signInService = signInService;
@@ -80,13 +80,6 @@ public class MemberService : IMemberService
         var response = await _signInService.RefreshTokenOnExpired(async () =>
             await _httpClient.GetAsync($"api/members/{memberId}/deactivate"));
         return await HandleResponse(response);
-    }
-
-    private async Task<ErrorDetail?> HandleResponse(HttpResponseMessage response)
-    {
-        if (!response.IsSuccessStatusCode) return await response.Content.ReadFromJsonAsync<ErrorDetail>();
-
-        return null;
     }
 
     public async Task<(MemberInfo?, ErrorDetail?)> UpdateMemberAsync(UpdateMemberInfo memberInfo)

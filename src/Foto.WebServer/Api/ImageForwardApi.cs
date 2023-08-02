@@ -32,7 +32,7 @@ public static class ImageForwardApi
             
             req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-            if (properties.HasExternalToken() && properties.GetExternalProvider() is string externalProvider)
+            if (properties.HasExternalToken() && properties.GetExternalProvider() is { } externalProvider)
                 // Set the external provider name as the scheme so we can do auth
                 // on the backend with the right configuration
                 req.Headers.TryAddWithoutValidation("X-Auth-Scheme", externalProvider);

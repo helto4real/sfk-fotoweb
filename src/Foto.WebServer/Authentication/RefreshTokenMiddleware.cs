@@ -7,21 +7,16 @@ namespace Foto.WebServer.Authentication;
 /// <summary>
 ///     Middleware to refresh the access token from refreshtoken
 /// </summary>
-public class RefreshTokenMiddleware
+public class RefreshTokenMiddleware(RequestDelegate next, ILogger<RefreshTokenMiddleware> logger)
 {
-    private readonly RequestDelegate _next;
     private static readonly string[] ExcludedPaths = { "/login", "/register", "/signalr", "/_framework", "/_blazor", "/api/auth" };
-    public RefreshTokenMiddleware(RequestDelegate next)
-    {
-        _next = next;
-    }
 
     public async Task Invoke(HttpContext context, IAuthService authService)
     {
         if (ExcludedPaths.Any(s => context.Request.Path.StartsWithSegments(s)))
         {
             // We need to exclude some routes from this middleware
-            await _next(context);
+            await next(context);
             return;
         }
         
@@ -36,6 +31,7 @@ public class RefreshTokenMiddleware
 
             if (refreshToken is null)
             {
+                logger.LogDebug("No refresh token found for user {User} accessing {Path}, redirect to login page", context.User.Identity.Name, context.Request.Path);
                 await InvalidateUserAndRedirectToLogin(context);
                 return;
             }
@@ -46,25 +42,26 @@ public class RefreshTokenMiddleware
             if (accessToken is not null)
             {
                 // We still have a valid access token, continue
-                await _next(context);
+                await next(context);
                 return;
             }
 
             // We have an invalid access token, check if we have a refresh token
-            var (authInfo, _) = await authService.RefreshAccessTokenAsync(refreshToken, context.User.Identity.Name!);
+            var (authInfo, error) = await authService.RefreshAccessTokenAsync(refreshToken, context.User.Identity.Name!);
 
             if (authInfo is null)
             {
+                logger.LogDebug("Could not refresh accesstoken from refresh for {User} accessing {Path}, redirect to login page. Error {ErrorDetail}", context.User.Identity.Name, context.Request.Path, error?.Detail);
                 await InvalidateUserAndRedirectToLogin(context);
                 return;
             }
-
+            logger.LogDebug("Middleware refreshed accesstoken for {User} accessing {Path}", context.User.Identity.Name, context.Request.Path);
             var userClaimsPrincipal = new UserClaimPrincipal(authInfo.UserName, authInfo.IsAdmin, authInfo.RefreshToken );
-        
+
             await context.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme, userClaimsPrincipal, userClaimsPrincipal.AuthenticationProperties);
-            
-            await _next(context);
+            context.User = userClaimsPrincipal;
+            await next(context);
             return;
              
         }

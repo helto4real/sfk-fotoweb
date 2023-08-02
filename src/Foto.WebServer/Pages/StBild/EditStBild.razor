@@ -75,8 +75,8 @@
                 </div>
                 <div class="mb-3">
                     <label for="about" class="form-label">Om dig: (ålder, bostadsort, favoritmotiv, kameramärke, favoritfotograf, hemsida)</label>
-                    <InputTextArea id="about" maxlength="300" type="title" class="form-control :invalid" readonly="@_isReadOnly" @bind-Value="@_stBild.AboutThePhotograper"/>
-                    <ValidationMessage class="text-danger" For="@(() => _stBild.AboutThePhotograper)"/>
+                    <InputTextArea id="about" maxlength="300" type="title" class="form-control :invalid" readonly="@_isReadOnly" @bind-Value="@_stBild.AboutThePhotographer"/>
+                    <ValidationMessage class="text-danger" For="@(() => _stBild.AboutThePhotographer)"/>
                 </div>
                 <div class="mb-3">
                     <label for="location" class="form-label">Vart bilden är tagen: (t.ex. plats, närmaste stad)</label>
@@ -150,7 +150,7 @@
             RuleFor(x => x.Location)
                 .NotEmpty()
                 .WithMessage("Plats måste anges.");
-            RuleFor(x => x.AboutThePhotograper)
+            RuleFor(x => x.AboutThePhotographer)
                 .NotEmpty()
                 .WithMessage("Om fotografen måste anges.");
             RuleFor(x => x.Time)

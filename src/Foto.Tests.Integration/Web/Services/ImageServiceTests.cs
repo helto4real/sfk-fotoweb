@@ -3,6 +3,7 @@ using Foto.Tests.Integration.TestContainer;
 using Foto.WebServer.Dto;
 using Foto.WebServer.Services;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 
@@ -26,15 +27,14 @@ public class ImageServiceTests: IntegrationTestsBase
             Location = "Location",
             Time = new DateTime(2023, 1, 1).ToUniversalTime(),
             Description = "Description",
-            AboutThePhotograper = "AboutThePhotograper"
+            AboutThePhotographer = "AboutThePhotographer"
         };
         using var memoryStream = new MemoryStream();
         await using var writer = new StreamWriter(memoryStream);
         
         var fileMock = FileMock(writer, fileName, memoryStream);
-
         // Act
-        var imageService = new ImageService(client, options);
+        var imageService = new ImageService(client, options, new FakeSignInService(), new Mock<ILogger<ImageService>>().Object);
         var (image, error) = await imageService.UploadImageWithMetadata(fileMock.Object, "Title", stBildMetaData, "st-bild");
         
         // Assert
@@ -47,7 +47,7 @@ public class ImageServiceTests: IntegrationTestsBase
         dbImage!.Title.Should().Be("Title");
         var stBild = db.StBilder.Single(n => n.ImageReference == image.Id);
         stBild.Description.Should().Be("Description");
-        stBild.AboutThePhotograper.Should().Be("AboutThePhotograper");
+        stBild.AboutThePhotographer.Should().Be("AboutThePhotographer");
         stBild.Location.Should().Be("Location");
         stBild.Name.Should().Be("Name");
         stBild.Time.Should().Be(new DateTime(2023, 1, 1).ToUniversalTime());
@@ -78,6 +78,6 @@ public class StBildMetadata
     public string Location { get; set; } = default!;
     public DateTime Time { get; set; } = new DateTime(2023, 1, 1);
     public string Description { get; set; } = default!;
-    public string AboutThePhotograper { get; set; } = default!;
+    public string AboutThePhotographer { get; set; } = default!;
 
 }

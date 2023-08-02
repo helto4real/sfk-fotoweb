@@ -192,7 +192,7 @@ public class PhotoStore : IPhotoStore, IPhoto, IDisposable
         await writer.WriteLineAsync("Beskrivning: " + stBild.Description + "\r\n");
         await writer.WriteLineAsync("Plats: " + stBild.Location + "\r\n");
         await writer.WriteLineAsync("Datum: " + stBild.Time + "\r\n");
-        await writer.WriteLineAsync("Om fotografen: " + stBild.AboutThePhotograper + "\r\n");
+        await writer.WriteLineAsync("Om fotografen: " + stBild.AboutThePhotographer + "\r\n");
     }
 
     public static async Task CopyFileAsync(string sourcePath, string destinationPath)

@@ -28,8 +28,8 @@ public static class AuthenticationExtensions
                 ValidateIssuer = true,
                 ValidateAudience = true,
                 ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                // ClockSkew = TimeSpan.Zero // This is for testing expiration, remove!!!
+                // ClockSkew = TimeSpan.Zero, // This is for testing expiration, remove!!!
+                ValidateIssuerSigningKey = true
             };
             o.Events = new JwtBearerEvents
             {

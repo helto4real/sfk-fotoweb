@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace FotoApi.Infrastructure.Security.Authorization.CommandHandlers;
 
-public class RefreshTokenHandler(PhotoServiceDbContext db, ITokenService tokenService, UserManager<User> userManager)
+public class RefreshTokenHandler(PhotoServiceDbContext db, ITokenService tokenService, UserManager<User> userManager, ILogger<RefreshTokenHandler> logger)
     : IHandler<RefreshTokenRequest, UserAuthorizedResponse?>
 {
     public async Task<UserAuthorizedResponse?> Handle(RefreshTokenRequest request, CancellationToken ct)
@@ -16,6 +16,7 @@ public class RefreshTokenHandler(PhotoServiceDbContext db, ITokenService tokenSe
         var user = await db.Users.FirstOrDefaultAsync(u => u.UserName == request.UserName && u.RefreshToken == request.RefreshToken, ct);
         if (user is null)
         {
+            logger.LogDebug("Refresh token not found or wrong for user {User}", request.UserName);
             throw new RefreshTokenNotFoundOrWrongException();
         }
         var (refreshToken, expireTime) = tokenService.GenerateRefreshToken();
@@ -24,6 +25,7 @@ public class RefreshTokenHandler(PhotoServiceDbContext db, ITokenService tokenSe
         db.Users.Update(user);
         await db.SaveChangesAsync(ct);
         var isAdmin = await userManager.IsInRoleAsync(user, "Admin");
+        logger.LogDebug("Refreshed accesstoken from refresh token for {User}", user.UserName);
         return new UserAuthorizedResponse
         {
             UserName = user.UserName!,

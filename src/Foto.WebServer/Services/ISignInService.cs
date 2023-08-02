@@ -8,12 +8,15 @@ namespace Foto.WebServer.Services;
 public interface ISignInService
 {
     Task<HttpResponseMessage> RefreshTokenOnExpired(Func<Task<HttpResponseMessage>> func);
+    Task<bool> ValidateAccessTokenAndRefreshIfNeedAsync(HttpClient httpClient);
+
 }
 
 public class SignInService(
         IJSRuntime? jsRuntime,
         IHttpContextAccessor accessor,
         IAuthService authService,
+        
         NavigationManager? navigationManager)
     : ISignInService
 {
@@ -27,12 +30,17 @@ public class SignInService(
     private readonly NavigationManager _navigationManager = navigationManager ??
                                                             throw new ArgumentNullException(nameof(navigationManager),
                                                                 "NavigationManager is null");
-
+    public async Task<bool> ValidateAccessTokenAndRefreshIfNeedAsync(HttpClient httpClient)
+    {
+        var response =
+            await RefreshTokenOnExpired(async () =>
+                await httpClient.GetAsync("api/users/token/validate"));
+        return response.IsSuccessStatusCode;
+    }
     public async Task<HttpResponseMessage> RefreshTokenOnExpired(Func<Task<HttpResponseMessage>> func)
     {
         // Call the provided function to get the response
         var response = await func();
-
         if (response.StatusCode == HttpStatusCode.Unauthorized)
         {
             // The token is expired, try to refresh it and call the function again with the new token
@@ -72,9 +80,10 @@ public class SignInService(
         if (authInfo is null) return;
 
         var requestPath =
-            $"{_httpContext.Request.Scheme}://{_httpContext.Request.Host}/api/auth/signin?refreshToken={Uri.EscapeDataString(refreshToken!)}";
-
-        await _jsRuntime.InvokeVoidAsync("fetch", requestPath);
+            $"/api/auth/signin?refreshToken={Uri.EscapeDataString(authInfo.RefreshToken)}";
+        
+        await _jsRuntime.InvokeVoidAsync("refreshToken", requestPath);
+        
         result.Properties!.UpdateTokenValue("access_token", authInfo.RefreshToken);
         _httpContext.User = result.Principal!;
     }

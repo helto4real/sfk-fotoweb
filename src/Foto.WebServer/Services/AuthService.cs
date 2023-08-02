@@ -5,23 +5,23 @@ using Microsoft.Extensions.Options;
 
 namespace Foto.WebServer.Services;
 
-public class AuthService : IAuthService
+public class AuthService : ServiceBase, IAuthService
 {
-    private readonly IOptions<AppSettings> _appSettings;
     private readonly IMemoryCache _cache;
+    private readonly ILogger<AuthService> _logger;
     private readonly HttpClient _httpClient;
 
     public AuthService(
         HttpClient httpClient,
         IOptions<AppSettings> appSettings,
-        IMemoryCache cache
-    )
+        IMemoryCache cache,
+        ILogger<AuthService> logger) : base(logger)
     {
         _httpClient = httpClient;
-        _appSettings = appSettings;
         _cache = cache;
+        _logger = logger;
 
-        httpClient.BaseAddress = new Uri(_appSettings.Value.FotoApiUrl);
+        httpClient.BaseAddress = new Uri(appSettings.Value.FotoApiUrl);
         httpClient.DefaultRequestHeaders.Add("User-Agent", "FotoWebbServer");
     }
 
@@ -29,7 +29,11 @@ public class AuthService : IAuthService
     {
         var response = await _httpClient.PostAsJsonAsync("/api/users/token", loginInfo);
         var result = await HandleResponse(response);
-        if (result is not null) return (null, result);
+        if (result is not null)
+        {
+            _logger.LogInformation("Login failed for user {UserName}", loginInfo.Username);
+            return (null, result);
+        }
 
         var loginInfoResponse = await response.Content.ReadFromJsonAsync<LoginInfo>();
         if (loginInfoResponse is null)
@@ -52,8 +56,11 @@ public class AuthService : IAuthService
         var response = await _httpClient.PostAsJsonAsync($"/api/users/token/{provider}", userInfo);
 
         if (!response.IsSuccessStatusCode) return null;
-
-        return await response.Content.ReadFromJsonAsync<LoginInfo>();
+        
+        var result = await response.Content.ReadFromJsonAsync<LoginInfo>();
+        var duration = result!.RefreshTokenExpiration - DateTime.UtcNow;
+        _cache.Set(result.RefreshToken, result.Token, duration);
+        return result;
     }
 
     public async Task<(User?, ErrorDetail?)> RegisterUserAsync(NewUserInfo userInfo)
@@ -73,8 +80,13 @@ public class AuthService : IAuthService
 
     public (string?, ErrorDetail?) GetAccessTokenFromRefreshToken(string refreshToken, string userName)
     {
-        if (_cache.TryGetValue(refreshToken, out string? accessToken)) return (accessToken, null);
+        if (_cache.TryGetValue(refreshToken, out string? accessToken))
+        {
+            // Refresh token found, return the access token   
+            return (accessToken, null);
+        }
 
+        _logger.LogDebug("Refresh token for user {User} expired", userName);
         return (null,
             new ErrorDetail
             {
@@ -87,28 +99,27 @@ public class AuthService : IAuthService
     {
         var response = await _httpClient.PostAsJsonAsync("/api/users/token/refresh", new { refreshToken, userName });
         var result = await HandleResponse(response);
-        if (result is not null) return (null, result);
+        if (result is not null)
+        {
+            _logger.LogDebug("Failed to refresh the refresh token {User}", userName);
+            return (null, result);
+        }
 
         var loginInfoResponse = await response.Content.ReadFromJsonAsync<LoginInfo>();
         if (loginInfoResponse is null)
+        {
             return (null,
                 new ErrorDetail
                 {
                     Title = "Internt fel",
                     Detail = "Försök att logga in igen eller kontakta administratör vid återkommande problem"
-                });
+                });}
 
         var duration = loginInfoResponse.RefreshTokenExpiration - DateTime.UtcNow;
-
+            
+        _logger.LogDebug("Refreshed the refresh token for {User}", userName);
         // We cache the access token with the refresh token as key so we do not have to call the API for every request
         _cache.Set(loginInfoResponse.RefreshToken, loginInfoResponse.Token, duration);
         return (loginInfoResponse, null);
-    }
-
-    public async Task<ErrorDetail?> HandleResponse(HttpResponseMessage response)
-    {
-        if (!response.IsSuccessStatusCode) return await response.Content.ReadFromJsonAsync<ErrorDetail>();
-
-        return null;
     }
 }

@@ -1,4 +1,5 @@
-﻿using Foto.WebServer.Authentication;
+﻿using System.Globalization;
+using Foto.WebServer.Authentication;
 using Foto.WebServer.Dto;
 using Foto.WebServer.Services;
 using Microsoft.AspNetCore.Authentication;
@@ -13,14 +14,29 @@ public static class AuthApi
     {
         var group = routes.MapGroup("/api/auth");
 
+        // Use this function to debug cookie issues DO NOT USE IN PRODUCTION!!!
+        // group.MapGet("decrypt", (HttpContext httpContext) =>
+        // {
+        //     var opt = httpContext.RequestServices
+        //         .GetRequiredService<IOptionsMonitor<CookieAuthenticationOptions>>()
+        //         .Get(CookieAuthenticationDefaults.AuthenticationScheme); //or use .Get("Cookies")
+        //
+        //     // TWO - Get the encrypted cookie value
+        //     var cookie = opt.CookieManager.GetRequestCookie(httpContext, opt.Cookie.Name);
+        //
+        //     // THREE - decrypt it
+        //     var unprotected =  opt.TicketDataFormat.Unprotect(cookie);
+        //     return Results.Ok(unprotected!.Properties.Items);
+        // });
+        
         group.MapGet("refresh", async ([FromQuery]string? refreshToken, HttpContext context, IAuthService authService) =>
         {
-            // Todo: Make more robust
             var (authInfo, _) = await authService.RefreshAccessTokenAsync(refreshToken!, context.User!.Identity!.Name!);
             if (authInfo is null)
             {
                 return Results.BadRequest("Invalid refresh token");
             }
+            context.Response.Cookies.Append("RefreshTime", DateTime.Now.ToString(CultureInfo.InvariantCulture));
             var userClaimsPrincipal = new UserClaimPrincipal(authInfo.UserName, authInfo.IsAdmin, authInfo.RefreshToken );
 
             await context.SignInAsync(
@@ -28,18 +44,20 @@ public static class AuthApi
             return Results.Ok();
         });
         
-        group.MapGet("signin", async ([FromQuery]string? refreshToken, HttpContext context) =>
+        group.MapGet("signin", ([FromQuery]string? refreshToken, HttpContext context, IAuthService authService) =>
         {
-            var userClaimsPrincipal = new UserClaimPrincipal("tomash277@gmail.com", true, refreshToken! );
-            await context.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme, userClaimsPrincipal, userClaimsPrincipal.AuthenticationProperties);
-            return Results.Ok();
+            var user = context.User;
+            if (!user.Identity!.IsAuthenticated || user.Identity?.Name is null)
+            {
+                return Results.BadRequest("User is not authenticated");
+            }
+            
+            var userClaimsPrincipal = new UserClaimPrincipal(user.Identity.Name, user.IsInRole("Admin"), refreshToken! );
+            return Results.SignIn( userClaimsPrincipal, userClaimsPrincipal.AuthenticationProperties, CookieAuthenticationDefaults.AuthenticationScheme);
         });
         
         group.MapGet("signout", async (HttpContext context) =>
         {
-            // Todo: Make more robust
-        
             await context.SignOutAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme);
             return Results.Ok();
@@ -85,10 +103,6 @@ public static class AuthApi
                 if (user is not null)
                 {
                     var claimPrincipal = externalClaimsPrincipal.NewClaimsPrincipal(user.RefreshToken, user.IsAdmin);
-                    // // We create an temporary cookie to store the token so
-                    // // we can use it to authenticate in the provider correctly
-                    // context.Response.Cookies.Append("externaltokeninfo", user.Token,
-                    //     new CookieOptions { Secure = true, MaxAge = TimeSpan.FromSeconds(10) });
                     await Results.SignIn(claimPrincipal,
                         externalClaimsPrincipal.AuthenticationProperties,
                         CookieAuthenticationDefaults.AuthenticationScheme).ExecuteAsync(context);

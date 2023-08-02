@@ -11,7 +11,7 @@ public record StBildInfo
     public string Description { get; set; } = default!;
     public Guid ImageReference { get; set; } = default!;
     public string Name { get; set; } = default!;
-    public string AboutThePhotograper { get; set; } = default!;
+    public string AboutThePhotographer { get; set; } = default!;
     public bool IsUsed { get; set; } = default!;
     public bool IsAccepted { get; set; }
 }
@@ -23,7 +23,7 @@ public record NewStBildInfo
     public DateTime Time { get; set; } = default;
     public string Description { get; set; } = default!;
     public string Name { get; set; } = default!;
-    public string AboutThePhotograper { get; set; } = default!;
+    public string AboutThePhotographer { get; set; } = default!;
     public  IBrowserFile? ImageFile { get; set; }
     public string ImageName { get; set; } = default!;
 }

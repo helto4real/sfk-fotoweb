@@ -86,7 +86,10 @@ public static class UsersApi
         {
             var response = await pipe.Pipe(request, handler.Handle, ct);
             return TypedResults.Ok(response);
-        }); 
+        });
+
+        group.MapGet("/token/validate", Results<Ok, BadRequest<ErrorDetail>>
+            () => TypedResults.Ok()).RequireAuthorization();
         
         group.MapPost("/token/refresh", async Task<Results<Ok<UserAuthorizedResponse>, BadRequest<ErrorDetail>>> 
             (RefreshTokenRequest request, RefreshTokenHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>

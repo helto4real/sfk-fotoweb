@@ -7,11 +7,12 @@ using Foto.WebServer.Authentication;
 using Foto.WebServer.Dto;
 using Foto.WebServer.Pages;
 using Foto.WebServer.Services;
+using Foto.WebServer.Shared.Logging;
 using Microsoft.AspNetCore.Http.Json;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddSerilog();
 builder.Services.Configure<JsonOptions>(o =>
 {
     o.SerializerOptions.Converters.Add(new JsonStringEnumConverter());

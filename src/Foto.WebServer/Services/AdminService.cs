@@ -6,9 +6,8 @@ using Microsoft.Extensions.Options;
 
 namespace Foto.WebServer.Services;
 
-public class AdminService : IAdminService
+public class AdminService : ServiceBase,IAdminService
 {
-    private readonly AppSettings _appSettings;
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
     private readonly ILogger<AdminService> _logger;
@@ -18,18 +17,15 @@ public class AdminService : IAdminService
         HttpClient httpClient,
         IOptions<AppSettings> appSettings,
         ISignInService signInService,
-        ILogger<AdminService> logger)
+        ILogger<AdminService> logger) : base(logger)
     {
         _httpClient = httpClient;
-        _appSettings = appSettings.Value;
         _signInService = signInService;
         _logger = logger;
         _jsonOptions.Converters.Add(new JsonStringEnumConverter());
-        httpClient.BaseAddress = new Uri(_appSettings.FotoApiUrl);
+        httpClient.BaseAddress = new Uri(appSettings.Value.FotoApiUrl);
         httpClient.DefaultRequestHeaders.Add("User-Agent", "FotoWebbServer");
     }
-
- 
 
     public async Task<IEnumerable<UrlToken>> GetCurrentTokens()
     {
@@ -69,13 +65,5 @@ public class AdminService : IAdminService
         if (result is not null) return (null, result);
         var member = await response.Content.ReadFromJsonAsync<List<RoleInfo>>();
         return (member!.AsReadOnly(), null);
-    }
-
-
-    private async Task<ErrorDetail?> HandleResponse(HttpResponseMessage response)
-    {
-        if (!response.IsSuccessStatusCode) return await response.Content.ReadFromJsonAsync<ErrorDetail>();
-
-        return null;
     }
 }

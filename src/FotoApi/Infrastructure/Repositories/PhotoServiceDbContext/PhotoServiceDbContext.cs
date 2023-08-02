@@ -58,7 +58,7 @@ public class PhotoServiceDbContext: IdentityDbContext<User, Role, string>
             e.Property(p => p.OwnerReference).IsRequired();
             e.Property(p => p.ImageReference).IsRequired();
             e.Property(p => p.Title).IsRequired();
-            e.Property(p => p.AboutThePhotograper).IsRequired();
+            e.Property(p => p.AboutThePhotographer).IsRequired();
             e.Property(p => p.Time).IsRequired();
             e.Property(p => p.Description).IsRequired();
             e.Property(p => p.Name).IsRequired();

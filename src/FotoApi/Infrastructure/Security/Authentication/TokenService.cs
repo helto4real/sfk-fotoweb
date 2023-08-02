@@ -82,6 +82,7 @@ public sealed class TokenService : ITokenService
              audience: null,
              identity,
              notBefore: DateTime.UtcNow,
+             // expires: DateTime.UtcNow.AddSeconds(5),    // For testing purposes, remember to chage the ClockSkew in AuthenticationExtensions.cs
              expires: DateTime.UtcNow.AddMinutes(15),
              issuedAt: DateTime.UtcNow,
              _signingCredential);
@@ -100,7 +101,8 @@ public sealed class TokenService : ITokenService
         var randomNumber = new byte[64];
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomNumber);
-        return (Convert.ToBase64String(randomNumber), DateTime.UtcNow.AddDays(_refreshTokenValidityInDays));
+        var refreshToken = Convert.ToBase64String(randomNumber);
+        return (refreshToken, DateTime.UtcNow.AddDays(_refreshTokenValidityInDays));
     }
 
     public string? GetUserIdByAccessTokenAsync(string accessToken)
