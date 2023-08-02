@@ -9,12 +9,7 @@
 
 <div class="container d-flex flex-column justify-content-center align-items-center">
     <div class="row row-cols-auto align-items-center">
-        <AuthorizeView Roles="Admin">
-            <h2>Redigera och godkänn ST-bild</h2>
-        </AuthorizeView>
-        <AuthorizeView Roles="User">
-            <h2>Redigera ST-bild</h2>
-        </AuthorizeView>
+        <h2>Redigera ST-bild</h2>
     </div>
 </div>
 <div class="container mt-3">
@@ -29,18 +24,10 @@
         {
             @if (_isReadOnly)
             {
-                <AuthorizeView Roles="Admin">
-                    <div class="alert alert-warning" role="alert">
-                        <h4 class="alert-heading">Bilden är redan skickad till ST!</h4>
-                        <p>Bilden är redan skickad till ST och kan inte redigeras.</p>
-                    </div>
-                </AuthorizeView>
-                <AuthorizeView Roles="User">
-                    <div class="alert alert-warning" role="alert">
-                        <h4 class="alert-heading">Bilden är redan godkänd!</h4>
-                        <p>Bilden är redan godkänd och kan inte redigeras.</p>
-                    </div>
-                </AuthorizeView>
+                <div class="alert alert-warning" role="alert">
+                    <h4 class="alert-heading">Bilden är redan godkänd!</h4>
+                    <p>Bilden är redan godkänd och kan inte redigeras.</p>
+                </div>
             }
             <CvEditForm id="uploadForm" Model="_stBild" class="form" OnValidSubmit="@HandleValidSubmit" Context="NewContext">
 
@@ -88,14 +75,10 @@
                     <InputDate id="time" class="form-control :invalid" readonly="@_isReadOnly" @bind-Value="@_stBild.Time"/>
                     <ValidationMessage class="text-danger" For="@(() => _stBild.Time)"/>
                 </div>
-                <AuthorizeView Roles="Admin">
-                    <div class="mb-3">
-                        <label for="isaccepted" class="form-check-label">Kryssa i för att godkänna bilden:</label>
-                        <InputCheckbox id="isaccepted" class="form-check-input :invalid" @bind-Value="@_stBild.IsAccepted"/>
-                    </div>
-                </AuthorizeView>
-                <button type="submit" class="btn btn-primary mt-1" disabled="@_isReadOnly">Spara</button>
-                <button type="button" class="btn btn-secondary m-lg-1" @onclick="OnCancel">Avbryt</button>
+                <div class="align-middle" >
+                    <button type="submit" class="btn btn-primary app-button" disabled="@_isReadOnly">Spara</button>
+                    <button type="button" class="btn btn-secondary app-button" style="margin-left: 5px" @onclick="OnCancel">Avbryt</button>
+                </div>
             </CvEditForm>
         }
     </div>

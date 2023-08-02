@@ -18,7 +18,7 @@
 {
     <div class="container">
         <div class="row g-3 mb-5 justify-content-center align-items-center">
-            <div class="col col-8" style="max-width: 300px;">
+            <div class="col col-8" style="max-width: 350px;">
                 <EditForm Model="@User" OnValidSubmit="@HandleValidSubmit" Context="authirzationContext">
                     <DataAnnotationsValidator/>
                     <ValidationSummary/>
@@ -33,9 +33,9 @@
                         <InputCheckbox id="isadmin" class="form-check-input" @bind-Value="@User.IsAdmin"/>
                     </div>
                     <div class="d-flex justify-content-between align-items-center mt-1">
-                        <button type="submit" class="btn btn-primary">Spara</button>
-                        <button type="button" class="btn btn-secondary" @onclick="OnCancel">Avbryt</button>
-                        <button type="button" class="btn btn-danger" @onclick="OnDeleteUser">Ta bort</button>
+                        <button type="submit" class="btn btn-primary app-button">Spara</button>
+                        <button type="button" class="btn btn-secondary app-button" @onclick="OnCancel">Avbryt</button>
+                        <button type="button" class="btn btn-danger app-button" @onclick="OnDeleteUser">Ta bort</button>
                     </div>
                 </EditForm>
             </div>

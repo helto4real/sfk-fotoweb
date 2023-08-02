@@ -152,3 +152,10 @@ font-size: 32px;
 .blazor-error-boundary::after {
     content: "An error has occurred."
 }
+
+.app-button {
+    width: 98px; !important;
+}
+.app-button-wide {
+    width: 105px; !important;
+}

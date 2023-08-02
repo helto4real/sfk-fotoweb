@@ -25,12 +25,12 @@ public static class StBilderApi
         // Rate limit all of the APIs
         group.RequirePerUserRateLimit();
 
-        group.MapGet("/", async Task<Results<Ok<List<StBildResponse>>, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
+        group.MapGet("/{showPackagedImages:bool}", async Task<Results<Ok<List<StBildResponse>>, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
             (bool showPackagedImages, GetAllStBilderHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
             var response = await pipe.Pipe(showPackagedImages, handler.Handle, ct);
             return TypedResults.Ok(response);
-        }).RequireAuthorization("AdminPolicy", "StBildAdministratiorPolicy");
+        }).RequireAuthorization("AdminPolicy");
         
         group.MapDelete("/{id:guid}", async Task<Results<Ok, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
             (Guid id, DeleteStBildHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>

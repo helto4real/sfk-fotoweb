@@ -69,9 +69,11 @@
                     <label for="isaccepted" class="form-check-label">Godkänd:</label>
                     <InputCheckbox id="isaccepted" class="form-check-input" disabled="true" @bind-Value="@_stBild.IsAccepted"/>
                 </div>
-                <button type="button" class="btn btn-primary" disabled="@_stBild.IsUsed" @onclick="OnAccept">Godkänn</button>
-                <button type="button" class="btn btn-danger m-lg-1" disabled="@_stBild.IsUsed" @onclick="OnReject">Avvisa</button>
-                <button type="button" class="btn btn-secondary m-lg-1" @onclick="OnCancel">Avbryt</button>
+                <div class="align-top">
+                    <button type="button" class="btn btn-primary py-1 app-button" disabled="@_stBild.IsUsed" @onclick="OnAccept">Godkänn</button>
+                    <button type="button" class="btn btn-danger py-1 app-button" style="margin-left: 5px" disabled="@_stBild.IsUsed" @onclick="OnReject">Avvisa</button>
+                    <button type="button" class="btn btn-secondary py-1 app-button" style="margin-left: 5px" @onclick="OnCancel">Avbryt</button>
+                </div>
             </CvEditForm>
         }
     </div>

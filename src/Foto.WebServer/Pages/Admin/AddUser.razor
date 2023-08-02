@@ -16,7 +16,7 @@
 
 <div class="container">
     <div class="row g-3 mb-5 justify-content-center align-items-center">
-        <div class="col col-8" style="max-width: 300px;">
+        <div class="col col-8" style="max-width: 350px;">
             <EditForm Model="@NewUserModel" OnValidSubmit="@HandleValidSubmit" Context="authirzationContext">
                 <FluentValidationValidator/>
                 <div class="mb-3">
@@ -33,7 +33,7 @@
     @if (_preCreatedUserNames.Any())
     {
         <div class="row g-3 mb-5 justify-content-center align-items-center">
-            <div class="col col-8" style="max-width: 300px;">
+            <div class="col col-8" style="max-width: 350px;">
                 <h5>Tillagda användare</h5>
                 <ul class="list-group">
                     @foreach (var user in _preCreatedUserNames)

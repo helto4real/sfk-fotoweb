@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FotoApi.Infrastructure.Security.Authorization.Policies;
 
@@ -21,7 +22,7 @@ public static class WebApplicationExtensions
         options.AddPolicy("AdminPolicy", policy =>
         {
             policy.RequireAuthenticatedUser();
-            policy.RequireRole("Admin");
+            policy.RequireClaim(ClaimTypes.Role, "Admin");
         });
     }
     
@@ -30,7 +31,7 @@ public static class WebApplicationExtensions
         options.AddPolicy("MemberPolicy", policy =>
         {
             policy.RequireAuthenticatedUser();
-            policy.RequireRole("Member", "Admin");
+            policy.RequireClaim(ClaimTypes.Role, "Member", "Admin");
         });
     }
     
@@ -39,7 +40,7 @@ public static class WebApplicationExtensions
         options.AddPolicy("CompetitionAdministratorsPolicy", policy =>
         {
             policy.RequireAuthenticatedUser();
-            policy.RequireRole("CompetitionAdministrator", "Admin");
+            policy.RequireClaim(ClaimTypes.Role, "CompetitionAdministrator", "Admin");
         });
     }
     
@@ -48,7 +49,7 @@ public static class WebApplicationExtensions
         options.AddPolicy("StBildAdministratiorPolicy", policy =>
         {
             policy.RequireAuthenticatedUser();
-            policy.RequireRole("StbildAdministrator", "Admin");
+            policy.RequireClaim(ClaimTypes.Role, "StbildAdministrator", "Admin");
         });
     }
 }
