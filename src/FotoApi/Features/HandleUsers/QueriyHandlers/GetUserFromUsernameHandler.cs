@@ -14,8 +14,8 @@ public class GetUserFromUsernameHandler(UserManager<User> userManager) : IHandle
         var user = await userManager.FindByNameAsync(username);
 
         if (user is null) throw new UserNotFoundException(username);
-        var isAdmin = await userManager.IsInRoleAsync(user, "Admin");
+        var roles = userManager.GetRolesAsync(user).Result.AsReadOnly();
         
-        return _userMapper.ToUserResponse(user, isAdmin);
+        return _userMapper.ToUserResponse(user, roles);
     }
 }

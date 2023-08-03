@@ -5,4 +5,4 @@ public record LoginInfo(
     string Token,
     DateTime RefreshTokenExpiration,
     string RefreshToken,
-    bool IsAdmin);
+    IReadOnlyCollection<string> Roles);

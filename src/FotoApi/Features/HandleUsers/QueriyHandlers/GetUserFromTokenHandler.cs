@@ -21,7 +21,7 @@ public class GetUserFromTokenHandler(ITokenService tokenService, UserManager<Use
         var user = await userManager.FindByNameAsync(userId);
 
         if (user is null) throw new UserNotFoundException(userId);
-        var isAdmin = await userManager.IsInRoleAsync(user, "Admin");
-        return _userMapper.ToUserResponse(user, isAdmin);
+        var roles = userManager.GetRolesAsync(user).Result.AsReadOnly();
+        return _userMapper.ToUserResponse(user, roles);
     }
 }

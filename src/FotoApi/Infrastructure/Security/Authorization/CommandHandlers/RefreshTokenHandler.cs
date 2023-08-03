@@ -24,14 +24,16 @@ public class RefreshTokenHandler(PhotoServiceDbContext db, ITokenService tokenSe
         user.RefreshTokenExpirationDate = expireTime;
         db.Users.Update(user);
         await db.SaveChangesAsync(ct);
-        var isAdmin = await userManager.IsInRoleAsync(user, "Admin");
+
         logger.LogDebug("Refreshed accesstoken from refresh token for {User}", user.UserName);
+        
+        var roles = userManager.GetRolesAsync(user).Result.AsReadOnly();
         return new UserAuthorizedResponse
         {
             UserName = user.UserName!,
-            IsAdmin = isAdmin,
+            Roles = roles,
             Email = user.Email!,
-            Token = tokenService.GenerateToken(user.UserName!, isAdmin),
+            Token = tokenService.GenerateToken(user.UserName!, roles),
             RefreshToken = refreshToken,
             RefreshTokenExpiration = expireTime
         };

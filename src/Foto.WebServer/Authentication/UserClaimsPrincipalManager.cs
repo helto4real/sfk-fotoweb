@@ -9,8 +9,8 @@ public class UserClaimPrincipal : ClaimsPrincipal
 {
     public AuthenticationProperties AuthenticationProperties { get; } = new();
     
-    public UserClaimPrincipal(string username, bool isAdmin, string refreshToken)
-        : base(CreateClaimIdentity(username, isAdmin))
+    public UserClaimPrincipal(string username, IReadOnlyCollection<string> roles, string refreshToken)
+        : base(CreateClaimIdentity(username, roles))
     {
         var tokens = new[]
         {
@@ -20,7 +20,7 @@ public class UserClaimPrincipal : ClaimsPrincipal
         AuthenticationProperties.StoreTokens(tokens);
     }
 
-    private static ClaimsIdentity CreateClaimIdentity(string username, bool isAdmin)
+    private static ClaimsIdentity CreateClaimIdentity(string username, IReadOnlyCollection<string> roles)
     {
         var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
         
@@ -31,10 +31,11 @@ public class UserClaimPrincipal : ClaimsPrincipal
                 new Claim(ClaimTypes.NameIdentifier, username),
             });
 
-        if (isAdmin)
-            identity.AddClaim(new Claim(ClaimTypes.Role, "Admin"));
-        else
-            identity.AddClaim(new Claim(ClaimTypes.Role, "User"));
+        foreach (var role in roles)
+        {
+            identity.AddClaim(new Claim(ClaimTypes.Role, role));
+        }
+        identity.AddClaim(new Claim(ClaimTypes.Role, "User"));
         return identity;
     }
 }

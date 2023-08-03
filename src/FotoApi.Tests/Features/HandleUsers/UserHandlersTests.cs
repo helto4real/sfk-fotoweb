@@ -33,10 +33,10 @@ public class UsersHandlersTests : IAsyncLifetime
         // We already have default admin user in the database
         result.Should().HaveCount(3);
         result[1].UserName.Should().Be("theadmin");
-        result[1].IsAdmin.Should().BeTrue();
+        result[1].Roles.Should().Contain("Admin");
         result[1].Email.Should().Be("theadmin@domain.com");
         result[2].UserName.Should().Be("user");
-        result[2].IsAdmin.Should().BeFalse();
+        result[2].Roles.Should().NotContain("Admin");
         result[2].Email.Should().Be("user@domain.com");
     }
     [Fact]
@@ -53,7 +53,7 @@ public class UsersHandlersTests : IAsyncLifetime
         // ASSERT
         result!.Should().NotBeNull();
         result!.UserName.Should().Be("user");
-        result.IsAdmin.Should().BeFalse();
+        result.Roles.Should().NotContain("Admin");
     }
     
     [Fact]
@@ -85,7 +85,7 @@ public class UsersHandlersTests : IAsyncLifetime
         // ASSERT
         result.Should().NotBeNull();
         result.UserName.Should().Be("user");
-        result.IsAdmin.Should().BeFalse();
+        result.Roles.Should().NotContain("Admin");
     }
     
     [Fact]
@@ -131,7 +131,7 @@ public class UsersHandlersTests : IAsyncLifetime
         // ASSERT
         result.Should().NotBeNull();
         result.UserName.Should().Be("prereg@domain.com");
-        result.IsAdmin.Should().BeFalse();
+        result.Roles.Should().NotContain("Admin");
         result.Email.Should().Be("prereg@domain.com");
     }
     

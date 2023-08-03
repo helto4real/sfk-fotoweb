@@ -94,8 +94,13 @@ public class IntegrationTestsBase : IAsyncDisposable
          // Read the user JWTs configuration for testing so unit tests can generate
          // JWT tokens.
          var tokenService = _fotoApplication.Services.GetRequiredService<ITokenService>();
-
-         return tokenService.GenerateToken(id, isAdmin);
+         var roles = isAdmin switch
+         {
+             true => new[] { "Admin" },
+             false => Array.Empty<string>()
+         };
+         
+         return tokenService.GenerateToken(id, roles);
      }
     
     private sealed class AuthHandler : DelegatingHandler

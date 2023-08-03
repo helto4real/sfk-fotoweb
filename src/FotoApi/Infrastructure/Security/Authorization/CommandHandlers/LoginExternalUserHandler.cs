@@ -46,19 +46,19 @@ public class LoginExternalUserHandler(UserManager<User> userManager,
             loginUser.RefreshToken = refreshToken;
             loginUser.RefreshTokenExpirationDate = expireTime;
             await userManager.UpdateAsync(loginUser);
+
+            var userRoles = (await userManager.GetRolesAsync(loginUser)).AsReadOnly();
             
-            var userRoles = await userManager.GetRolesAsync(loginUser);
-            var isAdmin = userRoles.Contains("Admin");
             return (new UserAuthorizedResponse
             {
                 UserName = command.UserName,
                 FirstName = "FirstName",
                 LastName = "LastName",
                 Email = loginUser.Email!,
-                Token = tokenService.GenerateToken(loginUser.UserName!, isAdmin),
+                Token = tokenService.GenerateToken(loginUser.UserName!, userRoles),
                 RefreshToken = refreshToken,
                 RefreshTokenExpiration = expireTime,
-                IsAdmin = isAdmin
+                Roles = userRoles
             });
         }
         throw new UserException(result.Errors.Select(e => e.Description));

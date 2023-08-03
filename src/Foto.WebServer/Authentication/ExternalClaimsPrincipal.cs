@@ -25,14 +25,14 @@ public class ExternalClaimsPrincipal
     public string NameIdentifier => _externalPrincipal.FindFirstValue(ClaimTypes.NameIdentifier)!;
     public string Name => _externalPrincipal.FindFirstValue(ClaimTypes.Email) ?? _externalPrincipal.Identity?.Name!;
 
-    public ClaimsPrincipal NewClaimsPrincipal(string refreshToken, bool isAdmin)
+    public ClaimsPrincipal NewClaimsPrincipal(string refreshToken, IReadOnlyCollection<string> roles)
     {
-        var claimsIdentity = CreateExternalClaimsIdentity(isAdmin);
+        var claimsIdentity = CreateExternalClaimsIdentity(roles);
         AddTokens(refreshToken);
         return new ClaimsPrincipal(claimsIdentity);
     }
 
-    public ClaimsIdentity CreateExternalClaimsIdentity(bool isAdmin)
+    public ClaimsIdentity CreateExternalClaimsIdentity(IReadOnlyCollection<string> roles)
     {
         var identity = new ClaimsIdentity(new[]
         {
@@ -40,10 +40,11 @@ public class ExternalClaimsPrincipal
             new Claim(ClaimTypes.NameIdentifier, NameIdentifier)
         }, "fotowebb external authentication");
 
-        if (isAdmin)
-            identity.AddClaim(new Claim(ClaimTypes.Role, "Admin"));
-        else
-            identity.AddClaim(new Claim(ClaimTypes.Role, "User"));
+        foreach (var role in roles)
+        {
+            identity.AddClaim(new Claim(ClaimTypes.Role, role));
+        }
+        identity.AddClaim(new Claim(ClaimTypes.Role, "User"));
         return identity;
     }
 

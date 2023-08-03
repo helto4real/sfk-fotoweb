@@ -101,7 +101,7 @@ public class LogIn : PageModel
             return Page();
         }
 
-        var userClaimsPrincipal = new UserClaimPrincipal(user.UserName, user.IsAdmin, user.RefreshToken);
+        var userClaimsPrincipal = new UserClaimPrincipal(user.UserName, user.Roles, user.RefreshToken);
         
         // Since we are successfully authenticated, we redirect the user to the home page.
         userClaimsPrincipal.AuthenticationProperties.RedirectUri = "/";

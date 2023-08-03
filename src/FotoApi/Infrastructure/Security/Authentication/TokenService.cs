@@ -20,7 +20,7 @@ public static class AuthenticationServiceExtensions
 public interface ITokenService
 {
     // Generate a JWT token for the specified user name and admin role
-    string GenerateToken(string username, bool isAdmin = false);
+    string GenerateToken(string username, IReadOnlyCollection<string> roles);
     (string refreshToken, DateTime expireTime) GenerateRefreshToken();
     string? GetUserIdByAccessTokenAsync(string accessToken);
 }
@@ -57,7 +57,7 @@ public sealed class TokenService : ITokenService
             SecurityAlgorithms.HmacSha512Signature);
 
     }
-    public string GenerateToken(string username, bool isAdmin = false)
+    public string GenerateToken(string username, IReadOnlyCollection<string> roles)
     {
          var identity = new ClaimsIdentity(JwtBearerDefaults.AuthenticationScheme);
 
@@ -68,9 +68,9 @@ public sealed class TokenService : ITokenService
 
          identity.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, id));
 
-         if (isAdmin)
+         foreach (var role in roles)
          {
-             identity.AddClaim(new Claim(ClaimTypes.Role, "Admin"));
+             identity.AddClaim(new Claim(ClaimTypes.Role, role));
          }
 
          identity.AddClaim(new Claim(JwtRegisteredClaimNames.Aud,_audience));

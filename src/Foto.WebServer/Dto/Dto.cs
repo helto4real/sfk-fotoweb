@@ -10,25 +10,14 @@ public class NewUserInfo
     public string Email { get; set; } = default!;
     public string FirstName { get; set; } = default!;
     public string LastName { get; set; } = default!;
-    
-    public bool IsAdmin { get; set; } = false;
 
     public string UrlToken { get; set; } = default!;
-    
-    public UserInfo ToUserInfo()
-    {
-        return new UserInfo
-        {
-            Username = UserName,
-            IsAdmin = IsAdmin
-        };
-    }
 }
 public class UserInfo
 {
     public string Username { get; set; } = default!;
-    
-    public bool IsAdmin { get; set; } = false;
+    public List<string> Roles { get; set; } = new();
+    public bool IsInRole(string role) => Roles.Contains(role);
 }
 
 public class ExternalUserInfo

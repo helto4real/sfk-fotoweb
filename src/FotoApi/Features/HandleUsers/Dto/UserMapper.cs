@@ -7,10 +7,10 @@ namespace FotoApi.Features.HandleUsers.Dto;
 [Mapper]
 public partial class UserMapper
 {
-    public UserResponse ToUserResponse(User user, bool isAdmin)
+    public UserResponse ToUserResponse(User user, IReadOnlyCollection<string> roles)
     {
         var userResponse = _ToUserResponse(user);
-        userResponse.IsAdmin = isAdmin;
+        userResponse.Roles = roles;
         return userResponse;
     }
 

@@ -18,7 +18,7 @@ public class LoginAndCreateUserHandler(
         var result = await pipe.Pipe(_mapper.ToCreateUserCommand(request),
             createUserHandler.Handle, ct);
         var authorizedUserResponse =
-            _mapper.ToUserAuthorizedResponse(result, tokenService.GenerateToken(result.UserName, result.IsAdmin));
+            _mapper.ToUserAuthorizedResponse(result, tokenService.GenerateToken(result.UserName, result.Roles));
         return authorizedUserResponse;
     }
 }

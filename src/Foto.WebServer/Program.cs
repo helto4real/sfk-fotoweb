@@ -9,6 +9,7 @@ using Foto.WebServer.Pages;
 using Foto.WebServer.Services;
 using Foto.WebServer.Shared.Logging;
 using Microsoft.AspNetCore.Http.Json;
+using Shared.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,8 @@ builder.Services.AddAuthorizationBuilder().AddPolicy("AdminPolicy", policy =>
 {
     policy.RequireRole("Admin");
 });
+
+builder.AddAuthorizationPolicies();
 
 builder.Services.AddRazorPages();
 //builder.Services.AddRazorComponents().AddServerComponents();

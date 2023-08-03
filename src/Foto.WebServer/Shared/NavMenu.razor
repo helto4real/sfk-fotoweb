@@ -27,34 +27,26 @@
             </AuthorizeView>
             <AuthorizeView Roles="Admin">
                 <Authorized>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Admin</a>
-                    <ul class="dropdown-menu">
-                        <li class="dropdown-submenu"><a class="dropdown-item dropdown-toggle" href="#">Medlemmar</a>
-                            <ul class="dropdown-menu">
-                                <li><NavLink class="dropdown-item" href="/admin/members/register">Registrera</NavLink></li>
-                                <li><NavLink class="dropdown-item" href="/admin/members/manage">Hantera</NavLink></li>
-                            </ul>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li class="dropdown-submenu"><a class="dropdown-item dropdown-toggle" href="#">Användare</a>
-                            <ul class="dropdown-menu">
-                                <li><NavLink class="dropdown-item" href="admin/users/list">Hantera användare</NavLink></li>
-                                <li><NavLink class="dropdown-item" href="admin/users/precreate">Lägg till användare</NavLink></li>
-                            </ul>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li class="dropdown-submenu"><a class="dropdown-item dropdown-toggle" href="#">ST-bilder</a>
-                            <ul class="dropdown-menu">
-                                <li><NavLink class="dropdown-item" href="/admin/st-bild/godkann">Godkänn inlämnade</NavLink></li>
-                                <li><NavLink class="dropdown-item" href="/admin/st-bild/paketera">Paketera godkända</NavLink></li>
-                                <li><NavLink class="dropdown-item" href="/admin/st-bild/hantera">Hantera</NavLink></li>
-                            </ul>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><NavLink class="dropdown-item" href="admin/tokens">Hantera tokens</NavLink></li>
-                    </ul>
-                </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Admin</a>
+                        <ul class="dropdown-menu">
+                            <li class="dropdown dropend"><a class="dropdown-item dropdown-toggle" href="#">Medlemmar</a>
+                                <ul class="dropdown-menu dropdown-submenu">
+                                    <li><NavLink class="dropdown-item" href="/admin/members/register">Registrera</NavLink></li>
+                                    <li><NavLink class="dropdown-item" href="/admin/members/manage">Hantera</NavLink></li>
+                                </ul>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li class="dropdown dropend"><a class="dropdown-item dropdown-toggle" href="#">Användare</a>
+                                <ul class="dropdown-menu dropdown-submenu">
+                                    <li><NavLink class="dropdown-item" href="admin/users/list">Hantera användare</NavLink></li>
+                                    <li><NavLink class="dropdown-item" href="admin/users/precreate">Lägg till användare</NavLink></li>
+                                </ul>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><NavLink class="dropdown-item" href="admin/tokens">Hantera tokens</NavLink></li>
+                        </ul>
+                    </li>
                 </Authorized>
             </AuthorizeView>
             <AuthorizeView>
@@ -64,12 +56,23 @@
                         <ul class="dropdown-menu">
                             <li><NavLink class="dropdown-item" href="/st-bild/upload">Ladda upp ST-bild</NavLink></li>
                             <li><NavLink class="dropdown-item" href="/st-bild/list">Visa ST-bilder</NavLink></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <AuthorizeView Policy="StBildAdministratiorPolicy" Context="stAdminCtx">
+                                <li class="dropdown dropstart">
+                                    <a class="dropdown-item dropdown-toggle" href="#">Administrera</a>
+                                    <ul class="dropdown-menu dropdown-submenu dropdown-submenu-left">
+                                        <li><NavLink class="dropdown-item" href="/admin/st-bild/godkann">Godkänn inlämnade</NavLink></li>
+                                        <li><NavLink class="dropdown-item" href="/admin/st-bild/paketera">Paketera godkända</NavLink></li>
+                                        <li><NavLink class="dropdown-item" href="/admin/st-bild/hantera">Hantera</NavLink></li>
+                                    </ul>
+                                </li>
+                            </AuthorizeView>
                         </ul>
                     </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">@context.User.Identity?.Name</a>
                     <ul class="dropdown-menu">
-                        <li><NavLink class="dropdown-item" @onclick="@Logout">Logga ut</NavLink></li>
+                        <li class="dropdown dropstart"><NavLink class="dropdown-item" @onclick="@Logout">Logga ut</NavLink></li>
                     </ul>
                 </li>
                 </Authorized>

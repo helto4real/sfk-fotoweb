@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Security.Claims;
 using Foto.WebServer.Authentication;
 using Foto.WebServer.Dto;
 using Foto.WebServer.Services;
@@ -37,7 +38,7 @@ public static class AuthApi
                 return Results.BadRequest("Invalid refresh token");
             }
             context.Response.Cookies.Append("RefreshTime", DateTime.Now.ToString(CultureInfo.InvariantCulture));
-            var userClaimsPrincipal = new UserClaimPrincipal(authInfo.UserName, authInfo.IsAdmin, authInfo.RefreshToken );
+            var userClaimsPrincipal = new UserClaimPrincipal(authInfo.UserName, authInfo.Roles, authInfo.RefreshToken );
 
             await context.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme, userClaimsPrincipal, userClaimsPrincipal.AuthenticationProperties);
@@ -51,8 +52,10 @@ public static class AuthApi
             {
                 return Results.BadRequest("User is not authenticated");
             }
+
+            var roles = user.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).ToList().AsReadOnly();
             
-            var userClaimsPrincipal = new UserClaimPrincipal(user.Identity.Name, user.IsInRole("Admin"), refreshToken! );
+            var userClaimsPrincipal = new UserClaimPrincipal(user.Identity.Name, roles, refreshToken! );
             return Results.SignIn( userClaimsPrincipal, userClaimsPrincipal.AuthenticationProperties, CookieAuthenticationDefaults.AuthenticationScheme);
         });
         
@@ -102,7 +105,7 @@ public static class AuthApi
 
                 if (user is not null)
                 {
-                    var claimPrincipal = externalClaimsPrincipal.NewClaimsPrincipal(user.RefreshToken, user.IsAdmin);
+                    var claimPrincipal = externalClaimsPrincipal.NewClaimsPrincipal(user.RefreshToken, user.Roles);
                     await Results.SignIn(claimPrincipal,
                         externalClaimsPrincipal.AuthenticationProperties,
                         CookieAuthenticationDefaults.AuthenticationScheme).ExecuteAsync(context);

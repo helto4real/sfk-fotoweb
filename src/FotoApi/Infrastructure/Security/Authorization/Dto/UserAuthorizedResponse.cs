@@ -9,7 +9,7 @@ public record UserAuthorizedResponse
     public string Token { get; set; } = default!;
     public string RefreshToken { get; set; } = default!;
     public DateTime RefreshTokenExpiration { get; set; } = default!;
-    public bool IsAdmin {get; init;}
+    public IReadOnlyCollection<string> Roles { get; init; } = default!;
 }
     
     

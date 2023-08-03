@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Foto.Tests.Integration", "F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FotoApi.Tests", "FotoApi.Tests\FotoApi.Tests.csproj", "{450FAB7B-AE3C-418C-90F7-B89E704F356A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{823283D8-26A9-4B5D-9B15-AACF7C49F8FB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +50,10 @@ Global
 		{450FAB7B-AE3C-418C-90F7-B89E704F356A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{450FAB7B-AE3C-418C-90F7-B89E704F356A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{450FAB7B-AE3C-418C-90F7-B89E704F356A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{823283D8-26A9-4B5D-9B15-AACF7C49F8FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{823283D8-26A9-4B5D-9B15-AACF7C49F8FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{823283D8-26A9-4B5D-9B15-AACF7C49F8FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{823283D8-26A9-4B5D-9B15-AACF7C49F8FB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	
 EndGlobal

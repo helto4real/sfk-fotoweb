@@ -50,6 +50,6 @@ public class CreateUserHandler(
 
         await bus.PublishAsync(new UserCreatedNotification(user.Email!, urlToken.Entity.Token));
         logger.LogInformation("Registrerat användare med användarnam {UserName}", request.UserName);
-        return _userMapper.ToUserResponse(user, false);
+        return _userMapper.ToUserResponse(user, Array.Empty<string>());
     }
 }

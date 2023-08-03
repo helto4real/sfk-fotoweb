@@ -75,7 +75,7 @@
                                 {
                                     <input class="form-check-input" type="checkbox" id="@role.Name" unchecked @onchange="eventArgs => {OnRoleSelectChangedAsync(role.Name, eventArgs);}"/> 
                                 }
-                                <label style="margin-left: 8px">@GetRoleName(role.Name)</label>
+                                <label style="margin-left: 8px">@RoleNameTranslator.GetRoleName(role.Name)</label>
                             </div>
                         }
                     }
@@ -212,15 +212,6 @@
     //         NavigationManager?.NavigateTo("/admin/members/manage");            
     //     }
     // }
-    private string GetRoleName(string role) =>
-        role switch
-        {
-            "Admin" => "Administratör",
-            "Member" => "Medlem",
-            "StbildAdministrator" => "ST-Administratör",
-            "CompetitionAdministrator" => "Tävlingsadministratör",
-            _ => "Okänd roll"
-        };
 
     private void OnRoleSelectChangedAsync(string role, ChangeEventArgs arg)
     {

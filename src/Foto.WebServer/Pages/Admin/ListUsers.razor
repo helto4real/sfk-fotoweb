@@ -20,7 +20,6 @@
                 <thead>
                 <tr>
                     <th scope="col">Username</th>
-                    <th scope="col">Admin</th>
                     <th scope="col"></th>
                 </tr>
                 </thead>
@@ -29,7 +28,6 @@
                 {
                     <tr >
                         <td>@user.Username</td>
-                        <td class="text-center"><input type="checkbox" checked="@user.IsAdmin" disabled/></td>
                         <td><NavLink href="@GetUserEditLink(user.Username)"><span>Redigera</span></NavLink></td>
                     </tr>
                 }
@@ -52,10 +50,9 @@
         {
             foreach (var user in await UserService.GetAllUsers())
             {
-                _users.Add(new UserInfo{Username = user.UserName, IsAdmin = user.IsAdmin});
+                _users.Add(new UserInfo{Username = user.UserName});
             }
             StateHasChanged();
-            
         }
         await base.OnAfterRenderAsync(firstRender);
     }

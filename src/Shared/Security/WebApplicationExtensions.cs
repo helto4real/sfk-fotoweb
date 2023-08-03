@@ -1,7 +1,8 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
 
-namespace FotoApi.Infrastructure.Security.Authorization.Policies;
+namespace Shared.Security;
 
 public static class WebApplicationExtensions
 {

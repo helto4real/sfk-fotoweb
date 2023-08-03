@@ -56,7 +56,7 @@ public class RefreshTokenMiddleware(RequestDelegate next, ILogger<RefreshTokenMi
                 return;
             }
             logger.LogDebug("Middleware refreshed accesstoken for {User} accessing {Path}", context.User.Identity.Name, context.Request.Path);
-            var userClaimsPrincipal = new UserClaimPrincipal(authInfo.UserName, authInfo.IsAdmin, authInfo.RefreshToken );
+            var userClaimsPrincipal = new UserClaimPrincipal(authInfo.UserName, authInfo.Roles, authInfo.RefreshToken );
 
             await context.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme, userClaimsPrincipal, userClaimsPrincipal.AuthenticationProperties);

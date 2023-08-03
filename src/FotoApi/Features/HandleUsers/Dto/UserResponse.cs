@@ -6,5 +6,5 @@ public record UserResponse
     public string FirstName { get; init; } = default!;
     public string LastName { get; init; } = default!;
     public string Email { get; init; } = default!;
-    public bool IsAdmin { get; set; }
+    public IReadOnlyCollection<string> Roles { get; set; } = default!;
 }

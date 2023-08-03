@@ -14,25 +14,23 @@ public class LoginUserHandler(UserManager<User> userManager, ITokenService token
         if (user is null || !await userManager.CheckPasswordAsync(user, request.Password))
             throw new LoginFailedException();
 
-        var isAdmin = await userManager.IsInRoleAsync(user, "Admin");
-
         var (refreshToken, expireTime) = tokenService.GenerateRefreshToken();
         
         // Now add the new token data to the user
         user.RefreshToken = refreshToken;
         user.RefreshTokenExpirationDate = expireTime;
         await userManager.UpdateAsync(user);
-        
+        var roles = (await userManager.GetRolesAsync(user)).AsReadOnly();
         return (new UserAuthorizedResponse
         {
             UserName = request.UserName,
             FirstName = "FirstName",
             LastName = "LastName",
             Email = user.Email!,
-            Token = tokenService.GenerateToken(user.UserName!, isAdmin),
+            Token = tokenService.GenerateToken(user.UserName!, roles),
             RefreshToken = refreshToken,
             RefreshTokenExpiration = expireTime,
-            IsAdmin = isAdmin
+            Roles = roles
         });
     }
 }
