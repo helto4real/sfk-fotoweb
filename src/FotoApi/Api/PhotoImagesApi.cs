@@ -13,7 +13,7 @@ internal static class PhotoImagesApi
 {
     private static int MaxAllowedImageSize => 1024 * 1024 * 100;
 
-    public static RouteGroupBuilder MapPhotoImages(this IEndpointRouteBuilder routes)
+    public static RouteGroupBuilder MapPhotoImageApi(this IEndpointRouteBuilder routes)
     {
         var group = routes.MapGroup("/api/images");
 

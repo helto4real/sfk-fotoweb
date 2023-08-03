@@ -30,7 +30,7 @@ public static class StBilderApi
         {
             var response = await pipe.Pipe(showPackagedImages, handler.Handle, ct);
             return TypedResults.Ok(response);
-        }).RequireAuthorization("AdminPolicy");
+        }).RequireAuthorization("StBildAdministratiorPolicy");
         
         group.MapDelete("/{id:guid}", async Task<Results<Ok, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
             (Guid id, DeleteStBildHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
@@ -83,6 +83,14 @@ public static class StBilderApi
             await pipe.Pipe(new PackageStBilderRequest(request.Ids), handler.Handle, ct);
             return TypedResults.Ok();
         });
+
+        group.MapGet("/packages/{returnDelivered:bool}", async Task<Results<
+            Ok<List<StBildPackageResponse>>, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
+            (bool returnDelivered, GetStBildPackagesHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
+        {
+            var result = await pipe.Pipe(returnDelivered, handler.Handle, ct);
+            return TypedResults.Ok(result);
+        }).RequireAuthorization("StBildAdministratiorPolicy");
         
         group.MapPost("{stBildId:guid}/acceptstatus/{stBildAcceptStatus:bool}", async Task<Results<
             Ok, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
@@ -96,7 +104,14 @@ public static class StBilderApi
             await pipe.Pipe(new AcceptStBildRequest(stBildId, stBildAcceptStatus), handler.Handle, ct);
             return TypedResults.Ok();
         });
-
+        
+        group.MapGet("stpackage/set-delivered/{id:guid}", async Task<Results<Ok, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
+            (Guid id, SetPackageDeliverStatusHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
+        {
+            await pipe.Pipe(new PackageStatusRequest(id, true), handler.Handle, ct);
+            return TypedResults.Ok();
+        }).RequireAuthorization("StBildAdministratiorPolicy");
+        
         return group;
     }
 }

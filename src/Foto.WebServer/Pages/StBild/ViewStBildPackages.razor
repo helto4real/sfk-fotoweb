@@ -1,0 +1,97 @@
+﻿@page "/admin/st-bild/paket"
+@using Foto.WebServer.Services
+@using Foto.WebServer.Dto
+@inherits AuthorizedBasePage
+@inject IStBildService StBildService
+
+<div class="container d-flex flex-column justify-content-center align-items-center">
+    <div class="row row-cols-auto align-items-center">
+        <h2>Ladda ner ST-bildpaket</h2>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row g-3 mb-5 mt-3 justify-content-center align-items-center">
+        <button type="button" class="btn btn-primary" style="max-width: 220px;"
+                @onclick="OnChangeShowDelivered">@(_showDelivered ? "Göm skickade paket " : "Visa skickade paket")</button>
+    </div>
+    <div class="row g-3 mb-5 justify-content-center align-items-center">
+        <div class="col col-8" style="max-width: @((_showDelivered || _stBildPackages.Count == 0) ? "410" : "320")px;">
+            @if (_stBildPackages.Count > 0)
+            {
+                <table class="table table-striped table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col">Datum</th>
+                        <th scope="col">Paket</th>
+                        @if (_showDelivered)
+                        {
+                            <th scope="col">Status</th>
+                        }
+                        <th scope="col"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var package in _stBildPackages)
+                    {
+                        <tr >
+                            <td>@(package.UpdatedDate.ToLocalTime().ToString("d"))</td>
+                            <td>@($"Paket {package.PackageNumber}")</td>
+                            @if (_showDelivered)
+                            {
+                                <td>@(package.IsDelivered ? "Hanterad" : "Ej hanterad")</td>
+                            }
+                            <td><NavLink href="@GetPackageDownloadLine(package.Id)" download=@($"ST-bilder paket-{package.PackageNumber}.zip")><span>Ladda ned</span></NavLink></td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="container d-flex flex-column justify-content-center align-items-center">
+                    <div class="row row-cols-auto align-items-center">
+                        <span>Det finns inga ST paket att visa. Du kan trycka på "Visa skickade paket" för att ladda ner redan skickade/nedladdade paket.</span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+@if (_responseHandler.HasAlert)
+{
+    <div class="alert alert-danger">@_responseHandler.Message</div>
+}
+
+@code {
+    List<StBildPackageInfo> _stBildPackages = new();
+    private readonly ResponseHandler _responseHandler = new();
+    private bool _showDelivered;
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var result = await StBildService.GetStBildPackagesAsync(_showDelivered);
+            _stBildPackages = _responseHandler.CheckResponse(result) ?? _stBildPackages;
+            StateHasChanged();
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private string GetPackageDownloadLine(Guid packageId)
+    {
+        return $"/api/downloads/stpackage/{packageId}";
+    }
+
+    private async Task OnChangeShowDelivered()
+    {
+        _showDelivered = !_showDelivered;
+        var result = await StBildService.GetStBildPackagesAsync(_showDelivered);
+        _stBildPackages = _responseHandler.CheckResponse(result) ?? _stBildPackages;
+        StateHasChanged();
+    }
+
+}

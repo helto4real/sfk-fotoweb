@@ -103,4 +103,22 @@ public class StBildService : ServiceBase, IStBildService
         var result = await HandleResponse(response);
         return result ?? null;
     }
+
+    public async Task<(List<StBildPackageInfo>?, ErrorDetail?)> GetStBildPackagesAsync(bool returnDelivered)
+    {
+        var response = await _signInService.RefreshTokenOnExpired(async () =>
+            await _httpClient.GetAsync($"/api/stbilder/packages/{returnDelivered}"));
+        var result = await HandleResponse(response);
+        if (result is not null) return (null, result);
+        var packages = await response.Content.ReadFromJsonAsync<List<StBildPackageInfo>>();
+        return (packages, null);
+    }
+
+    public async Task<ErrorDetail?> SetPackageStatusDelivered(Guid id)
+    {
+        var response = await _signInService.RefreshTokenOnExpired(async () =>
+            await _httpClient.GetAsync($"/api/stbilder/stpackage/set-delivered/{id}"));
+        var result = await HandleResponse(response);
+        return result;
+    }
 }

@@ -1,13 +1,4 @@
-### Create a user
-# @password = P@ssw0rd!
-
-# POST https://localhost:8001/users
-# Content-Type: application/json
-
-# {
-#     "username": "myuser",
-#     "password": "{{password}}"
-# }
+@api_url = https://localhost:8001/api
 
 # @name gettoken
 POST https://localhost:8001/api/users/token
@@ -24,7 +15,7 @@ Content-Type: application/json
 
 ### Create a todo
 # @name createstbild
-POST https://localhost:8001/api/stbilder
+POST {{api_url}}/stbilder
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -49,21 +40,21 @@ Content-Type: application/json
 @st-bild-ir = {{createstbild.response.body.id}}
 
 ### Delete st bild
-DELETE https://localhost:8001/stbilder/{{st-bild-ir}}
+DELETE {{api_url}}/stbilder/{{st-bild-ir}}
 Authorization: Bearer {{token}}
 
 ### Get st bild
-GET https://localhost:8001/stbilder/{{st-bild-ir}}
-Authorization: Bearer {{token}}
-
-### Get st bild
-GET https://localhost:8001/api/stbilder/5f14577e-2176-43a1-a62d-c286a5394a8a
+GET {{api_url}}/stbilder/5f14577e-2176-43a1-a62d-c286a5394a8a
 Authorization: Bearer {{token}}
 
 ### Get all bild
-GET https://localhost:8001/api/stbilder/user
+GET {{api_url}}/stbilder/user
 Authorization: Bearer {{token}}
 
 ### Get my stbilder
-GET https://localhost:8001/api/stbilder/?useMyImages=true
+GET {{api_url}}/stbilder/?useMyImages=true
+Authorization: Bearer {{token}}
+
+### Get stbildpackages
+GET {{api_url}}/stbilder/packages
 Authorization: Bearer {{token}}

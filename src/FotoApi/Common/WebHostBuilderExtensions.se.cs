@@ -61,7 +61,8 @@ internal static class WebHostBuilderExtensions_se
     private static WebApplication AddEndpoints(this WebApplication app)
     {
         // Configure the APIs
-        app.MapPhotoImages();
+        app.MapPhotoImageApi();
+        app.MapDownloadApi();
         app.MapUsers();
         app.MapAdmin();
         app.MapPublic();

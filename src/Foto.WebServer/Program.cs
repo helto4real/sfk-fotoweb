@@ -104,6 +104,7 @@ app.MapFallbackToPage("/_Host");
 app.MapAuthenticationApi();
 app.MapCookieConsentApi();
 app.MapImageForwardApi(photoApiUrl);
+app.MapDownloadForwardApi(photoApiUrl);
 app.MapReverseProxy();
 // app.MapUser();
 app.UseCookiePolicy();

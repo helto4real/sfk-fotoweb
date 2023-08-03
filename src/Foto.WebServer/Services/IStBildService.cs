@@ -11,4 +11,6 @@ public interface IStBildService
     Task<List<StBildInfo>> GetApprovedNotPackagedStBilderAsync();
     Task<bool> PackageStBilder(GuidIds guidIds);
     Task<ErrorDetail?> SetAcceptStatusForStBild(Guid stBildId, bool stBildIsAccepted);
+    Task<(List<StBildPackageInfo>?, ErrorDetail?)> GetStBildPackagesAsync(bool returnDelivered);
+    Task<ErrorDetail?> SetPackageStatusDelivered(Guid id);
 }

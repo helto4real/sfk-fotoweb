@@ -172,13 +172,18 @@ public class PhotoStore : IPhotoStore, IPhoto, IDisposable
     public string ZipPackage(Guid packageId, int packageNumber)
     {
         var packageFolder = Path.Combine(StPackageRootFolder, packageId.ToString());
-        var zipFilePath = Path.Combine(StPackageRootFolder, $"SFK ST-bilder paket {packageNumber}" + ".zip");
+        var zipFilePath = GetPackageZipFilePath(packageNumber);
         if (File.Exists(zipFilePath))
             File.Delete(zipFilePath);
         
         ZipFile.CreateFromDirectory(packageFolder, zipFilePath);
         Directory.Delete(packageFolder, true);
         return zipFilePath;
+    }
+
+    public string GetPackageZipFilePath(int packageNumber)
+    {
+        return Path.Combine(StPackageRootFolder, $"SFK ST-bilder paket {packageNumber}" + ".zip");
     }
 
     private async Task WriteStTextInfo(string destinationPath, StBild stBild)
@@ -294,6 +299,7 @@ public interface IPhotoStore
 
     Task PackageStBild(string imageLocalRelativeFilePath, Guid packageId, StBild stBild);
     string ZipPackage(Guid packageId, int packageNumber);
+    string GetPackageZipFilePath(int packageNumber);
 }
 
 public interface IPhoto

@@ -3,8 +3,8 @@
 public record StPackage : TimeTrackedEntity
 {
     public Guid Id { get; set; } = Guid.NewGuid();
-    public int PackageNumber { get; init; }
-    public bool IsDelivered { get; init; }
+    public int PackageNumber { get; set; }
+    public bool IsDelivered { get; set; }
     public string PackageRelativPath { get; set; } = default!;
 }
 
