@@ -1,22 +1,63 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.Components.Authorization
+@using Foto.WebServer.Services
 @layout MainLayout
 @inherits AuthorizedBasePage
-
+@inject IUserService UserService
 
 <div class="container d-flex flex-column justify-content-center align-items-center">
     <div class="row row-cols-auto align-items-center">
         <h1>Välkommen till SFK fotowebb</h1>
-        <p>Detta är en webbplats för medlemmar i Sundsvalls fotoklubb. Denna tjänst är under utveckling och du kommer
+        <p>
+            Detta är en webbplats för medlemmar i Sundsvalls fotoklubb. Denna tjänst är under utveckling och du kommer
             att kunna ladda upp bilder till tävlingar och till ST. Har du några frågor, skicka dessa
-            till sekreterare@sundsvallsfotoklubb.se</p>
+            till sekreterare@sundsvallsfotoklubb.se
+        </p>
     </div>
 </div>
 
+@if (!_emailConfirmed)
+{
+    <div class="container d-flex flex-column justify-content-center align-items-center">
+        <div class="row row-cols-auto align-items-center alert alert-warning">
+            Du har inte bekräftat din e-postadress. Klicka på länken i det e-postmeddelande du fick när du registrerade. 
+            Det är viktigt att du konfirmerar din e-post adress så vi vet att vi har rätt kontaktuppgifter till dig. Kontakta 
+            administratören om du inte fått något e-postmeddelande eller om din e-post inte är rätt.
+        </div>
+    </div>
+}
+
+@if (_responseHandler.HasAlert)
+{
+    <div class="alert alert-danger">@_responseHandler.Message</div>
+}
 @code {
+    private bool _emailConfirmed = true;
+    private readonly ResponseHandler _responseHandler = new();
+
     [Parameter]
     public string[] SocialProviders { get; set; } = Array.Empty<string>();
 
     [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var currentUser = await GetCurrentUserAsync();
+            if (currentUser?.Identity?.Name is not null)
+            {
+                var result = await UserService.GetCurrentUserAsync();
+                var user = _responseHandler.CheckResponse(result);
+                if (user is not null)
+                {
+                    _emailConfirmed = user.EmailConfirmed;
+                }
+            }
+            StateHasChanged();
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
 }

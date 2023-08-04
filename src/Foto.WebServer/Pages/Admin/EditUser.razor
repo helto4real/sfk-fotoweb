@@ -36,13 +36,13 @@
                             @foreach (var role in _roles)
                             {
                                 <div>
-                                    @if(User.Roles.Any(r => r == role.Name))
+                                    @if (User.Roles.Any(r => r == role.Name))
                                     {
-                                        <input class="form-check-input" type="checkbox" id="@role.Name" checked @onchange="eventArgs => {OnRoleSelectChangedAsync(role.Name, eventArgs);}"/> 
+                                        <input class="form-check-input" type="checkbox" id="@role.Name" checked @onchange="eventArgs => { OnRoleSelectChangedAsync(role.Name, eventArgs); }"/>
                                     }
                                     else
                                     {
-                                        <input class="form-check-input" type="checkbox" id="@role.Name" unchecked @onchange="eventArgs => {OnRoleSelectChangedAsync(role.Name, eventArgs);}"/> 
+                                        <input class="form-check-input" type="checkbox" id="@role.Name" unchecked @onchange="eventArgs => { OnRoleSelectChangedAsync(role.Name, eventArgs); }"/>
                                     }
                                     <label style="margin-left: 8px">@RoleNameTranslator.GetRoleName(role.Name)</label>
                                 </div>
@@ -68,6 +68,7 @@ else
 {
     [Parameter]
     public string UserName { get; set; } = string.Empty;
+
     private UserInfo? User { get; set; } = new();
     private IReadOnlyCollection<RoleInfo>? _roles;
     private readonly ResponseHandler _responseHandler = new();
@@ -79,7 +80,12 @@ else
             var rolesTask = AdminService.GetRolesAsync();
             var userTask = UserService.GetUserByUsernameAsync(UserName);
             await Task.WhenAll(userTask, rolesTask);
-            User = userTask.Result;
+            var user = _responseHandler.CheckResponse(userTask.Result);
+
+            if (user is not null)
+            {
+                User = user;
+            }
             _roles = _responseHandler.CheckResponse(rolesTask.Result);
 
             StateHasChanged();
@@ -102,7 +108,7 @@ else
             return;
         }
 
-        // Navigate back to the newUser list page
+    // Navigate back to the newUser list page
         NavigationManager?.NavigateTo("/admin/users/list");
     }
 
@@ -112,7 +118,7 @@ else
         if (confirmed)
         {
             await UserService.DeleteUserAsync(UserName);
-            // Navigate back to the newUser list page
+    // Navigate back to the newUser list page
             NavigationManager?.NavigateTo("/admin/users/list");
         }
     }
@@ -121,11 +127,11 @@ else
     {
         NavigationManager!.NavigateTo("/admin/users/list");
     }
-    
+
     private void OnRoleSelectChangedAsync(string role, ChangeEventArgs arg)
     {
         if (arg.Value is not bool value) return;
-        
+
         User?.Roles.RemoveAll(r => r == role);
         if (value)
         {

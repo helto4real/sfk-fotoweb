@@ -4,7 +4,8 @@ namespace Foto.WebServer.Services;
 
 public interface IUserService
 {
-    Task<UserInfo?> GetUserByUsernameAsync(string username);
+    Task<(UserInfo?, ErrorDetail?)> GetUserByUsernameAsync(string username);
+    Task<(UserInfo?, ErrorDetail?)> GetCurrentUserAsync();
     Task<bool> UpdateUserAsync(UserInfo user);
     Task<bool> DeleteUserAsync(string username);
     Task<IEnumerable<User>> GetAllUsers();

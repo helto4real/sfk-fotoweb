@@ -5,8 +5,10 @@ using FotoApi.Features.Shared.Dto;
 using FotoApi.Infrastructure.ExceptionsHandling;
 using FotoApi.Infrastructure.Pipelines;
 using FotoApi.Infrastructure.Security.Authentication.Dto;
+using FotoApi.Infrastructure.Security.Authorization;
 using FotoApi.Infrastructure.Security.Authorization.CommandHandlers;
 using FotoApi.Infrastructure.Security.Authorization.Dto;
+using FotoApi.Infrastructure.Security.Authorization.Exceptions;
 using Microsoft.AspNetCore.Http.HttpResults;
 using LoginUserRequest = FotoApi.Infrastructure.Security.Authorization.Dto.LoginUserRequest;
 
@@ -28,7 +30,15 @@ public static class UsersApi
         {
             var result = await pipe.Pipe(handler.Handle, ct);
             return TypedResults.Ok(result);
-        }).RequireAuthorization("AdminPolicy"); 
+        }).RequireAuthorization("AdminPolicy");         
+        
+        group.MapGet("user/current", async Task<Results<Ok<UserResponse>, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
+            (GetUserFromUsernameHandler handler, FotoAppPipeline pipe, CurrentUser user, CancellationToken ct) =>
+        {
+            if (user.User?.UserName is null) throw new UserNotAuthorizedException("User not authorized");
+            var result = await pipe.Pipe(user.User.UserName, handler.Handle, ct);
+            return TypedResults.Ok(result);
+        }).RequireAuthorization(); 
         
         // Edit user
         group.MapPut("user", async Task<Results<

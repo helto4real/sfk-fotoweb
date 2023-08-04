@@ -17,15 +17,32 @@ public class UserService : ServiceBase, IUserService
         httpClient.DefaultRequestHeaders.Add("User-Agent", "FotoWebbServer");
     }
 
-    public async Task<UserInfo?> GetUserByUsernameAsync(string username)
+    public async Task<(UserInfo?, ErrorDetail?)> GetUserByUsernameAsync(string username)
     {
         var response =
             await _signInService.RefreshTokenOnExpired(async () =>
                 await _httpClient.GetAsync($"api/users/user/{username}"));
 
+        var result = await HandleResponse(response);
+        if (result is not null) return (null, result);
+        
         var user = await response.Content.ReadFromJsonAsync<UserInfo>();
 
-        return user;
+        return (user, null);
+    }
+
+    public async Task<(UserInfo?, ErrorDetail?)> GetCurrentUserAsync()
+    {
+        var response =
+            await _signInService.RefreshTokenOnExpired(async () =>
+                await _httpClient.GetAsync($"api/users/user/current"));
+
+        var result = await HandleResponse(response);
+        if (result is not null) return (null, result);
+        
+        var user = await response.Content.ReadFromJsonAsync<UserInfo>();
+
+        return (user, null);
     }
 
     public async Task<bool> UpdateUserAsync(UserInfo user)

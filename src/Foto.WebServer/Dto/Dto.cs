@@ -16,7 +16,9 @@ public class NewUserInfo
 public class UserInfo
 {
     public string Username { get; set; } = default!;
-    public List<string> Roles { get; set; } = new();
+    public string Email { get; set; } = default!;
+    public bool EmailConfirmed { get; set; }
+    public List<string>? Roles { get; set; } = new();
     public bool IsInRole(string role) => Roles.Contains(role);
 }
 
