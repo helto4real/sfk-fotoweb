@@ -11,7 +11,7 @@
         <p>
             Detta är en webbplats för medlemmar i Sundsvalls fotoklubb. Denna tjänst är under utveckling och du kommer
             att kunna ladda upp bilder till tävlingar och till ST. Har du några frågor, skicka dessa
-            till sekreterare@sundsvallsfotoklubb.se
+            till <a href="mailto:webmaster@sundsvallsfotoklubb.se">webmaster@sundsvallsfotoklubb.se</a>
         </p>
     </div>
 </div>
@@ -20,9 +20,10 @@
 {
     <div class="container d-flex flex-column justify-content-center align-items-center">
         <div class="row row-cols-auto align-items-center alert alert-warning">
-            Du har inte bekräftat din e-postadress. Klicka på länken i det e-postmeddelande du fick när du registrerade. 
-            Det är viktigt att du konfirmerar din e-post adress så vi vet att vi har rätt kontaktuppgifter till dig. Kontakta 
-            administratören om du inte fått något e-postmeddelande eller om din e-post inte är rätt.
+            <h5>Bekräfta din e-postaddress!</h5>
+            <p >Du har inte bekräftat din e-postadress (@_email). Klicka på länken i det e-postmeddelande du fick när du registrerade.
+                Det är viktigt att du konfirmerar din e-post adress så vi vet att vi har rätt kontaktuppgifter till dig. Kontakta
+                administratören om du inte fått något e-postmeddelande eller om din e-post inte är rätt.</p>
         </div>
     </div>
 }
@@ -33,6 +34,7 @@
 }
 @code {
     private bool _emailConfirmed = true;
+    private string _email = default!;
     private readonly ResponseHandler _responseHandler = new();
 
     [Parameter]
@@ -53,6 +55,7 @@
                 if (user is not null)
                 {
                     _emailConfirmed = user.EmailConfirmed;
+                    _email = user.Email;
                 }
             }
             StateHasChanged();
