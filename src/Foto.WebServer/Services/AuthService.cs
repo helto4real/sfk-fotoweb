@@ -56,7 +56,7 @@ public class AuthService : ServiceBase, IAuthService
         var response = await _httpClient.PostAsJsonAsync($"/api/users/token/{provider}", userInfo);
 
         if (!response.IsSuccessStatusCode) return null;
-        
+
         var result = await response.Content.ReadFromJsonAsync<LoginInfo>();
         var duration = result!.RefreshTokenExpiration - DateTime.UtcNow;
         _cache.Set(result.RefreshToken, result.Token, duration);
@@ -113,10 +113,11 @@ public class AuthService : ServiceBase, IAuthService
                 {
                     Title = "Internt fel",
                     Detail = "Försök att logga in igen eller kontakta administratör vid återkommande problem"
-                });}
+                });
+        }
 
         var duration = loginInfoResponse.RefreshTokenExpiration - DateTime.UtcNow;
-            
+
         _logger.LogDebug("Refreshed the refresh token for {User}", userName);
         // We cache the access token with the refresh token as key so we do not have to call the API for every request
         _cache.Set(loginInfoResponse.RefreshToken, loginInfoResponse.Token, duration);

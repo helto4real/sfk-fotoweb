@@ -15,16 +15,16 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
         <ul class="navbar-nav ms-auto  mb-2 mb-lg-0">
-            <AuthorizeView>
-                <Authorized>
-                <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Bilder</a>
-                    <ul  class="dropdown-menu">
-                        <li><NavLink class="dropdown-item" href="image/upload">Ladda upp foto</NavLink></li>
-                        <li><NavLink class="dropdown-item" href="image/myimages">Mina bilder</NavLink></li>
-                    </ul>
-                </li>
-                </Authorized>
-            </AuthorizeView>
+            @* <AuthorizeView> *@
+            @*     <Authorized> *@
+            @*     <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Bilder</a> *@
+            @*         <ul  class="dropdown-menu"> *@
+            @*             <li><NavLink class="dropdown-item" href="image/upload">Ladda upp foto</NavLink></li> *@
+            @*             <li><NavLink class="dropdown-item" href="image/myimages">Mina bilder</NavLink></li> *@
+            @*         </ul> *@
+            @*     </li> *@
+            @*     </Authorized> *@
+            @* </AuthorizeView> *@
             <AuthorizeView Roles="Admin">
                 <Authorized>
                     <li class="nav-item dropdown">
@@ -56,8 +56,8 @@
                         <ul class="dropdown-menu">
                             <li><NavLink class="dropdown-item" href="/st-bild/upload">Ladda upp ST-bild</NavLink></li>
                             <li><NavLink class="dropdown-item" href="/st-bild/list">Visa ST-bilder</NavLink></li>
-                            <li><hr class="dropdown-divider"></li>
                             <AuthorizeView Policy="StBildAdministratiorPolicy" Context="stAdminCtx">
+                                <li><hr class="dropdown-divider"></li>
                                 <li class="dropdown dropstart">
                                     <a class="dropdown-item dropdown-toggle" href="#">Administrera</a>
                                     <ul class="dropdown-menu dropdown-submenu dropdown-submenu-left">

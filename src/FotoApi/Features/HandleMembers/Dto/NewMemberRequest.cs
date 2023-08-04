@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using FotoApi.Infrastructure.Security.Authorization.Dto;
+using Shared.Validation;
 
 namespace FotoApi.Features.HandleMembers.Dto;
 
@@ -29,9 +30,7 @@ public class NewMemberRequestValidator : AbstractValidator<NewMemberRequest>
             .NotEmpty()
             .EmailAddress()
             .WithMessage("En giltig e-postadress måste anges.");
-        RuleFor(x => x.PhoneNumber)
-            .NotEmpty()
-            .Matches(@"^(07|01)[\d]{1}-?[\d]{7}$")
-            .WithMessage("Giltiga telefonnummer är bara siffror eller med ett streck efter riktnummer.");
+        RuleFor(x => x.PhoneNumber!)
+            .AppPhoneNumber();
     }
 }

@@ -3,7 +3,7 @@
 @using Foto.WebServer.Services
 @using Microsoft.AspNetCore.Authorization
 @inherits AuthorizedBasePage
-@attribute [Authorize(Roles = "Admin")]
+@attribute [Authorize(Policy = "StBildAdministratiorPolicy")]
 @inject IStBildService StBildService
 
 <div class="container d-flex flex-column justify-content-center align-items-center">

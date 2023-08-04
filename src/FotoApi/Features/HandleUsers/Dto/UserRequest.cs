@@ -20,16 +20,16 @@ public class UserRequestValidator : AbstractValidator<UpdateUserRequest>
             .WithMessage("Username must be provided")
             .MaximumLength(50)
             .WithMessage("Username must be less than 50 characters");
-        RuleFor(x => x.FirstName)
-            .NotEmpty()
-            .WithMessage("First name must be provided")
-            .MaximumLength(50)
-            .WithMessage("First name must be less than 50 characters");
-        RuleFor(x => x.LastName)
-            .NotEmpty()
-            .WithMessage("Last name must be provided")
-            .MaximumLength(50)
-            .WithMessage("Last name must be less than 50 characters");
+        // RuleFor(x => x.FirstName)
+        //     .NotEmpty()
+        //     .WithMessage("First name must be provided")
+        //     .MaximumLength(50)
+        //     .WithMessage("First name must be less than 50 characters");
+        // RuleFor(x => x.LastName)
+        //     .NotEmpty()
+        //     .WithMessage("Last name must be provided")
+        //     .MaximumLength(50)
+        //     .WithMessage("Last name must be less than 50 characters");
         RuleFor(x => x.Email)
             .NotEmpty()
             .WithMessage("Email must be provided")

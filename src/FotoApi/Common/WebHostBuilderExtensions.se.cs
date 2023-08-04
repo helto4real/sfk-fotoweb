@@ -12,6 +12,7 @@ using FotoApi.Infrastructure.Repositories.MessagingDbContext;
 using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 using FotoApi.Infrastructure.Security.Authentication;
 using FotoApi.Infrastructure.Security.Authorization;
+using FotoApi.Infrastructure.Security.Authorization.Policies;
 using FotoApi.Infrastructure.Settings;
 using FotoApi.Infrastructure.Telemetry;
 using FotoApi.Model;
@@ -122,6 +123,8 @@ internal static class WebHostBuilderExtensions_se
         builder.Services.AddAuthorizationBuilder().AddCurrentUserHandler();
         builder.Services.AddAuthorizationBuilder().AddAdminUserHandler();
         builder.AddAuthorizationPolicies();
+        builder.Services.AddScoped<IPolicyChecker, PolicyChecker>();
+        builder.Services.AddHttpContextAccessor();
         builder.Services.AddResponseCompression(opts =>
         {
             opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(

@@ -56,10 +56,13 @@
                     <InputText id="city" class="form-control" @bind-Value="@_member.City"/>
                     <ValidationMessage For="@(() => _member.City)"/>
                 </div>
-                <div class="form-group mt-1">
-                    <label for="status">Status:</label>
-                    <span id="status" class="form-control">@(_member.IsActive ? "Aktiv" : "Inaktiv")</span>
-                </div>
+                @if (MemberId != Guid.Empty)
+                {
+                    <div class="form-group mt-1">
+                        <label for="status">Status:</label>
+                        <span id="status" class="form-control">@(_member.IsActive ? "Aktiv" : "Inaktiv")</span>
+                    </div>
+                }
                 <div class="form-group mt-1">
                     <label>Roller:</label>
                     @if (_roles is not null)
@@ -146,12 +149,12 @@
             var result = await MemberService.CreateMemberAsync(
                 new NewMemberInfo(
                     _member.Email,
-                    _member.PhoneNumber,
-                    _member.FirstName,
-                    _member.LastName,
-                    _member.Address,
-                    _member.ZipCode,
-                    _member.City,
+                    _member.PhoneNumber?.Trim(),
+                    _member.FirstName.Trim(),
+                    _member.LastName.Trim(),
+                    _member.Address?.Trim(),
+                    _member.ZipCode?.Trim(),
+                    _member.City?.Trim(),
                     _member.Roles
                 )
                 );
@@ -163,13 +166,13 @@
             var result = await MemberService.UpdateMemberAsync(
                 new UpdateMemberInfo(
                     _member.Id,
-                    _member.Email,
-                    _member.PhoneNumber,
-                    _member.FirstName,
-                    _member.LastName,
-                    _member.Address,
-                    _member.ZipCode,
-                    _member.City,
+                    _member.Email.Trim(),
+                    _member.PhoneNumber?.Trim(),
+                    _member.FirstName.Trim(),
+                    _member.LastName.Trim(),
+                    _member.Address?.Trim(),
+                    _member.ZipCode?.Trim(),
+                    _member.City?.Trim(),
                     _member.Roles
                     )
                 );

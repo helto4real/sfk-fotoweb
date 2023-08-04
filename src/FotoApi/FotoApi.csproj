@@ -68,7 +68,6 @@
     <Folder Include=".images\uploaded_images\" />
     <Folder Include=".images\user_images\" />
     <Folder Include="Infrastructure\Repositories\PhotoServiceDbContext\Migrations\" />
-    <Folder Include="Infrastructure\Security\Authorization\Policies\" />
   </ItemGroup>
   
   <ItemGroup>

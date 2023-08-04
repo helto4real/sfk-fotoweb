@@ -37,6 +37,9 @@ public class LoginExternalUserHandler(UserManager<User> userManager,
 
             result = await userManager.AddLoginAsync(loginUser,
                     new UserLoginInfo(command.Provider, command.ProviderKey, null));
+            
+            if (result.Succeeded)
+                loginUser.EmailConfirmed = true; // We always set this since it is external user
         }
         
         if (result.Succeeded)
@@ -45,6 +48,7 @@ public class LoginExternalUserHandler(UserManager<User> userManager,
             
             loginUser.RefreshToken = refreshToken;
             loginUser.RefreshTokenExpirationDate = expireTime;
+            
             await userManager.UpdateAsync(loginUser);
 
             var userRoles = (await userManager.GetRolesAsync(loginUser)).AsReadOnly();

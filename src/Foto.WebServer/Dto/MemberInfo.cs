@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Shared.Validation;
 
 namespace Foto.WebServer.Dto;
 
@@ -32,8 +33,6 @@ public class MemberInfoValidator : AbstractValidator<MemberInfo>
             .EmailAddress()
             .WithMessage("En giltig e-postadress måste anges.");
         RuleFor(x => x.PhoneNumber)
-            .NotEmpty()
-            .Matches(@"^(07|01)[\d]{1}-?[\d]{7}$")
-            .WithMessage("Giltiga telefonnummer är bara siffror eller med ett streck efter riktnummer.");
+            .AppPhoneNumber();
     }
 }

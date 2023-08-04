@@ -9,13 +9,16 @@ public class AuthorizedHttpClientHandler(IAuthService authService, IHttpContextA
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         var authHeader = await GetAuthorizationHeader();
-        request.Headers.Authorization = authHeader;
+        if (authHeader is not null)
+            request.Headers.Authorization = authHeader;
         return await base.SendAsync(request, cancellationToken);
     }
     private async Task<AuthenticationHeaderValue?> GetAuthorizationHeader()
     {
         // First get the refresh token from context
         var authResult = await accessor.HttpContext!.AuthenticateAsync();
+        if (!authResult.Succeeded)
+            return null;
         var properties = authResult.Properties!;
 
         var refreshToken = properties.GetTokenValue(TokenNames.AccessToken);
