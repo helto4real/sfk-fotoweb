@@ -1,4 +1,5 @@
-﻿using FotoApi.Infrastructure.Security.Authorization.Dto;
+﻿using FluentValidation;
+using FotoApi.Infrastructure.Security.Authorization.Dto;
 
 namespace FotoApi.Features.HandleMembers.Dto;
 
@@ -12,4 +13,25 @@ public record NewMemberRequest
     public string? ZipCode { get; set; }
     public string? City { get; set; }
     public List<RoleRequest> Roles { get; set; } = new();
+}
+
+public class NewMemberRequestValidator : AbstractValidator<NewMemberRequest>
+{
+    public NewMemberRequestValidator()
+    {
+        RuleFor(x => x.FirstName)
+            .NotEmpty()
+            .WithMessage("Förnamn måste anges.");
+        RuleFor(x => x.LastName)
+            .NotEmpty()
+            .WithMessage("Efternamn måste anges.");
+        RuleFor(x => x.Email)
+            .NotEmpty()
+            .EmailAddress()
+            .WithMessage("En giltig e-postadress måste anges.");
+        RuleFor(x => x.PhoneNumber)
+            .NotEmpty()
+            .Matches(@"^(07|01)[\d]{1}-?[\d]{7}$")
+            .WithMessage("Giltiga telefonnummer är bara siffror eller med ett streck efter riktnummer.");
+    }
 }
