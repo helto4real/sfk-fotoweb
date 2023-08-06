@@ -20,19 +20,18 @@ public class StBildService : ServiceBase, IStBildService
         httpClient.DefaultRequestHeaders.Add("User-Agent", "FotoWebbServer");
     }
 
-    public async Task<StBildInfo?> GetStBildAsync(Guid stbildId)
+    public async Task<(StBildInfo?, ErrorDetail?)> GetStBildAsync(Guid stbildId)
     {
         var response =
             await _signInService.RefreshTokenOnExpired(async () =>
                 await _httpClient.GetAsync($"/api/stbilder/{stbildId}"));
-        if (response.IsSuccessStatusCode)
-        {
-            var stBild = await response.Content.ReadFromJsonAsync<StBildInfo>();
-            if (stBild is not null) stBild.Time = stBild.Time.ToLocalTime();
-            return stBild;
-        }
-
-        return null;
+        
+        var result = await HandleResponse(response);
+        if (result is not null) return (null, result);
+        
+        var stBild = await response.Content.ReadFromJsonAsync<StBildInfo>();
+        stBild!.Time = stBild.Time.ToLocalTime();
+        return (stBild, null);
     }
 
     public async Task UpdateStBildAsync(StBildInfo stBild)

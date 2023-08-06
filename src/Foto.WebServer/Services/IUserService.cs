@@ -6,10 +6,10 @@ public interface IUserService
 {
     Task<(UserInfo?, ErrorDetail?)> GetUserByUsernameAsync(string username);
     Task<(UserInfo?, ErrorDetail?)> GetCurrentUserAsync();
-    Task<bool> UpdateUserAsync(UserInfo user);
-    Task<bool> DeleteUserAsync(string username);
-    Task<IEnumerable<User>> GetAllUsers();
-    Task<User?> CreateUserAsync(NewUserInfo user);
+    Task<ErrorDetail?> UpdateUserAsync(UserInfo user);
+    Task<ErrorDetail?> DeleteUserAsync(string username);
+    Task<(IEnumerable<User>?, ErrorDetail?)> GetAllUsers();
+    Task<(User?, ErrorDetail?)> CreateUserAsync(NewUserInfo user);
     Task<(User?, ErrorDetail?)> PreCreateUserAsync(string? email);
-    Task<bool> ConfirmEmailAsync(string token);
+    Task<ErrorDetail?> ConfirmEmailAsync(string token);
 }

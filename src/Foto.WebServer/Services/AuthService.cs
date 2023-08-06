@@ -1,5 +1,7 @@
 ﻿using System.Net;
 using Foto.WebServer.Dto;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
@@ -8,6 +10,8 @@ namespace Foto.WebServer.Services;
 public class AuthService : ServiceBase, IAuthService
 {
     private readonly IMemoryCache _cache;
+    private readonly IHttpContextAccessor _accessor;
+    private readonly IAuthorizationService _authService;
     private readonly ILogger<AuthService> _logger;
     private readonly HttpClient _httpClient;
 
@@ -15,10 +19,14 @@ public class AuthService : ServiceBase, IAuthService
         HttpClient httpClient,
         IOptions<AppSettings> appSettings,
         IMemoryCache cache,
+        IHttpContextAccessor accessor,
+        IAuthorizationService authService,
         ILogger<AuthService> logger) : base(logger)
     {
         _httpClient = httpClient;
         _cache = cache;
+        _accessor = accessor;
+        _authService = authService;
         _logger = logger;
 
         httpClient.BaseAddress = new Uri(appSettings.Value.FotoApiUrl);
@@ -122,5 +130,17 @@ public class AuthService : ServiceBase, IAuthService
         // We cache the access token with the refresh token as key so we do not have to call the API for every request
         _cache.Set(loginInfoResponse.RefreshToken, loginInfoResponse.Token, duration);
         return (loginInfoResponse, null);
+    }
+    
+    public async Task<bool> CompliesToPolicy(string policyName)
+    {
+        var authorizationRequirement = new OperationAuthorizationRequirement { Name = policyName };
+        
+        if (_accessor.HttpContext is null)
+            throw new InvalidOperationException("HttpContext is null");
+        
+        var result = await _authService.AuthorizeAsync(_accessor.HttpContext.User, policyName);
+        // var result = await authService.AuthorizeAsync(accessor.HttpContext.User, null, authorizationRequirement);
+        return result.Succeeded;
     }
 }

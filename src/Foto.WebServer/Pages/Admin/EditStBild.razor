@@ -78,13 +78,17 @@
         }
     </div>
 </div>
-
+@if (_responseHandler.HasAlert)
+{
+    <div class="alert alert-danger">@_responseHandler.Message</div>
+}
 @code {
 
     private StBildInfo? _stBild;
 
     private bool _isPackaged;
-
+    private readonly ResponseHandler _responseHandler = new();
+    
     [Parameter]
     public Guid StbildId { get; set; }
     
@@ -95,10 +99,11 @@
     {
         if (firstRender)
         {
-            _stBild = await StBildService.GetStBildAsync(StbildId);
+            var response = await StBildService.GetStBildAsync(StbildId);
+            _stBild = _responseHandler.CheckResponse(response) ?? this._stBild;
+            
             if (_stBild is not null)
                 _isPackaged = _stBild.IsUsed;
-            // Todo: Add error handling
             StateHasChanged();
         }
         await base.OnAfterRenderAsync(firstRender);

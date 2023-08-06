@@ -31,12 +31,12 @@
                     </div>
                     <div class="form-group mt-1">
                         <label>Roller:</label>
-                        @if (_roles is not null)
+                        @if (_roles.Count > 0)
                         {
                             @foreach (var role in _roles)
                             {
                                 <div>
-                                    @if (User.Roles.Any(r => r == role.Name))
+                                    @if (User?.Roles?.Any(r => r == role.Name) ?? false)
                                     {
                                         <input class="form-check-input" type="checkbox" id="@role.Name" checked @onchange="eventArgs => { OnRoleSelectChangedAsync(role.Name, eventArgs); }"/>
                                     }
@@ -70,7 +70,7 @@ else
     public string UserName { get; set; } = string.Empty;
 
     private UserInfo? User { get; set; } = new();
-    private IReadOnlyCollection<RoleInfo>? _roles;
+    private IReadOnlyCollection<RoleInfo> _roles = new List<RoleInfo>();
     private readonly ResponseHandler _responseHandler = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -86,7 +86,7 @@ else
             {
                 User = user;
             }
-            _roles = _responseHandler.CheckResponse(rolesTask.Result);
+            _roles = _responseHandler.CheckResponse(rolesTask.Result) ?? _roles;
 
             StateHasChanged();
         }
@@ -95,21 +95,15 @@ else
 
     private async Task HandleValidSubmit()
     {
-        if (User == null)
+        if (User is not null)
         {
-    //Todo: show error
-            return;
-        }
-    // Save the newUser changes here
+            var result = await UserService.UpdateUserAsync(User);
+            if (!_responseHandler.CheckResponse(result))
+                return;
 
-        if (!await UserService.UpdateUserAsync(User))
-        {
-    // Todo: show error
-            return;
+            // Navigate back to the newUser list page
+            NavigationManager?.NavigateTo("/admin/users/list");
         }
-
-    // Navigate back to the newUser list page
-        NavigationManager?.NavigateTo("/admin/users/list");
     }
 
     private async Task OnDeleteUser()
@@ -117,8 +111,10 @@ else
         var confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"Är du säker på att du vill ta bort användaren {UserName}? Detta kommar ta bort all information och bilder om användaren!");
         if (confirmed)
         {
-            await UserService.DeleteUserAsync(UserName);
-    // Navigate back to the newUser list page
+            var result = await UserService.DeleteUserAsync(UserName);
+            if (!_responseHandler.CheckResponse(result))
+                return;
+            // Navigate back to the newUser list page
             NavigationManager?.NavigateTo("/admin/users/list");
         }
     }
@@ -132,10 +128,10 @@ else
     {
         if (arg.Value is not bool value) return;
 
-        User?.Roles.RemoveAll(r => r == role);
+        User?.Roles?.RemoveAll(r => r == role);
         if (value)
         {
-            User?.Roles.Add(role);
+            User?.Roles?.Add(role);
         }
     }
 

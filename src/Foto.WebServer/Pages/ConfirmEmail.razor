@@ -3,48 +3,52 @@
 @using Foto.WebServer.Services
 @inject IUserService UserService
 
-<h3>ConfirmEmail</h3>
-    <div class="container">
-        <div class="row g-3 mb-5 justify-content-center align-items-center">
-            <div class="col col-8" style="max-width: 350px;">
-            @if(@IsConfirmed)  {
+<div class="container">
+    <div class="row g-3 mb-5 justify-content-center align-items-center">
+        <div class="col col-8" style="max-width: 350px;">
+            <h2>Epost-konfirmering</h2>
+            @if (IsConfirmed)
+            {
                 <p>Din e-post är nu konfirmerad du kommer nu automatiskt flyttas till inloggningssidan.</p>
             }
             else
             {
                 <p>Din konfirmeringstoken har gått ut eller fel länk. Du kommer automatiskt komma till inloggningssidan. Logga in och följ instruktioner för att skicka konfirmeringen igen.</p>
             }
-            </div>
         </div>
     </div>
+</div>
 
 @code {
+
     [Parameter]
     [SupplyParameterFromQuery(Name = "token")]
-    public string Token { get; set; } = String.Empty;
-    
-    public bool IsConfirmed { get; set; }
-    
-    protected override async Task OnParametersSetAsync()
-    {
-        // IsConfirmed = await Client.ConfirmEmailAsync(Token);
-        // StateHasChanged();
-        // await Task.Delay(TimeSpan.FromSeconds(5000));
-        // NavigationManager?.NavigateTo("login", true);
-        
-        await base.OnParametersSetAsync();
-    }
-    
+    public string? Token { get; set; } = String.Empty;
+
+    private bool IsConfirmed { get; set; }
+
+    private readonly System.Timers.Timer _timer = new(7000);
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        _timer.AutoReset = false;
+        _timer.Elapsed += (_, _) =>
+        {
+            NavigationManager?.NavigateTo("/login", true);
+            _timer.Dispose();
+        };
+        _timer.Enabled = true;
         if (firstRender)
         {
-            IsConfirmed = await UserService.ConfirmEmailAsync(Token);
-            StateHasChanged();
-            await Task.Delay(TimeSpan.FromSeconds(5000));
-            NavigationManager?.NavigateTo("login", true);
+            if (Token is not null)
+            {
+                var result = await UserService.ConfirmEmailAsync(Token);
+                IsConfirmed = result is not null;
+                StateHasChanged();
+            }
         }
-        
+
         await base.OnAfterRenderAsync(firstRender);
     }
+
 }

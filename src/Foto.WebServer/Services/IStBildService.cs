@@ -4,7 +4,7 @@ namespace Foto.WebServer.Services;
 
 public interface IStBildService
 {
-    Task<StBildInfo?> GetStBildAsync(Guid stbildId);
+    Task<(StBildInfo?, ErrorDetail?)> GetStBildAsync(Guid stbildId);
     Task UpdateStBildAsync(StBildInfo stBild);
     Task<List<StBildInfo>> GetStBilder(bool showPackagedImages);
     Task<List<StBildInfo>> GetStBilderForCurrentUser(bool showPackagedImages);

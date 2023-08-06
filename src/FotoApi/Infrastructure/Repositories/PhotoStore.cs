@@ -152,10 +152,10 @@ public class PhotoStore : IPhotoStore, IPhoto, IDisposable
         }
 
         var destinationFilenameWithoutExtension = MakeFilenameSafe(stBild.Title);
-        var destinationImageFileName = MakeFilenameUnique(destinationFilenameWithoutExtension + ".jpg");
-        var destinationInfoFileName = MakeFilenameUnique(destinationFilenameWithoutExtension + ".txt");
-        var destinationImageFilePath = Path.Combine(packageFolder, destinationImageFileName);
-        var destinationInfoFilePath = Path.Combine(packageFolder, destinationInfoFileName);
+        var destinationImageFileName = destinationFilenameWithoutExtension + ".jpg";
+        var destinationInfoFileName = destinationFilenameWithoutExtension + ".txt";
+        var destinationImageFilePath = MakeFilenameUnique(Path.Combine(packageFolder, destinationImageFileName));
+        var destinationInfoFilePath = MakeFilenameUnique(Path.Combine(packageFolder, destinationInfoFileName));
         
         var imageSourcePath = Path.Combine(ImageRootFolder, imageLocalRelativeFilePath);
         
@@ -164,7 +164,7 @@ public class PhotoStore : IPhotoStore, IPhoto, IDisposable
             _logger.LogError("Could not create directory {DestinationImageFilePath}", destinationImageFilePath);
             return;
         }
-        
+
         await CopyFileAsync(imageSourcePath, destinationImageFilePath);
         await WriteStTextInfo(destinationInfoFilePath, stBild);
     }
@@ -209,20 +209,22 @@ public class PhotoStore : IPhotoStore, IPhoto, IDisposable
         }
     }
     
-    public static string MakeFilenameUnique(string filename)
+    public static string MakeFilenameUnique(string path)
     {
-        var uniqueFilename = filename;
+        
+        var uniqueFilPath = path;
         var count = 1;
-
-        while (File.Exists(uniqueFilename))
+        var directory = Path.GetDirectoryName(path)!;
+        
+        while (File.Exists(uniqueFilPath))
         {
-            var extension = Path.GetExtension(filename);
-            var nameWithoutExtension = Path.GetFileNameWithoutExtension(filename);
-            uniqueFilename = $"{nameWithoutExtension} ({count}){extension}";
+            var extension = Path.GetExtension(uniqueFilPath);
+            var nameWithoutExtension = Path.GetFileNameWithoutExtension(uniqueFilPath);
+            uniqueFilPath = Path.Combine(directory, $"{nameWithoutExtension}({count}){extension}");
             count++;
         }
 
-        return uniqueFilename;
+        return uniqueFilPath;
     }
     
     public static string MakeFilenameSafe(string filename)

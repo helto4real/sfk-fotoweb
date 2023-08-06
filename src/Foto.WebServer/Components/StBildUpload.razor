@@ -7,27 +7,12 @@
 @inject IImageService ImageService
 
  <div class="container ">
-    <div class="row justify-content-center mb-3">
-        <div class="col col-8" style="max-width: 450px;" >
-            <span class="text-center">Bilden ska vara exakt 2079x1382 pixels.</span>
-        </div>
-    </div>
     <div class="row g-3 mb-5 justify-content-center align-items-center">
         <div class="col col-8" style="max-width: 400px;">
             <CvEditForm id="uploadForm" EditContext="@_editContext" class="form" OnValidSubmit="@HandleValidSubmit">
                 
                 <FluentValidationValidator/>
-                
-                <div class="mb-3">
-                    <label for="imagefile" class="form-label">Ladda upp dit foto</label>
-                    @if (!_clearInputFileSelector)
-                    {
-                        <InputFile class="form-control" MaxFileSize="@IImageService.MaxAllowedImageSize" id="imagefile" OnChange="@HandleFileSelection"/>
-                    }
-                    <ValidationMessage class="text-danger" For="@(() => _model.ImageFile)" />
-                    <ValidationMessage class="text-danger" For="@(() => _model.ImageSize)" />
-                    <ValidationMessage class="text-danger" For="@(() => _model.ImageName)" />
-                </div>
+
                 <div class="mb-3">
                     <label for="title" class="form-label">Rubrik: (Rubrikförslag, lämpligen tre, fyra ord)</label>
                     <InputText id="title" type="title" class="form-control :invalid" @bind-Value="@_model.Title" />
@@ -57,6 +42,16 @@
                     <label for="time" class="form-label">När är bilden tagen:</label>
                     <InputDate id="time" class="form-control :invalid" @bind-Value="@_model.Time" />
                     <ValidationMessage class="text-danger" For="@(() => _model.Time)" />
+                </div>
+                <div class="mb-3">
+                    <label for="imagefile" class="form-label">Ladda upp dit foto (2079x1382 pixels)</label>
+                    @if (!_clearInputFileSelector)
+                    {
+                        <InputFile class="form-control" MaxFileSize="@IImageService.MaxAllowedImageSize" id="imagefile" OnChange="@HandleFileSelection"/>
+                    }
+                    <ValidationMessage class="text-danger" For="@(() => _model.ImageFile)" />
+                    <ValidationMessage class="text-danger" For="@(() => _model.ImageSize)" />
+                    <ValidationMessage class="text-danger" For="@(() => _model.ImageName)" />
                 </div>
                 <div class="d-flex justify-content-start align-items-center">
                     <button type="submit" class="btn btn-primary" disabled="@(_isSubmitting || !IsValid)">Ladda upp st-bild</button>
@@ -183,34 +178,41 @@
     {
         public LoginOrCreateUserModelValidator()
         {
-            RuleFor(x => x.Description)
+            RuleFor(x => x.ImageFile)
                 .NotEmpty()
-                .WithMessage("Beskrivning måste anges.")
-                .MaximumLength(300)
-                .WithMessage("Beskrivningen får max vara 300 tecken");
-            RuleFor(x => x.Name)
-                .NotEmpty()
-                .WithMessage("Namn på fotograf måste anges.");
-            RuleFor(x => x.Title)
-                .NotEmpty()
-                .WithMessage("Rubrik måste anges.");
-            RuleFor(x => x.Location)
-                .NotEmpty()
-                .WithMessage("Plats måste anges.");
-            RuleFor(x => x.AboutThePhotographer)
-                .NotEmpty()
-                .WithMessage("Om fotografen måste anges.");
-            RuleFor(x => x.Time)
-                .LessThanOrEqualTo(e => DateTime.Now.AddDays(1))
-                .WithMessage("Tidpunkt kan inte vara framåt i tiden");
+                .DependentRules(() =>
+                {
+                    RuleFor(x => x.ImageName)
+                        .Must(x => AllowedExtensions.Contains(Path.GetExtension(x).ToLowerInvariant()))
+                        .WithMessage("Bilden måste vara en jpg bild, (*.jpg eller *.jpeg)");
 
-            RuleFor(x => x.ImageName)
-                .Must(x => AllowedExtensions.Contains( Path.GetExtension(x).ToLowerInvariant()))
-                .WithMessage("Bilden måste vara en jpg bild, (*.jpg eller *.jpeg)");
+                    RuleFor(x => x.ImageSize)
+                        .LessThanOrEqualTo(IImageService.MaxAllowedImageSize)
+                        .WithMessage($"Bilden får inte vara större än {IImageService.MaxAllowedImageSize / 1024 / 1024}Mb.");
+                });
+                RuleFor(x => x.Description)
+                    .NotEmpty()
+                    .WithMessage("Beskrivning måste anges.")
+                    .MaximumLength(300)
+                    .WithMessage("Beskrivningen får max vara 300 tecken");
+                RuleFor(x => x.Name)
+                    .NotEmpty()
+                    .WithMessage("Namn på fotograf måste anges.");
+                RuleFor(x => x.Title)
+                    .NotEmpty()
+                    .WithMessage("Rubrik måste anges.");
+                RuleFor(x => x.Location)
+                    .NotEmpty()
+                    .WithMessage("Plats måste anges.");
+                RuleFor(x => x.AboutThePhotographer)
+                    .NotEmpty()
+                    .WithMessage("Om fotografen måste anges.");
+                RuleFor(x => x.Time)
+                    .LessThanOrEqualTo(e => DateTime.Now.AddDays(1))
+                    .WithMessage("Tidpunkt kan inte vara framåt i tiden");
+                ;
+
             
-            RuleFor(x => x.ImageSize)
-                .LessThanOrEqualTo(IImageService.MaxAllowedImageSize)
-                .WithMessage($"Bilden får inte vara större än {IImageService.MaxAllowedImageSize / 1024 /1024}Mb.");
         }
     }
 

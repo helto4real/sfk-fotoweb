@@ -36,6 +36,10 @@
         </div>
     </div>
 </div>
+@if (_responseHandler.HasAlert)
+{
+    <div class="alert alert-danger">@(_responseHandler.Message)</div>
+}
 
 @code {
     
@@ -43,16 +47,22 @@
     public string[] SocialProviders { get; set; } = Array.Empty<string>();
 
     private List<UserInfo> _users = new();
+    private readonly ResponseHandler _responseHandler = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            foreach (var user in await UserService.GetAllUsers())
+            var result = await UserService.GetAllUsers();
+            var users = _responseHandler.CheckResponse(result);
+            if (users is not null)
             {
-                _users.Add(new UserInfo{Username = user.UserName});
+                foreach (var user in users) 
+                {
+                    _users.Add(new UserInfo{Username = user.UserName});
+                }
+                StateHasChanged();
             }
-            StateHasChanged();
         }
         await base.OnAfterRenderAsync(firstRender);
     }

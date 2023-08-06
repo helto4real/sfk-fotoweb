@@ -5,7 +5,7 @@
 @using Foto.WebServer.Services
 @using Blazored.FluentValidation
 @inject IStBildService StBildService
-
+@inject IAuthService AuthService
 <div class="container d-flex flex-column justify-content-center align-items-center">
     <div class="row row-cols-auto align-items-center">
         <h2>Redigera ST-bild</h2>
@@ -82,12 +82,15 @@
         }
     </div>
 </div>
-
+@if (_responseHandler.HasAlert)
+{
+    <div class="alert alert-danger">@_responseHandler.Message</div>
+}
 @code {
 
     private StBildInfo? _stBild;
-
     private bool _isReadOnly;
+    private readonly ResponseHandler _responseHandler = new();
 
     [Parameter]
     public Guid StbildId { get; set; }
@@ -96,11 +99,11 @@
     {
         if (firstRender)
         {
-            var claimsPrincipal = (await AuthenticationStateTask!).User;
-            _stBild = await StBildService.GetStBildAsync(StbildId);
+            var response = await StBildService.GetStBildAsync(StbildId);
+            _stBild = _responseHandler.CheckResponse(response) ?? _stBild;
+
             if (_stBild is not null)
-                _isReadOnly = (claimsPrincipal.IsInRole("Admin") && _stBild.IsAccepted) || _stBild.IsUsed;
-            // Todo: Add error handling
+                _isReadOnly = (!(await AuthService.CompliesToPolicy("StBildAdministratiorPolicy")) && _stBild.IsAccepted) || _stBild.IsUsed;
             StateHasChanged();
             
         }

@@ -45,42 +45,43 @@ public class UserService : ServiceBase, IUserService
         return (user, null);
     }
 
-    public async Task<bool> UpdateUserAsync(UserInfo user)
+    public async Task<ErrorDetail?> UpdateUserAsync(UserInfo user)
     {
         var response =
             await _signInService.RefreshTokenOnExpired(async () =>
                 await _httpClient.PutAsJsonAsync("api/users/user", user));
-        return response.IsSuccessStatusCode;
+        var result = await HandleResponse(response);
+        return result;
     }
 
-    public async Task<bool> DeleteUserAsync(string username)
+    public async Task<ErrorDetail?> DeleteUserAsync(string username)
     {
         var response =
             await _signInService.RefreshTokenOnExpired(async () =>
                 await _httpClient.DeleteAsync($"api/users/user/{username}"));
-        return response.IsSuccessStatusCode;
+        var result = await HandleResponse(response);
+        return result;
     }
 
-    public async Task<IEnumerable<User>> GetAllUsers()
+    public async Task<(IEnumerable<User>?, ErrorDetail?)> GetAllUsers()
     {
         var response =
             await _signInService.RefreshTokenOnExpired(async () => await _httpClient.GetAsync("api/users"));
-        if (response.IsSuccessStatusCode)
-        {
-            var users = await response.Content.ReadFromJsonAsync<IEnumerable<User>>();
-            return users ?? Array.Empty<User>();
-        }
-
-        return Array.Empty<User>();
+        var result = await HandleResponse(response);
+        if (result is not null) return (null, result);
+        var users = await response.Content.ReadFromJsonAsync<IEnumerable<User>>();
+        return (users, null);
     }
 
-    public async Task<User?> CreateUserAsync(NewUserInfo user)
+    public async Task<(User?, ErrorDetail?)> CreateUserAsync(NewUserInfo user)
     {
         var response =
             await _signInService.RefreshTokenOnExpired(async () =>
                 await _httpClient.PostAsJsonAsync("api/users/user", user));
+        var result = await HandleResponse(response);
+        if (result is not null) return (null, result);
         var users = await response.Content.ReadFromJsonAsync<User>();
-        return users;
+        return (users, null);
     }
     
     public async Task<(User?, ErrorDetail?)> PreCreateUserAsync(string? email)
@@ -93,10 +94,11 @@ public class UserService : ServiceBase, IUserService
         return (user, null);
     }
     
-    public async Task<bool> ConfirmEmailAsync(string token)
+    public async Task<ErrorDetail?> ConfirmEmailAsync(string token)
     {
         var escapedToken = Uri.EscapeDataString(token);
-        var result = await _httpClient.GetAsync($@"api/public/confirmemail/{escapedToken}");
-        return result.IsSuccessStatusCode;
+        var response = await _httpClient.GetAsync($@"api/public/confirmemail/{escapedToken}");
+        var result = await HandleResponse(response);
+        return result;
     }
 }

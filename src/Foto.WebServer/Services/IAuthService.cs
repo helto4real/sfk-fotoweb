@@ -9,4 +9,5 @@ public interface IAuthService
     Task<LoginInfo?> GetOrRegisterUserAsync(string provider, ExternalUserInfo userInfo);
     (string?, ErrorDetail?) GetAccessTokenFromRefreshToken(string refreshToken, string userName);
     Task<(LoginInfo?, ErrorDetail?)> RefreshAccessTokenAsync(string refreshToken, string userName);
+    Task<bool> CompliesToPolicy(string policyName);
 }

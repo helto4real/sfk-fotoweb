@@ -55,13 +55,13 @@
                 <div class="col col-8">
                     <h1 class="text-center">Logga in</h1>
                     <p class="text-center">
-                        Logga in genom att ange ditt användarnamn och lösenord nedan eller använd ditt konto grån Google genom att
+                        Logga in genom att ange ditt användarnamn och lösenord nedan eller använd ditt konto från Google genom att
                         trycka på knappen under rubriken "Logga in med ditt sociala konto:"
                     </p>
                 </div>
             </div>
             <div class="row g-3 mb-5 justify-content-center align-items-center">
-                <div class="col col-8" style="max-width: 350px;">
+                <div class="col col-8" style="max-width: 300px;">
                     <form method="post" onsubmit="disableButtons()">
                         <div class="mb-3">
                             <label for="username" class="form-label">Användarnamn:</label>
@@ -83,7 +83,7 @@
                 </div>
             </div>
             <div class="row justify-content-center">
-                <div class="col col-8" style="max-width: 350px;">
+                <div class="col col-8" style="max-width: 300px;">
                     <h6>Logga in med ditt sociala konto:</h6>
                     <div class="row ">
                         @foreach (var provider in Model.ExternalProviders.SocialProviders.Value)

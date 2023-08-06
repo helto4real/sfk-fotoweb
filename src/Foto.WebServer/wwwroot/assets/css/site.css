@@ -1,4 +1,5 @@
 @import url('../vendor/open-iconic/font/css/open-iconic-bootstrap.min.css');
+@import url('custom.min.css');
 
 :root {
     --font-default: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
@@ -8,7 +9,21 @@
     --color-header: #0c0a1b;
     --color-secondary: #1c1a2e;
 }
- 
+
+.nav-link {
+    color: var(--bs-link-color);
+}
+.nav-link:hover {
+    color: #8fbbfd;
+}
+
+nav .nav-link {
+    color: #ffffffc3
+}
+nav .nav-link:hover {
+    color: #ffffff;
+}
+
 /* Smooth scroll behavior */
 :root {
     scroll-behavior: smooth;
@@ -28,7 +43,7 @@ body {
 /*    text-decoration: none;*/
 /*}*/
 a:hover {
-    color: #32cf93;
+    color: --
     text-decoration: none;
 }
 

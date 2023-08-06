@@ -10,21 +10,13 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Foto.WebServer.Pages;
 
-public class LogIn : PageModel
-{
-    private readonly IValidator<LogIn> _validator;
-    private readonly IAuthService _authService;
-
-    public LogIn(IValidator<
-        LogIn> validator, 
-        IAuthService authService, 
+public class LogIn(IValidator<
+            LogIn> validator,
+        IAuthService authService,
         ExternalProviders externalProviders)
-    {
-        _validator = validator;
-        ExternalProviders = externalProviders;
-        _authService = authService;
-    }
-    public ExternalProviders ExternalProviders { get; }
+    : PageModel
+{
+    public ExternalProviders ExternalProviders { get; } = externalProviders;
 
     public bool IsSubmitting { get; set; }
     
@@ -67,7 +59,7 @@ public class LogIn : PageModel
     
     public async Task<IActionResult> OnPostAsync()
     {
-        ValidationResult result = await _validator.ValidateAsync(this);
+        ValidationResult result = await validator.ValidateAsync(this);
         
         if (!result.IsValid) 
         {
@@ -80,7 +72,7 @@ public class LogIn : PageModel
             return Page();
         }
         
-        var (user, error) = await _authService.LoginAsync(new LoginUserInfo(){Username = UserName!, Password = Password!});
+        var (user, error) = await authService.LoginAsync(new LoginUserInfo(){Username = UserName!, Password = Password!});
             
         if (user is null)
         {
