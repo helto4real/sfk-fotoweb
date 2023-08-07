@@ -108,8 +108,8 @@ public class LogIn(IValidator<
             RuleFor(x => x.UserName)
                 .NotEmpty()
                 .WithMessage("Användarnamn måste anges.")
-                .MaximumLength(25)
-                .WithMessage("Användarnamn får max vara 25 tecken")
+                .MaximumLength(50)
+                .WithMessage("Användarnamn får max vara 50 tecken")
                 .MinimumLength(5)
                 .WithMessage("Användarnamn måste vara minst 5 tecken");
 

@@ -13,7 +13,7 @@
             }
             else
             {
-                <p>Din konfirmeringstoken har gått ut eller fel länk. Du kommer automatiskt komma till inloggningssidan. Logga in och följ instruktioner för att skicka konfirmeringen igen.</p>
+                <p>Du har antagligen klickat på en gammal länk. Använd senaste mailet du fått från systemet! Du kommer automatiskt komma till inloggningssidan. Logga in och följ instruktioner för att skicka konfirmeringen igen.</p>
             }
         </div>
     </div>
@@ -43,7 +43,7 @@
             if (Token is not null)
             {
                 var result = await UserService.ConfirmEmailAsync(Token);
-                IsConfirmed = result is not null;
+                IsConfirmed = result is null;
                 StateHasChanged();
             }
         }
