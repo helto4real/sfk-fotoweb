@@ -6,10 +6,6 @@
 @inject IUserService UserService;
 @inject ISignInService SignInService;
 
-<div class="container d-flex flex-column justify-content-center align-items-center">
-
-</div>
-
 <div class="container">
     <div class="row  g-3 mb-5 justify-content-center align-items-center">
         <div class="col col-8" style="max-width: 550px;">
@@ -42,7 +38,7 @@
                         <div class="form-group mt-1">
                             <label for="new-password" class="form-label">Nytt lösenord:</label>
                             <InputText id="new-password" type="password" class="form-control app-input-wide" @bind-Value="_loginInfo.NewPassword"/>
-                            <ValidationMessage class="text-danger" For="@(() => _loginInfo.CurrentPassword)"/>
+                            <ValidationMessage class="text-danger" For="@(() => _loginInfo.NewPassword)"/>
                         </div>
                         <div class="form-group mt-1">
                             <label for="confirmPassword">Bekräfta lösenord</label>

@@ -13,4 +13,6 @@ public interface IUserService
     Task<(User?, ErrorDetail?)> PreCreateUserAsync(string? email);
     Task<ErrorDetail?> ConfirmEmailAsync(string token);
     Task<ErrorDetail?> ChangeLoginInfoAsync(UpdateLoginInfo loginInfo);
+    Task SendPasswordResetEmail(string email);
+    Task<ErrorDetail?> ResetPassword(string email, string newPassword, string token);
 }

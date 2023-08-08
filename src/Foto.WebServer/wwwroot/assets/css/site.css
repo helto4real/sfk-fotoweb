@@ -42,10 +42,7 @@ body {
 /*    color: var(--color-primary);*/
 /*    text-decoration: none;*/
 /*}*/
-a:hover {
-    color: --
-    text-decoration: none;
-}
+
 
 h1,
 h2,
@@ -143,6 +140,15 @@ font-size: 32px;
     }
 }
 
+.text-left {
+    text-align: left !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+.password-link  {
+    color: #7d93b7 !important;
+}
+
 /*We do not want active state on menuitems*/
 .active > a {
     background-color:unset;
@@ -205,10 +211,10 @@ font-size: 32px;
 }
 
 .app-button {
-    width: 98px; !important;
+    width: 98px !important;
 }
 .app-button-wide {
-    width: 105px; !important;
+    width: 105px !important;
 }
 
 /*Standard input fields*/

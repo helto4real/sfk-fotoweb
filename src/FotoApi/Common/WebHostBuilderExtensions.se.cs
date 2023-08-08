@@ -17,6 +17,7 @@ using FotoApi.Infrastructure.Settings;
 using FotoApi.Infrastructure.Telemetry;
 using FotoApi.Model;
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.SignalR;
 using Oakton.Resources;
@@ -137,7 +138,8 @@ internal static class WebHostBuilderExtensions_se
         
         builder.Services.AddIdentityCore<User>(options => options.User.RequireUniqueEmail = true)
             .AddRoles<Role>()
-            .AddEntityFrameworkStores<PhotoServiceDbContext>();
+            .AddEntityFrameworkStores<PhotoServiceDbContext>()
+            .AddDefaultTokenProviders();
         // State that represents the current user from the database *and* the request
         builder.Services.AddCurrentUser();
 
