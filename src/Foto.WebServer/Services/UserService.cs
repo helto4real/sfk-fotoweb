@@ -53,7 +53,17 @@ public class UserService : ServiceBase, IUserService
         var result = await HandleResponse(response);
         return result;
     }
-
+    
+    public async Task<ErrorDetail?> ChangeLoginInfoAsync(UpdateLoginInfo loginInfo)
+    {
+        loginInfo.IsUserExternal = await _signInService.IsCurrentUserExternalAsync();
+        var response =
+            await _signInService.RefreshTokenOnExpired(async () =>
+                await _httpClient.PutAsJsonAsync("api/users/logininfo", loginInfo));
+        var result = await HandleResponse(response);
+        return result;
+    }
+    
     public async Task<ErrorDetail?> DeleteUserAsync(string username)
     {
         var response =

@@ -167,9 +167,13 @@ internal static class WebHostBuilderExtensions_se
     {
         builder.Host.UseWolverine(opts =>
         {
-            opts.PersistMessagesWithPostgresql(connectionString);
-            opts.UseEntityFrameworkCoreTransactions();
-            opts.Policies.UseDurableLocalQueues();
+            if (!builder.Environment.IsDevelopment())
+            {
+                // We only persist messages in production 
+                opts.PersistMessagesWithPostgresql(connectionString);
+                opts.Policies.UseDurableLocalQueues();
+                opts.UseEntityFrameworkCoreTransactions();
+            }
             opts.Policies.AutoApplyTransactions();
         });
         builder.Host.UseResourceSetupOnStartup();

@@ -70,15 +70,15 @@
                             </AuthorizeView>
                         </ul>
                     </li>
-                <li class="nav-item dropdown">
+                <li class="nav-item dropdown ">
                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">@context.User.Identity?.Name</a>
-                    <ul class="dropdown-menu">
-                        <li class="dropdown dropstart"><NavLink class="dropdown-item" @onclick="@Logout">Logga ut</NavLink></li>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><NavLink class="dropdown-item" @onclick="@Logout">Logga ut</NavLink></li>
+                        <li><NavLink class="dropdown-item" href="/user/edit">Mina uppgifter</NavLink></li>
                     </ul>
                 </li>
                 </Authorized>
                 <NotAuthorized>
-    
                     <li class="nav-item mr-3">
                         <a class="nav-link m" href="/login">Logga in</a>
                     </li>

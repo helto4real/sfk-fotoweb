@@ -10,4 +10,11 @@ internal static class IMailSenderExtension
             $"Bekräfta din e-postaddress genom att klicka på följande länk : {photoWebUri}/confirm-email/?token={Uri.EscapeDataString(urlToken)}";
         return sender.SendEmailAsync(new MailInfo(email, subject, message), ct);
     }
+
+    public static Task SendAccountChangedEmailAsync(this IMailSender sender, string email, string message,
+        CancellationToken ct)
+    {
+        var subject = "SFK FotoWebb - Epost";
+        return sender.SendEmailAsync(new MailInfo(email, subject, message), ct);
+    }
 }

@@ -49,12 +49,12 @@ internal class MailSenderService(ILogger<MailSenderService> logger, IMailQueue m
                 var nextEmailMessage = await mailQueue.GetNextFromQueueAsync(_combinedCancellationToken);
 
                 await ConnectToSmtpServer();
-
+                
                 await SendEmail(nextEmailMessage);
                 // Read all queued messages and send them
-                while (mailQueue.HasItemsInQueue() && !_combinedCancellationToken.IsCancellationRequested)
+                while (mailQueue.TryRead(out nextEmailMessage) && !_combinedCancellationToken.IsCancellationRequested)
                     await SendEmail(nextEmailMessage);
-
+                
                 await DisconnectSmtpServer();
             }
         }

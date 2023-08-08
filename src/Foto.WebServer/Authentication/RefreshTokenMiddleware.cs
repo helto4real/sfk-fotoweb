@@ -23,9 +23,9 @@ public class RefreshTokenMiddleware(RequestDelegate next, ILogger<RefreshTokenMi
         if (context.User.Identity is not null && context.User.Identity.IsAuthenticated)
         {
             // var expiry = context.User.Claims.FirstOrDefault(x => x.Type == "expires").Value;
-            var result = await context.AuthenticateAsync();
+            var authResult = await context.AuthenticateAsync();
 
-            var properties = result.Properties!;
+            var properties = authResult.Properties!;
 
             var refreshToken = properties.GetTokenValue(TokenNames.AccessToken);
 
@@ -58,6 +58,13 @@ public class RefreshTokenMiddleware(RequestDelegate next, ILogger<RefreshTokenMi
             logger.LogDebug("Middleware refreshed accesstoken for {User} accessing {Path}", context.User.Identity.Name, context.Request.Path);
             var userClaimsPrincipal = new UserClaimPrincipal(authInfo.UserName, authInfo.Roles, authInfo.RefreshToken );
 
+            // Make sure we keep the status of external login
+            var externalProvider = authResult.Properties?.GetExternalProvider();
+            if (externalProvider is not null)
+            {
+                userClaimsPrincipal.AuthenticationProperties.SetExternalProvider(externalProvider);
+            }
+            
             await context.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme, userClaimsPrincipal, userClaimsPrincipal.AuthenticationProperties);
             context.User = userClaimsPrincipal;

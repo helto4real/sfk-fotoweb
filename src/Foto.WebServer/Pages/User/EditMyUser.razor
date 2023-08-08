@@ -1,0 +1,128 @@
+@page "/user/edit"
+@using Foto.WebServer.Services
+@using Foto.WebServer.Dto
+@using Blazored.FluentValidation
+@inherits AuthorizedBasePage
+@inject IUserService UserService;
+@inject ISignInService SignInService;
+
+<div class="container d-flex flex-column justify-content-center align-items-center">
+
+</div>
+
+<div class="container">
+    <div class="row  g-3 mb-5 justify-content-center align-items-center">
+        <div class="col col-8" style="max-width: 550px;">
+            <h2>Ändra kontouppgifter</h2>
+            Här kan du ändra din e-post address. @DisplayPasswordText Om du behöver ändra
+            ditt användarnamn så måste du kontakta en administratör.
+        </div>
+    </div>
+    <div class="row g-3 mb-5 justify-content-center align-items-center">
+        <div class="col col-4">
+            @if (_loginInfo is not null)
+            {
+                <CvEditForm id="uploadForm" Model="_loginInfo" class="form" OnValidSubmit="@HandleValidSubmit" Context="NewContext">
+                    <FluentValidationValidator @ref="_fluentValidationValidator"/>
+                    <div class="form-group mt-1">
+                        <span for="current-username" class="">Användarnamn:</span>
+                        <input id="current-username" type="text" class="form-control app-input-wide" value="@_loginInfo.CurrentUserName" disabled readonly/>
+                    </div>
+                    <div class="form-group mt-1">
+                        <label for="current-email" class="form-label">E-post:</label>
+                        <input id="current-email" type="text" class="form-control app-input-wide" value="@_loginInfo.CurrentEmail" disabled readonly/>
+                    </div>
+                    @if (!_isExternal)
+                    {
+                        <div class="form-group mt-1">
+                            <label for="password" class="form-label">Nuvarande lösenord:</label>
+                            <InputText id="password" type="password" class="form-control app-input-wide" @bind-Value="_loginInfo.CurrentPassword"/>
+                            <ValidationMessage class="text-danger" For="@(() => _loginInfo.CurrentPassword)"/>
+                        </div>
+                        <div class="form-group mt-1">
+                            <label for="new-password" class="form-label">Nytt lösenord:</label>
+                            <InputText id="new-password" type="password" class="form-control app-input-wide" @bind-Value="_loginInfo.NewPassword"/>
+                            <ValidationMessage class="text-danger" For="@(() => _loginInfo.CurrentPassword)"/>
+                        </div>
+                        <div class="form-group mt-1">
+                            <label for="confirmPassword">Bekräfta lösenord</label>
+                            <InputText id="confirmPassword" type="password" class="form-control app-input-wide" @bind-Value="_loginInfo.ConfirmPassword"/>
+                            <ValidationMessage class="text-danger" For="@(() => _loginInfo.ConfirmPassword)"/>
+                        </div>
+                    }
+                    <div class="form-group mt-1">
+                        <label for="new-email">Ny e-post:</label>
+                        <InputText id="new-email" class="form-control app-input-wide" @bind-Value="@_loginInfo.NewEmail"/>
+                        <ValidationMessage class="text-danger" For="@(() => _loginInfo.NewEmail)"/>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-4 app-input-wide">
+                        @if (CanSubmit)
+                        {
+                            <button type="submit" class="btn btn-primary app-button-wide">Spara</button>
+                        }
+                        else
+                        {
+                            <button type="submit" class="btn btn-primary app-button-wide" disabled>Spara</button>
+                        }
+                        <button type="button" class="btn btn-secondary app-button-wide" @onclick="OnCancel">Avbryt</button>
+                    </div>
+                </CvEditForm>
+            }
+        </div>
+    </div>
+</div>
+
+@if (_responseHandler.HasAlert)
+{
+    <div class="alert alert-danger">@_responseHandler.Message</div>
+}
+
+@code {
+    private readonly ResponseHandler _responseHandler = new ResponseHandler();
+    private UpdateLoginInfo? _loginInfo;
+    private UserInfo? _user;
+    private FluentValidationValidator? _fluentValidationValidator;
+    private bool _isExternal;
+
+    private bool CanSubmit => _loginInfo is not null && _loginInfo.NewEmail is not null && _loginInfo.NewEmail.Trim() != _user?.Email &&
+                              (_fluentValidationValidator?.Validate() ?? false);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var response = await UserService.GetCurrentUserAsync();
+            _user = _responseHandler.CheckResponse(response);
+
+            if (_user is not null)
+            {
+                _loginInfo = new UpdateLoginInfo()
+                {
+                    CurrentUserName = _user.Username,
+                    CurrentEmail = _user.Email
+                };
+            }
+            _isExternal = await SignInService.IsCurrentUserExternalAsync();
+            StateHasChanged();
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (_loginInfo is not null)
+        {
+            var response = await UserService.ChangeLoginInfoAsync(_loginInfo);
+            _responseHandler.CheckResponse(response);
+        }
+    }
+
+    private void OnCancel()
+    {
+        NavigationManager?.NavigateTo("/");
+    }
+
+    private object DisplayPasswordText => !_isExternal ? "Du kan också ändra ditt lösenord." : string.Empty;
+
+}

@@ -12,4 +12,5 @@ public interface IUserService
     Task<(User?, ErrorDetail?)> CreateUserAsync(NewUserInfo user);
     Task<(User?, ErrorDetail?)> PreCreateUserAsync(string? email);
     Task<ErrorDetail?> ConfirmEmailAsync(string token);
+    Task<ErrorDetail?> ChangeLoginInfoAsync(UpdateLoginInfo loginInfo);
 }

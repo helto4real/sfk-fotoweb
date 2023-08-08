@@ -24,37 +24,37 @@
                 <div class="form-group mt-1">
                     <label for="given-name">Förnamn:</label>
                     <InputText id="given-name" class="form-control" autocomplete="given-name" @bind-Value="@_member.FirstName"/>
-                    <ValidationMessage For="@(() => _member.FirstName)"/>
+                    <ValidationMessage class="text-danger" For="@(() => _member.FirstName)"/>
                 </div>
                 <div class="form-group mt-1">
                     <label for="family-name">Efternamn:</label>
                     <InputText id="family-name" class="form-control" autocomplete="family-name" @bind-Value="@_member.LastName"/>
-                    <ValidationMessage For="@(() => _member.LastName)"/>
+                    <ValidationMessage class="text-danger" For="@(() => _member.LastName)"/>
                 </div>
                 <div class="form-group mt-1">
                     <label for="email">E-post:</label>
                     <InputText id="email" class="form-control" @bind-Value="@_member.Email"/>
-                    <ValidationMessage For="@(() => _member.Email)"/>
+                    <ValidationMessage class="text-danger" For="@(() => _member.Email)"/>
                 </div>
                 <div class="form-group mt-1">
                     <label for="phonenumber">Telefonnummer:</label>
                     <InputText id="phonenumber" class="form-control" @bind-Value="@_member.PhoneNumber"/>
-                    <ValidationMessage For="@(() => _member.PhoneNumber)"/>
+                    <ValidationMessage class="text-danger" For="@(() => _member.PhoneNumber)"/>
                 </div>
                 <div class="form-group mt-1">
                     <label for="address">Adress:</label>
                     <InputText id="address" class="form-control" @bind-Value="@_member.Address"/>
-                    <ValidationMessage For="@(() => _member.Address)"/>
+                    <ValidationMessage class="text-danger" For="@(() => _member.Address)"/>
                 </div>
                 <div class="form-group mt-1">
                     <label for="zip">Postkod:</label>
                     <InputText id="zip" class="form-control" @bind-Value="@_member.ZipCode"/>
-                    <ValidationMessage For="@(() => _member.ZipCode)"/>
+                    <ValidationMessage class="text-danger" For="@(() => _member.ZipCode)"/>
                 </div>                
                 <div class="form-group mt-1">
                     <label for="city">Postadress:</label>
                     <InputText id="city" class="form-control" @bind-Value="@_member.City"/>
-                    <ValidationMessage For="@(() => _member.City)"/>
+                    <ValidationMessage class="text-danger" For="@(() => _member.City)"/>
                 </div>
                 @if (MemberId != Guid.Empty)
                 {

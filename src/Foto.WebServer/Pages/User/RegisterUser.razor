@@ -25,20 +25,20 @@
     <div class="col col-8" style="max-width: 350px;">
         <CvEditForm Model="@_model" class="form-horizontal py-5" OnValidSubmit="@CreateUser">
             <FluentValidationValidator/>
-            <div class="mb-3">
+            <div class="form-group mt-1">
                 <label for="username" class="form-label">Användarnamn</label>
                 <InputText id="username" class="form-control" autocomplete="username" @bind-Value="_model.UserName" autofocus/>
-                <ValidationMessage For="@(() => _model.UserName)"/>
+                <ValidationMessage class="text-danger" For="@(() => _model.UserName)"/>
             </div>
-            <div class="mb-3">
+            <div class="form-group mt-1">
                 <label for="password" class="form-label">Lösenord</label>
                 <InputText id="password" type="password" class="form-control" autocomplete="new-password" @bind-Value="_model.Password"/>
-                <ValidationMessage For="@(() => _model.Password)"/>
+                <ValidationMessage class="text-danger" For="@(() => _model.Password)"/>
             </div>
-            <div class="mb-3">
+            <div class="form-group mt-1">
                 <label for="confirmPassword">Bekräfta lösenord</label>
                 <InputText id="confirmPassword" type="password" class="form-control" @bind-Value="_model.ConfirmPassword"/>
-                <ValidationMessage For="@(() => _model.ConfirmPassword)"/>
+                <ValidationMessage class="text-danger" For="@(() => _model.ConfirmPassword)"/>
             </div>
             @* <div class="mb-3"> *@
             @*     <label for="firstname" class="form-label">Förnamn</label> *@

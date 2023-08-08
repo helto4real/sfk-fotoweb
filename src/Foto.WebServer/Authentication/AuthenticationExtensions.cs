@@ -107,7 +107,7 @@ public static class AuthenticationExtensions
     
     public static void SetExternalProvider(this AuthenticationProperties properties, string providerName) =>
         properties.SetString(ExternalProviderKey, providerName);
-    
+
     public static bool HasExternalToken(this AuthenticationProperties properties) =>
         properties.GetString(HasExternalTokenKey) is not null;
 

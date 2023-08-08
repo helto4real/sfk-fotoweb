@@ -31,6 +31,7 @@
 
     <ItemGroup>
       <AdditionalFiles Include="Pages\Admin\ManageStBilder.razor" />
+      <AdditionalFiles Include="Pages\User\RegisterUser.razor" />
       <AdditionalFiles Include="Shared\Footer.razor" />
       <AdditionalFiles Include="Shared\MainLayout.razor" />
       <AdditionalFiles Include="Shared\NavMenu.razor" />

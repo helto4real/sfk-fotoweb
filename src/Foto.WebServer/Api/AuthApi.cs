@@ -32,6 +32,12 @@ public static class AuthApi
         
         group.MapGet("refresh", async ([FromQuery]string? refreshToken, HttpContext context, IAuthService authService) =>
         {
+            var authResult = await context.AuthenticateAsync();
+            if (!authResult.Succeeded)
+            {
+                return Results.Unauthorized();
+            }
+            
             var (authInfo, _) = await authService.RefreshAccessTokenAsync(refreshToken!, context.User!.Identity!.Name!);
             if (authInfo is null)
             {
@@ -40,22 +46,41 @@ public static class AuthApi
             context.Response.Cookies.Append("RefreshTime", DateTime.Now.ToString(CultureInfo.InvariantCulture));
             var userClaimsPrincipal = new UserClaimPrincipal(authInfo.UserName, authInfo.Roles, authInfo.RefreshToken );
 
+            // Make sure we keep the status of external login in the new cookie
+            var externalProvider = authResult.Properties.GetExternalProvider();
+            if (externalProvider is not null)
+            {
+                userClaimsPrincipal.AuthenticationProperties.SetExternalProvider(externalProvider);
+            }
+            
             await context.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme, userClaimsPrincipal, userClaimsPrincipal.AuthenticationProperties);
             return Results.Ok();
         });
         
-        group.MapGet("signin", ([FromQuery]string? refreshToken, HttpContext context, IAuthService authService) =>
+        group.MapGet("signin", async ([FromQuery]string? refreshToken, HttpContext context, IAuthService authService) =>
         {
-            var user = context.User;
-            if (!user.Identity!.IsAuthenticated || user.Identity?.Name is null)
+            var authResult = await context.AuthenticateAsync();
+            if (!authResult.Succeeded)
             {
-                return Results.BadRequest("User is not authenticated");
+                return Results.Unauthorized();
+            }
+            
+            var user = context.User;
+            if (user.Identity?.Name is null)
+            {
+                return Results.Unauthorized();
             }
 
             var roles = user.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).ToList().AsReadOnly();
             
             var userClaimsPrincipal = new UserClaimPrincipal(user.Identity.Name, roles, refreshToken! );
+            // Make sure we keep the status of external login in the new cookie
+            var externalProvider = authResult.Properties.GetExternalProvider();
+            if (externalProvider is not null)
+            {
+                userClaimsPrincipal.AuthenticationProperties.SetExternalProvider(externalProvider);
+            }
             return Results.SignIn( userClaimsPrincipal, userClaimsPrincipal.AuthenticationProperties, CookieAuthenticationDefaults.AuthenticationScheme);
         });
         
