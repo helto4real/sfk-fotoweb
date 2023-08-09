@@ -1,0 +1,17 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: fotowebb-db
+  annotations:
+    metallb.universe.tf/allow-shared-ip: 'true'
+spec:
+  ports:
+    - name: 'portgress'
+      protocol: TCP
+      port: 5432
+      targetPort: 5432
+  selector:
+    name: fotowebb-db
+  type: LoadBalancer
+  loadBalancerIP: 10.10.20.232
+

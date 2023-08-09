@@ -1,0 +1,196 @@
+<html lang="en" data-bs-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="block-all-mixed-content;upgrade-insecure-requests;default-src 'self';img-src data: 'self';script-src stackpath.bootstrapcdn.com 'sha256-34WLX60Tw3aG6hylk0plKbZZFXCuepeQ6Hu7OqRf8PI=' 'sha256-HU12q4hTLt0INlq0UBW6M5D5JYS2DLzQLA7sDXKLXmw=' 'self'; style-src stackpath.bootstrapcdn.com fonts.googleapis.com 'unsafe-inline' 'self'; font-src fonts.gstatic.com 'self';"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <base href="./" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Poppins"
+    />
+
+    <link href="assets/css/custom.min.css" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="assets/vendor/bootstrap-icons/font/bootstrap-icons.css"
+    />
+
+    <link rel="stylesheet" href="assets/css/site.css" />
+    <!--!-->
+    <!--!-->
+    <!--!-->
+    <title>SFK Fotowebb</title>
+    <!--!-->
+    <!--!-->
+  </head>
+  <body>
+    <!--Blazor:{"sequence":1,"type":"server","descriptor":"CfDJ8ILTSgkaEgNOiMQ0gwr5UcnjAbAQeFLfqYv9sf6PDod/vzAG3\u002BzNoNWS2PJSMxgqjaiF7\u002B3ZwMQlzTPdJNSbIwWICu7oXFxaZyOTuq2/LKvsXo15ElRSaMg/Po5WX3MkX0rM\u002BJ1hEwzUJg6DHla8lLR3q8Bs8WNPa75QlBqTMaBdCpXL5ImhWICo5vq5SFKPg6d72DmVgFEXPOSuwkntl\u002B2f3fANTg3lpJp/zGLZFGSK2sYYQRXunu65WF\u002B9n1dn1E7EljhBe4MBw2cXaDiEKY6DDjSzciw0vtWASNFxlpQx8uCM024z7DNxB3\u002BuEfIFz25QI9QgQFvfZaFILShX8jOn5//aBo2oRq/DRRAJzJr9FuCROUR41HZbU\u002Bc7niagzROfTRN2RtSplqwulrrxjxKdPZzZ9\u002B8gcLnCQdczjveRi/7f8IwfceVYFZDxmdN\u002BY34BWneEHGJEbD0AZY8wWqzsXsmzDmphwLn4RHjik\u002Bbu"}--><!--!--><!--!--><!--!--><!--!--><!--!--><!--!--><!--!--><!--!--><!--!--><!--!--><!--!-->
+
+    <header id="header" class="header">
+      <!--!-->
+      <nav class="navbar navbar-expand-md">
+        <div class="container-fluid">
+          <!--!--><a href="/" class="logo navbar-brand"
+            ><img class="d-inline-block" src="logo.jpg" alt="" />
+            SFK Fotowebb
+          </a>
+          <!--!--><button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarTogglerDemo02"
+            aria-controls="navbarTogglerDemo02"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+              <!--!--><!--!-->
+              <!--!-->
+              <li class="nav-item dropdown">
+                <!--!--><a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  >ST-bilder</a
+                >
+                <ul class="dropdown-menu">
+                  <li>
+                    <!--!--><a href="/st-bild/upload" class="dropdown-item"
+                      >Ladda upp ST-bild</a
+                    >
+                  </li>
+                  <!--!-->
+                  <li>
+                    <!--!--><a href="/st-bild/list" class="dropdown-item"
+                      >Visa ST-bilder</a
+                    >
+                  </li>
+                  <!--!-->
+                  <!--!-->
+                </ul>
+              </li>
+              <!--!-->
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  >helto4real@gmail.com</a
+                ><!--!-->
+                <ul class="dropdown-menu">
+                  <li class="dropdown dropstart">
+                    <!--!--><a class="dropdown-item">Logga ut</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <!--!-->
+    <main id="main" role="main" class="main">
+      <!--!--><!--!--><!--!--><!--!-->
+      <div
+        class="container d-flex flex-column justify-content-center align-items-center"
+      >
+        <div class="row row-cols-auto align-items-center">
+          <h1 tabindex="-1">Välkommen till SFK fotowebb</h1>
+          <p>
+            Detta är en webbplats för medlemmar i Sundsvalls fotoklubb. Denna
+            tjänst är under utveckling och du kommer att kunna ladda upp bilder
+            till tävlingar och till ST. Har du några frågor, skicka dessa till
+            sekreterare@sundsvallsfotoklubb.se
+          </p>
+        </div>
+      </div>
+    </main>
+    <!--!-->
+    <!--!-->
+    <div
+      class="modal fade mt-auto"
+      tabindex="-1"
+      style="display: none"
+      data-blazorstrap="acceptCookieModal"
+      _bl_c384cf83-266b-4867-a705-eec6b798db23=""
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            Cookies och GDPR<!--!--><button
+              type="button"
+              class="btn-close ms-auto"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <!--!--><!--!-->Vi använder cookies för att ge dig bästa möjliga
+            upplevelse. För att kunna fortsätta att använda siten behöver du
+            acceptera att vi lagrar cookies genom att trycka på knappen "Jag
+            förstår".
+          </div>
+          <div class="modal-footer">
+            <a href="/cookie/consent"
+              ><!--!--><button
+                type="button"
+                class="btn btn-primary"
+                data-blazorstrap="dc5a564d-7342-4743-80b9-30176e2b70f7"
+              >
+                <!--!-->Jag förstår
+              </button></a
+            ><!--!-->
+            <a href="/cookiepolicy" target="_blank"
+              ><!--!--><button
+                type="button"
+                class="btn btn-secondary"
+                data-blazorstrap="3ec0479b-8cb5-4307-a0f2-0d3f2fca63c3"
+              >
+                <!--!-->Läs mer...
+              </button></a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--!-->
+    <div
+      class="modal-backdrop fade"
+      style="display: none"
+      _bl_11da633e-1c22-42f8-9bf4-3d4c37b1312b=""
+    ></div>
+    <!--!-->
+    <footer class="fixed-bottom">
+      <!--!--><!--!-->
+      <div class="m-auto p-1 d-flex bg-body-secondary align-middle align-items-center">
+        <span class="align-content-center m-auto"
+          >För support:
+          <a href="mailto:webmaster@sundsvallsfotoklubb.se"
+            >webmaster@sundsvallsfotoklubb.se</a
+          ></span
+        >
+      </div>
+    </footer>
+    <!--!-->
+    <!--!-->
+    <div id="blazor-error-ui">
+      An unhandled exception has occurred. See browser dev tools for details.
+
+      <a href="" class="reload">Ladda om sidan!</a>
+      <a class="dismiss">🗙</a>
+    </div>
+
+    <script src="_framework/blazor.server.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="_content/BlazorStrap/blazorstrap.js"></script>
+    <script src="assets/js/main.js"></script>
+  </body>
+</html>
