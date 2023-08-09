@@ -18,7 +18,7 @@ jobs:
       run: dotnet build ./FotoApp.sln -c Release
 
     - name: dotnet test
-      run: dotnet test ./FotoApp.sln -c Release --no-build
+      run: dotnet test ./FotoApp.sln -c Release --no-build --results-directory TestResults --logger trx
     - name: Test Report
       uses: dorny/test-reporter@v1
       if: success() || failure()    # run this step even if previous step failed
