@@ -99,13 +99,13 @@ public class UpdateLoginInfoHandler(
         {
             var currentPassword = command.CurrentPassword?.Trim() ??
                                   throw new UserNotAuthorizedException("Lösenord saknas");
-
-            var result = await userManager.ChangeEmailAsync(user, newEmail, currentPassword);
-            if (!result.Succeeded) throw new UserNotAuthorizedException("Fel lösenord");
             if (!await userManager.CheckPasswordAsync(user, command.CurrentPassword))
             {
                 throw new UserNotAuthorizedException("Felaktigt lösenord");
             }
+
+            var result = await userManager.SetEmailAsync(user, newEmail);
+            if (!result.Succeeded) throw new UserNotAuthorizedException("Fel lösenord");
 
             emailUpdated = true;
         }

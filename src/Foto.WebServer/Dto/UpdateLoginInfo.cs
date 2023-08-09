@@ -24,7 +24,7 @@ public class UpdateLoginInfoValidator : AbstractValidator<UpdateLoginInfo>
 {
     public UpdateLoginInfoValidator()
     {
-        When(x => x.NewPassword is not null, () =>
+        When(x => !string.IsNullOrWhiteSpace(x.NewPassword), () =>
         {
             RuleFor(x => x.CurrentPassword).NotEmpty().WithMessage("Password is required");
             RuleFor(x => x.NewPassword)
@@ -34,7 +34,7 @@ public class UpdateLoginInfoValidator : AbstractValidator<UpdateLoginInfo>
                 .WithMessage("Lösenorden måste matcha.");
         });
 
-        When(x => x.NewUserName is not null, () =>
+        When(x => !string.IsNullOrWhiteSpace(x.NewUserName), () =>
         {
             RuleFor(x => x.NewUserName).EmailAddress()
                 .WithMessage("Användarnamnet måste vara en giltig e-postadress");
@@ -42,7 +42,7 @@ public class UpdateLoginInfoValidator : AbstractValidator<UpdateLoginInfo>
                 .WithMessage("Username must be at most 50 characters");
         });
 
-        When(x => x.NewEmail is not null,
+        When(x => !string.IsNullOrWhiteSpace(x.NewEmail),
             () => { RuleFor(x => x.NewEmail).EmailAddress().WithMessage("E-post måste vara en giltig e-postadress"); });
     }
 }

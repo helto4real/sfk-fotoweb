@@ -81,8 +81,7 @@
     private FluentValidationValidator? _fluentValidationValidator;
     private bool _isExternal;
 
-    private bool CanSubmit => _loginInfo is not null && _loginInfo.NewEmail is not null && _loginInfo.NewEmail.Trim() != _user?.Email &&
-                              (_fluentValidationValidator?.Validate() ?? false);
+    private bool CanSubmit => _loginInfo is not null && (_fluentValidationValidator?.Validate() ?? false);
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
