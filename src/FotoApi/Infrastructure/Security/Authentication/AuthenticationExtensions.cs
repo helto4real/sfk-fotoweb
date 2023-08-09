@@ -15,7 +15,7 @@ public static class AuthenticationExtensions
 
     public static WebApplicationBuilder AddAuthentication(this WebApplicationBuilder builder)
     {
-        IdentityModelEventSource.ShowPII = true;
+        // dentityModelEventSource.ShowPII = true; // Only for debugging
         
         builder.Services.AddAuthentication(
         options =>

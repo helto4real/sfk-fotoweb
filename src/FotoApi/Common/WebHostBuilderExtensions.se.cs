@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Builder;
 using Oakton.Resources;
 using Serilog;
 using Shared.Security;
@@ -150,6 +151,7 @@ internal static class WebHostBuilderExtensions_se
         
         // Configure rate limiting
         builder.Services.AddRateLimiting();
+        // builder.Services.AddAntiforgery();
         
         // Configure OpenTelemetry
         builder.AddOpenTelemetry();

@@ -218,7 +218,7 @@ public class UsersHandlersTests : IAsyncLifetime
         await handler.Handle("delete_user", CancellationToken.None);
         
         // ASSERT
-        userManager.FindByNameAsync("delete_user").Result.Should().BeNull();
+        (await userManager.FindByNameAsync("delete_user")).Should().BeNull();
         
         _ctx.Bus.Verify(e => e.PublishAsync(It.IsAny<UserDeletedNotification>(), It.IsAny<DeliveryOptions>()), Times.Once);
     }

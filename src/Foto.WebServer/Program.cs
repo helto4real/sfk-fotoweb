@@ -96,7 +96,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseMiddleware<RefreshTokenMiddleware>();
 app.UseAuthorization();
-
+app.UseAntiforgery();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 // app.MapRazorComponents<App>();
