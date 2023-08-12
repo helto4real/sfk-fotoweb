@@ -1,5 +1,6 @@
 ﻿@page "/login"
 @model Foto.WebServer.Pages.LogIn
+@using Foto.WebServer.Components
 @using Microsoft.AspNetCore.Components.Web
 @namespace Foto.WebServer.Pages
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
@@ -62,7 +63,7 @@
             </div>
             <div class="row g-3 mb-5 justify-content-center align-items-center">
                 <div class="col col-8" style="max-width: 300px;">
-                    <form method="post" onsubmit="disableButtons()">
+                    <form method="post" onsubmit="disableLoginButtons()">
                         <div class="mb-3">
                             <label for="username" class="form-label">Användarnamn:</label>
                             <input type="text" id="username" name="username" class="form-control" value="@Model.UserName" autocomplete="username"/>
@@ -72,6 +73,7 @@
                             <label for="password" class="form-label">Lösenord:</label>
                             <input type="password" id="password" name="password" class="form-control" autocomplete="current-password" value="@Model.Password">
                             <span asp-validation-for="Password" class="text-danger"></span>
+                            <button type="button" id="show-password-reset-form-link" class="btn btn-link form-text text-left password-link" data-bs-target="#passwordResetForm" data-bs-toggle="modal">Glömt lösenord?</button>
                         </div>
                         <div class="d-flex justify-content-start align-items-center">
                             <button id="loginbutton" type="submit" class="btn btn-primary">Logga in</button>
@@ -90,7 +92,7 @@
                         {
                             <div class="col">
                                 <a href="/api/auth/login/@provider">
-                                    <button type="button" id="button-@provider" onclick="disableButtons()"
+                                    <button type="button" id="button-@provider" onclick="disableLoginButtons()"
                                             class="btn btn-danger btn-lg btn-block bg-secondary border-dark" >
                                         <i
                                             class="@(Model.GetClassFromProvider(provider))"></i>
@@ -102,6 +104,7 @@
                 </div>
             </div>
         </div>
+        <component type="typeof(ResetPassword)" render-mode="Server"/>
     </main>
 }
 else
@@ -128,21 +131,10 @@ else
 {
     <div class="alert alert-danger mt-5">@Model.ErrorMessage</div>
 }
-<script>
-    function disableButtons() {
-        var button = document.getElementById('loginbutton');
-        button.disabled = true;
-        var buttonGoogle = document.getElementById('button-Google');
-        buttonGoogle.disabled = true;
-        
-        var spinner = document.getElementById('spinner');
-        spinner.style.display = 'block';
-    }
-</script>
 
 <script src="_framework/blazor.server.js"></script>
 <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-@* <script src="_content/BlazorStrap/popper.min.js"></script> *@
+<script src="assets/js/login.js"></script>
 <script src="_content/BlazorStrap/blazorstrap.js"></script>
 </body>
 </html>

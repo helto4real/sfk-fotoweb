@@ -1,0 +1,18 @@
+@api_url = https://localhost:8001/api
+
+# @name gettoken
+POST {{api_url}}/users/token
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "password": "P@ssw0rd!",
+    "admin": "true"
+}
+
+### Get token
+@token = {{gettoken.response.body.token}}
+
+### Get roles
+GET {{api_url}}/admin/roles
+Authorization: Bearer {{token}}

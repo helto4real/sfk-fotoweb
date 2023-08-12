@@ -17,8 +17,10 @@ using FotoApi.Infrastructure.Settings;
 using FotoApi.Infrastructure.Telemetry;
 using FotoApi.Model;
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Builder;
 using Oakton.Resources;
 using Serilog;
 using Shared.Security;
@@ -137,7 +139,8 @@ internal static class WebHostBuilderExtensions_se
         
         builder.Services.AddIdentityCore<User>(options => options.User.RequireUniqueEmail = true)
             .AddRoles<Role>()
-            .AddEntityFrameworkStores<PhotoServiceDbContext>();
+            .AddEntityFrameworkStores<PhotoServiceDbContext>()
+            .AddDefaultTokenProviders();
         // State that represents the current user from the database *and* the request
         builder.Services.AddCurrentUser();
 
@@ -148,6 +151,7 @@ internal static class WebHostBuilderExtensions_se
         
         // Configure rate limiting
         builder.Services.AddRateLimiting();
+        // builder.Services.AddAntiforgery();
         
         // Configure OpenTelemetry
         builder.AddOpenTelemetry();
@@ -167,9 +171,13 @@ internal static class WebHostBuilderExtensions_se
     {
         builder.Host.UseWolverine(opts =>
         {
-            opts.PersistMessagesWithPostgresql(connectionString);
-            opts.UseEntityFrameworkCoreTransactions();
-            opts.Policies.UseDurableLocalQueues();
+            if (!builder.Environment.IsDevelopment())
+            {
+                // We only persist messages in production 
+                opts.PersistMessagesWithPostgresql(connectionString);
+                opts.Policies.UseDurableLocalQueues();
+                opts.UseEntityFrameworkCoreTransactions();
+            }
             opts.Policies.AutoApplyTransactions();
         });
         builder.Host.UseResourceSetupOnStartup();

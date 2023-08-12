@@ -13,7 +13,7 @@ public static class ImageForwardApi
         var group = routes.MapGroup("/api/images");
 
         group.RequireAuthorization();
-
+        group.DisableAntiforgery();
         var transform = static async ValueTask (HttpContext context, HttpRequestMessage req) =>
         {
             var authService = context.RequestServices.GetRequiredService<IAuthService>();
@@ -41,7 +41,7 @@ public static class ImageForwardApi
         // Use this HttpClient for all proxied requests
         var client = new HttpMessageInvoker(new SocketsHttpHandler());
 
-        group.Map("{*path}", async (IHttpForwarder forwarder, HttpContext context) =>
+        group.MapGet("{*path}", async (IHttpForwarder forwarder, HttpContext context) =>
         {
             await forwarder.SendAsync(context, todoUrl, client, transform);
 

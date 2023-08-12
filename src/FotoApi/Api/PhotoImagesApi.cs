@@ -6,6 +6,7 @@ using FotoApi.Infrastructure.ExceptionsHandling;
 using FotoApi.Infrastructure.Pipelines;
 using FotoApi.Infrastructure.Security.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 
 namespace FotoApi;
 
@@ -23,12 +24,11 @@ internal static class PhotoImagesApi
         // be authenticated with a valid user.
         group.RequireAuthorization(pb => pb.RequireCurrentUser())
             .AddOpenApiSecurityRequirement();
-
         // Rate limit all of the APIs
         group.RequirePerUserRateLimit();
-
+        // group.DisableAntiforgery();
         // Validate the parameters
-
+        //
         group.MapGet("user",
             async Task<Results<Ok<List<ImageResponse>>, BadRequest<ErrorDetail>>>
                 (GetAllImagesForUserHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
@@ -46,7 +46,7 @@ internal static class PhotoImagesApi
             });
         
         // Get image stream by id
-        group.MapGet("image/{id:guid}", async Task<IResult> 
+        group.MapGet("image/{id:guid}",  async Task<IResult> 
                 (Guid id, HttpRequest req, GetImageStreamHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
                 {
                     var isThumbnail = req.Query.ContainsKey("thumb");
@@ -58,8 +58,9 @@ internal static class PhotoImagesApi
             .Produces(StatusCodes.Status403Forbidden)
             .Produces<Stream>(contentType: "image/jpeg");
 
-        group.MapPost("/",
-            async Task<Results<Created<ImageResponse>, BadRequest<ErrorDetail>>>
+         // group.MapGet("/antiforgerytoken")
+         group.MapPost("/",
+             [IgnoreAntiforgeryToken] async Task<Results<Created<ImageResponse>, BadRequest<ErrorDetail>>>
                 (HttpContext ctx, IFormFile file, SaveImageFromStreamHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
             {
                 // The image always needs to contain metadata
@@ -79,7 +80,7 @@ internal static class PhotoImagesApi
                     metadata, file.FileName), handler.Handle, ct);
 
                 return TypedResults.Created($"/api/images/{result.Id}", result);
-            });
+            }).DisableAntiforgery();
 
         group.MapPut("{id:guid}",
             async Task<Results<Ok, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> (Guid id, ImageRequest request,

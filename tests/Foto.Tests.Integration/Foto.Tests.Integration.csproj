@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentAssertions" Version="6.11.0" />
+    <PackageReference Include="Testcontainers" Version="3.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.0-preview.7.23375.9" />
+    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="8.0.0-preview.4.23259.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.0-preview.4.23259.3" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0-preview.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0-preview.4.23259.3" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0-preview-23371-04" />
+    <PackageReference Include="Moq" Version="4.18.4" />
+    <PackageReference Include="xunit" Version="2.5.1-pre.20" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.1-pre.10" PrivateAssets="all" />
+    <PackageReference Include="coverlet.collector" Version="6.0.0" PrivateAssets="all" />
+    <ProjectReference Include="..\..\src\Foto.WebServer\Foto.WebServer.csproj" />
+    <ProjectReference Include="..\..\src\FotoApi\FotoApi.csproj" />
+  </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="System.Net.Http.Json" />
+        <Using Include="System.Net.Http" />
+        <Using Include="System.Net" />
+        <Using Include="Xunit" />
+    </ItemGroup>
+
+
+
+
+</Project>

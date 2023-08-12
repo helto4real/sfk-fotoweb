@@ -3,6 +3,7 @@
 @using Foto.WebServer.Dto
 @using Foto.WebServer.Services
 @using Microsoft.AspNetCore.Authorization
+
 @inherits AuthorizedBasePage
 @attribute [Authorize(Roles = "Admin")]
 @inject IUserService UserService
@@ -27,7 +28,7 @@
                     <div class="form-group mt-1">
                         <label for="username">Username:</label>
                         <InputText id="username" class="form-control" @bind-Value="@User.Username"/>
-                        <ValidationMessage For="@(() => User.Username)"/>
+                        <ValidationMessage class="text-danger" For="@(() => User.Username)"/>
                     </div>
                     <div class="form-group mt-1">
                         <label>Roller:</label>

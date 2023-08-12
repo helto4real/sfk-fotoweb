@@ -1,4 +1,5 @@
-﻿using System.Threading.Channels;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Threading.Channels;
 
 namespace FotoApi.Features.SendEmailNotifications;
 
@@ -17,14 +18,14 @@ internal class MailSender : IMailSender, IMailQueue
         await _mailQueue.Writer.WriteAsync(mailInfo, ct);
     }
 
-    public bool HasItemsInQueue()
-    {
-        return _mailQueue.Reader.TryRead(out _);
-    }
-
     public async Task<MailInfo> GetNextFromQueueAsync(CancellationToken ct)
     {
         return await _mailQueue.Reader.ReadAsync(ct);
+    }
+    
+    public bool TryRead([MaybeNullWhen(false)] out MailInfo nextEmailMessage)
+    {
+        return _mailQueue.Reader.TryRead(out nextEmailMessage);
     }
 
     public Task SendEmailAsync(MailInfo mailInfo, CancellationToken ct)

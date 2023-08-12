@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -7,9 +8,14 @@ namespace FotoApi.Infrastructure.Security.Authentication;
 
 public static class AuthenticationExtensions
 {
+    private static readonly string ExternalProviderKey = "ExternalProviderName";
+    
+    public static string? GetExternalProvider(this AuthenticationProperties properties) =>
+        properties.GetString(ExternalProviderKey);
+
     public static WebApplicationBuilder AddAuthentication(this WebApplicationBuilder builder)
     {
-        IdentityModelEventSource.ShowPII = true;
+        // dentityModelEventSource.ShowPII = true; // Only for debugging
         
         builder.Services.AddAuthentication(
         options =>

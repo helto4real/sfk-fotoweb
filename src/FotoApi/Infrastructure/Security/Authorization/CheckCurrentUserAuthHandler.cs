@@ -66,13 +66,12 @@ public static class AuthorizationHandlerExtensions
         {
             
             // TODO: Check user if the user is locked out as well
-            if (_currentUser.User is not null)
-            {
-                if (_currentUser.IsAdmin)
-                    context.Succeed(requirement);
-                else
-                    context.Fail();
-            }
+            if (_currentUser.User is null) return Task.CompletedTask;
+            
+            if (_currentUser.IsAdmin)
+                context.Succeed(requirement);
+            else
+                context.Fail();
             return Task.CompletedTask;
         }
     }

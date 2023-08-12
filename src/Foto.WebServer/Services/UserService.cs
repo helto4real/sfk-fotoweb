@@ -53,6 +53,30 @@ public class UserService : ServiceBase, IUserService
         var result = await HandleResponse(response);
         return result;
     }
+    
+    public async Task<ErrorDetail?> ChangeLoginInfoAsync(UpdateLoginInfo loginInfo)
+    {
+        loginInfo.IsUserExternal = await _signInService.IsCurrentUserExternalAsync();
+        var response =
+            await _signInService.RefreshTokenOnExpired(async () =>
+                await _httpClient.PutAsJsonAsync("api/users/logininfo", loginInfo));
+        var result = await HandleResponse(response);
+        return result;
+    }
+
+    public async Task SendPasswordResetEmail(string email)
+    {
+        var response =
+            await _httpClient.PostAsJsonAsync("api/users/user/passwordreset/request", new EmailResetInfo(email));
+        // We do not handle response since we do not want to leak information about the user, we log on server-side instead
+    }
+
+    public async Task<ErrorDetail?> ResetPassword(string email, string newPassword, string token)
+    {
+        var response =
+            await _httpClient.PostAsJsonAsync("api/users/user/passwordreset/reset", new ResetPasswordInfo(email, token, newPassword));
+        return await HandleResponse(response);
+    }
 
     public async Task<ErrorDetail?> DeleteUserAsync(string username)
     {

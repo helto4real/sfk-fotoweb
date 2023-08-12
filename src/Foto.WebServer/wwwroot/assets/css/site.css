@@ -42,10 +42,7 @@ body {
 /*    color: var(--color-primary);*/
 /*    text-decoration: none;*/
 /*}*/
-a:hover {
-    color: --
-    text-decoration: none;
-}
+
 
 h1,
 h2,
@@ -109,6 +106,9 @@ font-size: 32px;
 .dropdown-menu > li:hover > .dropdown-submenu {
     display: block;
 }
+.dropdown-align-right{
+    padding-right: 1rem;
+}
  /*768px // 576px*/
 @media (max-width: 768px) {
     .dropdown-item::before {
@@ -139,29 +139,20 @@ font-size: 32px;
         all:unset;
     }
 }
-/*.navbar-nav li:hover > ul.dropdown-menu {*/
-/*    display: block;*/
-/*}*/
-/*.dropdown-submenu {*/
-/*    position:relative;*/
-/*}*/
-/*.dropdown-submenu>.dropdown-menu {*/
-/*    top:0;*/
-/*    left:100%;*/
-/*    margin-top:-6px;*/
-/*}*/
-/*.dropdown-submenu>.dropdown-menu-left {*/
-/*    right: 100%;*/
-/*    left: auto;*/
-/*    margin-top:-6px;*/
-/*}*/
 
-/*!* rotate caret on hover *!*/
-/*.dropdown-menu > li > a:hover:after {*/
-/*    text-decoration: underline;*/
-/*    transform: rotate(-90deg);*/
-/*}*/
+.text-left {
+    text-align: left !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+.password-link  {
+    color: #7d93b7 !important;
+}
 
+/*We do not want active state on menuitems*/
+.active > a {
+    background-color:unset;
+}
 .main {
     margin-top: 3em;
 }
@@ -220,8 +211,34 @@ font-size: 32px;
 }
 
 .app-button {
-    width: 98px; !important;
+    width: 98px !important;
 }
 .app-button-wide {
-    width: 105px; !important;
+    width: 105px !important;
 }
+
+/*Standard input fields*/
+.app-input-wide {
+    width: 20em;
+}
+.app-input {
+    width: 16em;
+}
+
+/*.form-control {*/
+/*    display: block;*/
+/*    width: 100%;*/
+/*    padding: .375rem .75rem;*/
+/*    font-size: 1rem;*/
+/*    font-weight: 400;*/
+/*    line-height: 1.5;*/
+/*    color: var(--bs-body-color);*/
+/*    background-color: var(--bs-body-bg);*/
+/*    background-clip: padding-box;*/
+/*    border: var(--bs-border-width) solid var(--bs-border-color);*/
+/*    -webkit-appearance: none;*/
+/*    -moz-appearance: none;*/
+/*    appearance: none;*/
+/*    border-radius: var(--bs-border-radius);*/
+/*    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;*/
+/*}*/

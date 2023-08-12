@@ -49,12 +49,12 @@ internal class MailSenderService(ILogger<MailSenderService> logger, IMailQueue m
                 var nextEmailMessage = await mailQueue.GetNextFromQueueAsync(_combinedCancellationToken);
 
                 await ConnectToSmtpServer();
-
+                
                 await SendEmail(nextEmailMessage);
                 // Read all queued messages and send them
-                while (mailQueue.HasItemsInQueue() && !_combinedCancellationToken.IsCancellationRequested)
+                while (mailQueue.TryRead(out nextEmailMessage) && !_combinedCancellationToken.IsCancellationRequested)
                     await SendEmail(nextEmailMessage);
-
+                
                 await DisconnectSmtpServer();
             }
         }
@@ -111,7 +111,15 @@ internal class MailSenderService(ILogger<MailSenderService> logger, IMailQueue m
         {
             Text = nextEmailMessage.Message
         };
-        await _smtpClient.SendAsync(message, _combinedCancellationToken);
-        logger.LogInformation("Email to {Email} sent!", nextEmailMessage.Email);
+        try
+        {
+            await _smtpClient.SendAsync(message, _combinedCancellationToken);
+            logger.LogInformation("Email to {Email} sent!", nextEmailMessage.Email);
+        }
+        catch (Exception e)
+        {
+            // We just log for now. Todo: Add smarter logic for retrying
+            logger.LogError(e, "Error sending email to {Email}", nextEmailMessage.Email);
+        }
     }
 }
