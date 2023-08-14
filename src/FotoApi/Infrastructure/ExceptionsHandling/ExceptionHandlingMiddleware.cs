@@ -51,6 +51,7 @@ internal sealed class ExceptionHandlingMiddleware : IMiddleware
             NotFoundException => StatusCodes.Status404NotFound,
             ValidationException => StatusCodes.Status400BadRequest,
             ForbiddenException =>StatusCodes.Status403Forbidden,
+            UnAuthorizedException => StatusCodes.Status401Unauthorized,
             _ => StatusCodes.Status500InternalServerError
         };
 
@@ -61,6 +62,7 @@ internal sealed class ExceptionHandlingMiddleware : IMiddleware
             ValidationException => "Validation error",
             BadRequestException => "Bad request",
             ForbiddenException => "Forbidden",
+            UnAuthorizedException => "Unauthorized",
             _ => "Server Error"
         };
 

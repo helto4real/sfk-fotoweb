@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
+
 @if (isConnected)
 {
     
@@ -10,7 +11,7 @@
                     <Authorizing>
                         <div class="d-flex justify-content-center">
                             <div class="spinner-border" role="status">
-                                <span class="visually-hidden">Loading...</span>
+                                <span class="visually-hidden">Authorizing...</span>
                             </div>
                         </div>
                     </Authorizing>
@@ -39,16 +40,16 @@
 }
 else
 {
-    <div class="d-flex justify-content-center">
+    <div class="d-flex justify-content-center" >
         <div class="spinner-border" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
 }
 
-
 @code {
-
+    // private bool _isDarkMode;
+    
     [Parameter]
     public bool ConsentGiven { get; set; }
 
@@ -56,6 +57,7 @@ else
     public HttpRequest? HttpRequest { get; set; }
     
     private bool isConnected;
+
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {

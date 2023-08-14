@@ -5,33 +5,35 @@
 @inherits AuthorizedBasePage
 @inject IUserService UserService
 
-<div class="container d-flex flex-column justify-content-center align-items-center">
-    <div class="row row-cols-auto align-items-center">
-        <h1>Välkommen till SFK fotowebb</h1>
-        <p>
-            Detta är en webbplats för medlemmar i Sundsvalls fotoklubb. Denna tjänst är under utveckling och du kommer
-            att kunna ladda upp bilder till tävlingar och till ST. Har du några frågor, skicka dessa
-            till <a href="mailto:webmaster@sundsvallsfotoklubb.se">webmaster@sundsvallsfotoklubb.se</a>
-        </p>
-    </div>
-</div>
+<AppContent ContentMaxWidth="MaxWidth.Small">
+    <Title>Välkommen till SFK fotowebb</Title>
+    <Ingress>
+        Detta är en webbplats för medlemmar i Sundsvalls fotoklubb. Denna tjänst är under utveckling och du kommer
+        att kunna ladda upp bilder till tävlingar och till ST.
+    </Ingress>
 
-@if (!_emailConfirmed)
-{
-    <div class="container d-flex flex-column justify-content-center align-items-center">
-        <div class="row row-cols-auto align-items-center alert alert-warning">
-            <h5>Bekräfta din e-postaddress!</h5>
-            <p >Du har inte bekräftat din e-postadress (@_email). Klicka på länken i det e-postmeddelande du fick när du registrerade.
-                Det är viktigt att du konfirmerar din e-post adress så vi vet att vi har rätt kontaktuppgifter till dig. Kontakta
-                administratören om du inte fått något e-postmeddelande eller om din e-post inte är rätt.</p>
-        </div>
-    </div>
-}
+    <Container>
+        @if (!_emailConfirmed)
+        {
+            <MudContainer>
+                <MudAlert Severity="Severity.Warning">
+                    <h5>Bekräfta din e-postadress!</h5>
+                    <p >
+                        Du har inte bekräftat din e-postadress (@_email). Klicka på länken i det e-postmeddelande du fick när du registrerade.
+                        Det är viktigt att du konfirmerar din e-post adress så vi vet att vi har rätt kontaktuppgifter till dig. Kontakta
+                        administratören om du inte fått något e-postmeddelande eller om din e-post inte är rätt.
+                    </p>
+                </MudAlert>
+            </MudContainer>
+        }
+    </Container>
+</AppContent>
 
-@if (_responseHandler.HasAlert)
-{
-    <div class="alert alert-danger">@_responseHandler.Message</div>
-}
+@* @if (_responseHandler.HasAlert) *@
+@* { *@
+@*     <div class="alert alert-danger">@_responseHandler.Message</div> *@
+@* } *@
+
 @code {
     private bool _emailConfirmed = true;
     private string _email = default!;

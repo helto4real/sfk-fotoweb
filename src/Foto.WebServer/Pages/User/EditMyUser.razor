@@ -1,7 +1,6 @@
 @page "/user/edit"
 @using Foto.WebServer.Services
 @using Foto.WebServer.Dto
-@using Blazored.FluentValidation
 @inherits AuthorizedBasePage
 @inject IUserService UserService;
 @inject ISignInService SignInService;
@@ -19,7 +18,6 @@
             @if (_loginInfo is not null)
             {
                 <CvEditForm id="uploadForm" Model="_loginInfo" class="form" OnValidSubmit="@HandleValidSubmit" Context="NewContext">
-                    <FluentValidationValidator @ref="_fluentValidationValidator"/>
                     <div class="form-group mt-1">
                         <span for="current-username" class="">Användarnamn:</span>
                         <input id="current-username" type="text" class="form-control app-input-wide" value="@_loginInfo.CurrentUserName" disabled readonly/>
@@ -78,10 +76,9 @@
     private readonly ResponseHandler _responseHandler = new ResponseHandler();
     private UpdateLoginInfo? _loginInfo;
     private UserInfo? _user;
-    private FluentValidationValidator? _fluentValidationValidator;
     private bool _isExternal;
 
-    private bool CanSubmit => _loginInfo is not null && (_fluentValidationValidator?.Validate() ?? false);
+    private bool CanSubmit => true;//_loginInfo is not null && (_fluentValidationValidator?.Validate() ?? false);
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

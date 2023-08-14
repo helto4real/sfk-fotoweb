@@ -1,0 +1,73 @@
+<AppImageCard
+    Image="img/skutt.jpg"
+    MaxWidth="200"
+    Height="133"
+    Title="Skutt"
+    Description="Skutt är en ekorre">
+    <Actions>
+        <MudPaper Class="d-flex justify-space-between align-center flex-grow-1 gap-4" Elevation="0">
+            <MudTooltip Text="@EditOrViewToolTip">
+                <MudIconButton Icon="@EditOrViewIcon" Color="Color.Inherit"/>
+            </MudTooltip>
+            <MudTooltip Inline="false" Text="@StatusToolTip" >
+                <MudIcon Class="mr-2" Icon="@StatusIcon" Color="@StatusColor"/>
+            </MudTooltip>
+        </MudPaper>
+    </Actions>
+</AppImageCard>
+
+@code {
+
+    [Parameter]
+    public string Image { get; set; } = default!;
+
+    [Parameter]
+    public string Title { get; set; } = default!;
+
+    [Parameter]
+    public string Description { get; set; } = default!;
+
+    [Parameter]
+    public StImageStatus Status { get; set; } = StImageStatus.Uploaded;
+
+    public bool CanEdit => Status is StImageStatus.Uploaded or StImageStatus.Rejected;
+
+    public string StatusIcon => Status switch
+    {
+        StImageStatus.Uploaded => Icons.Material.Filled.ImageSearch,
+        StImageStatus.Approved => Icons.Material.Filled.Check,
+        StImageStatus.Rejected => Icons.Material.Filled.FrontHand,
+        StImageStatus.Sent => Icons.Material.Filled.Newspaper,
+        _ => throw new ArgumentOutOfRangeException()
+        };
+
+    public Color StatusColor => Status switch
+    {
+        StImageStatus.Uploaded => Color.Inherit,
+        StImageStatus.Approved => Color.Success,
+        StImageStatus.Rejected => Color.Error,
+        StImageStatus.Sent => Color.Success,
+        _ => throw new ArgumentOutOfRangeException()
+        };
+
+    public string StatusToolTip => Status switch
+    {
+        StImageStatus.Uploaded => "Under godkännande av ST-administratör",
+        StImageStatus.Approved => "Godkänd och inväntar att skickas till ST",
+        StImageStatus.Rejected => "Ej godkänd, ändringar krävs",
+        StImageStatus.Sent => "Skickad till ST",
+        _ => throw new ArgumentOutOfRangeException()
+        };
+    
+    public string EditOrViewIcon => CanEdit ? Icons.Material.Filled.Edit : Icons.Material.Filled.Visibility;  
+    public string EditOrViewToolTip => CanEdit ? "Redigera ST-bild" : "Visa ST-bild";
+    
+    public enum StImageStatus
+    {
+        Uploaded,
+        Approved,
+        Rejected,
+        Sent
+    }
+
+}

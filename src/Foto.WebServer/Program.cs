@@ -1,6 +1,4 @@
 using System.Text.Json.Serialization;
-using Blazored.LocalStorage;
-using BlazorStrap;
 using FluentValidation;
 using Foto.WebServer.Api;
 using Foto.WebServer.Authentication;
@@ -9,6 +7,8 @@ using Foto.WebServer.Pages;
 using Foto.WebServer.Services;
 using Foto.WebServer.Shared.Logging;
 using Microsoft.AspNetCore.Http.Json;
+using MudBlazor;
+using MudBlazor.Services;
 using Shared.Security;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -48,11 +48,13 @@ builder.Services.AddReverseProxy()
     .LoadFromConfig(proxySettings);
 
 builder.Services.AddServerSideBlazor();
+builder.Services.AddMudServices();
+builder.Services.AddScoped<MudThemeProvider>();
+
 var photoApiUrl = builder.Configuration.GetServiceUri("fotoapp")?.ToString() ??
                   builder.Configuration["AppSettings:FotoApiUrl"] ?? 
                   throw new InvalidOperationException("Todo API URL is not configured");
 
-builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddHttpContextAccessor();
 
 // Configure the HttpClient for the backend API
@@ -76,9 +78,6 @@ builder.Services.AddHttpClient<IImageService, ImageService>()
 
 // Register notification service
 builder.Services.AddScoped(typeof(INotificationService<>), typeof(NotificationService<>));
-builder.Services.AddScoped<IValidator<LogIn>, LogIn.SingInValidator>();
-
-builder.Services.AddBlazorStrap();
 
 var app = builder.Build();
 

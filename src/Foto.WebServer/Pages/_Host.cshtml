@@ -8,17 +8,13 @@
 <html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="utf-8"/>
-    <meta http-equiv="Content-Security-Policy" content="block-all-mixed-content;upgrade-insecure-requests;default-src 'self';img-src data: 'self';script-src stackpath.bootstrapcdn.com 'sha256-34WLX60Tw3aG6hylk0plKbZZFXCuepeQ6Hu7OqRf8PI=' 'sha256-HU12q4hTLt0INlq0UBW6M5D5JYS2DLzQLA7sDXKLXmw=' 'self'; style-src stackpath.bootstrapcdn.com fonts.googleapis.com 'unsafe-inline' 'self'; font-src fonts.gstatic.com 'self';">
+    <meta http-equiv="Content-Security-Policy" content="block-all-mixed-content;upgrade-insecure-requests;default-src 'self';img-src https://*.googleusercontent.com data: 'self';script-src stackpath.bootstrapcdn.com 'sha256-34WLX60Tw3aG6hylk0plKbZZFXCuepeQ6Hu7OqRf8PI=' 'sha256-HU12q4hTLt0INlq0UBW6M5D5JYS2DLzQLA7sDXKLXmw=' 'self'; style-src stackpath.bootstrapcdn.com fonts.googleapis.com 'unsafe-inline' 'self'; font-src fonts.gstatic.com 'self';">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <base href="~/"/>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
-    
-    @* Vendor css including the custom bootstrap css *@
-    <link href="assets/css/custom.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="assets/vendor/bootstrap-icons/font/bootstrap-icons.css">
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
 
-    @* Application css *@
-    <link rel="stylesheet" href="assets/css/site.css">
+    <link rel="icon" type="image/png" href="favicon.jpg"/>
     <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered"/>
 </head>
 <body>
@@ -35,10 +31,9 @@
     <a class="dismiss">🗙</a>
 </div>
 
-<script src="_framework/blazor.server.js"></script>
-<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-@* <script src="_content/BlazorStrap/popper.min.js"></script> *@
-<script src="_content/BlazorStrap/blazorstrap.js"></script>
-<script src="assets/js/main.js"></script>
+<script src="js/jquery-3.5.0.slim.min.js"></script>
+<script src="js/main.js"></script>
+<script src="_content/MudBlazor/MudBlazor.min.js"></script>
+<script src="~/_framework/blazor.server.js"></script>
 </body>
 </html>

@@ -1,0 +1,37 @@
+
+<MudPaper Elevation="0" Outlined="false" MinWidth="@($"{MaxWidth}px")" MaxWidth="@($"{MaxWidth}px")">
+    <MudCard >
+        <MudCardMedia Image="@Image"  Height="@Height" Style="object-fit: contain" />
+        <MudCardContent>
+            <MudText Typo="Typo.h6">@Title</MudText>
+            <MudText Typo="Typo.body2">@Description</MudText>
+        </MudCardContent>
+        @if (Actions is not null)
+        {
+            <MudCardActions>
+                @Actions
+            </MudCardActions>
+        }
+    </MudCard>
+</MudPaper>
+
+@code {
+
+    [Parameter]
+    public int MaxWidth { get; set; } = 250;
+    
+    [Parameter]
+    public int Height { get; set; } = 166;
+    
+    [Parameter]
+    public string Image { get; set; } = default!;
+
+    [Parameter]
+    public string Title { get; set; } = default!;
+
+    [Parameter]
+    public string Description { get; set; } = default!;
+
+    [Parameter]
+    public RenderFragment? Actions { get; set; }
+}

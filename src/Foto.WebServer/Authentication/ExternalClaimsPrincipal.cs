@@ -25,14 +25,14 @@ public class ExternalClaimsPrincipal
     public string NameIdentifier => _externalPrincipal.FindFirstValue(ClaimTypes.NameIdentifier)!;
     public string Name => _externalPrincipal.FindFirstValue(ClaimTypes.Email) ?? _externalPrincipal.Identity?.Name!;
 
-    public ClaimsPrincipal NewClaimsPrincipal(string refreshToken, IReadOnlyCollection<string> roles)
+    public ClaimsPrincipal NewClaimsPrincipal(string refreshToken, IReadOnlyCollection<string> roles, string? userImageUrl)
     {
-        var claimsIdentity = CreateExternalClaimsIdentity(roles);
+        var claimsIdentity = CreateExternalClaimsIdentity(roles, userImageUrl);
         AddTokens(refreshToken);
         return new ClaimsPrincipal(claimsIdentity);
     }
 
-    public ClaimsIdentity CreateExternalClaimsIdentity(IReadOnlyCollection<string> roles)
+    public ClaimsIdentity CreateExternalClaimsIdentity(IReadOnlyCollection<string> roles, string? userImageUrl)
     {
         var identity = new ClaimsIdentity(new[]
         {
@@ -45,6 +45,10 @@ public class ExternalClaimsPrincipal
             identity.AddClaim(new Claim(ClaimTypes.Role, role));
         }
         identity.AddClaim(new Claim(ClaimTypes.Role, "User"));
+        if (userImageUrl is not null)
+        {
+            identity.AddClaim(new Claim("image", userImageUrl));
+        }
         return identity;
     }
 

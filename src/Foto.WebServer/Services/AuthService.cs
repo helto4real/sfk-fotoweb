@@ -1,4 +1,6 @@
 ﻿using System.Net;
+using System.Security.Claims;
+using System.Security.Principal;
 using Foto.WebServer.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
@@ -33,17 +35,17 @@ public class AuthService : ServiceBase, IAuthService
         httpClient.DefaultRequestHeaders.Add("User-Agent", "FotoWebbServer");
     }
 
-    public async Task<(LoginInfo?, ErrorDetail?)> LoginAsync(LoginUserInfo loginInfo)
+    public async Task<(AccountInfo?, ErrorDetail?)> LoginAsync(LoginUserInfo loginInfo)
     {
         var response = await _httpClient.PostAsJsonAsync("/api/users/token", loginInfo);
         var result = await HandleResponse(response);
         if (result is not null)
         {
-            _logger.LogInformation("Login failed for user {UserName}", loginInfo.Username);
+            _logger.LogInformation("Login failed for user {UserName}", loginInfo.UserName);
             return (null, result);
         }
 
-        var loginInfoResponse = await response.Content.ReadFromJsonAsync<LoginInfo>();
+        var loginInfoResponse = await response.Content.ReadFromJsonAsync<AccountInfo>();
         if (loginInfoResponse is null)
             return (null,
                 new ErrorDetail
@@ -59,13 +61,13 @@ public class AuthService : ServiceBase, IAuthService
         return (loginInfoResponse, null);
     }
 
-    public async Task<LoginInfo?> GetOrRegisterUserAsync(string provider, ExternalUserInfo userInfo)
+    public async Task<AccountInfo?> GetOrRegisterUserAsync(string provider, ExternalUserInfo userInfo)
     {
         var response = await _httpClient.PostAsJsonAsync($"/api/users/token/{provider}", userInfo);
 
         if (!response.IsSuccessStatusCode) return null;
 
-        var result = await response.Content.ReadFromJsonAsync<LoginInfo>();
+        var result = await response.Content.ReadFromJsonAsync<AccountInfo>();
         var duration = result!.RefreshTokenExpiration - DateTime.UtcNow;
         _cache.Set(result.RefreshToken, result.Token, duration);
         return result;
@@ -103,7 +105,7 @@ public class AuthService : ServiceBase, IAuthService
             });
     }
 
-    public async Task<(LoginInfo?, ErrorDetail?)> RefreshAccessTokenAsync(string refreshToken, string userName)
+    public async Task<(AccountInfo?, ErrorDetail?)> RefreshAccessTokenAsync(string refreshToken, string userName)
     {
         var response = await _httpClient.PostAsJsonAsync("/api/users/token/refresh", new { refreshToken, userName });
         var result = await HandleResponse(response);
@@ -113,7 +115,7 @@ public class AuthService : ServiceBase, IAuthService
             return (null, result);
         }
 
-        var loginInfoResponse = await response.Content.ReadFromJsonAsync<LoginInfo>();
+        var loginInfoResponse = await response.Content.ReadFromJsonAsync<AccountInfo>();
         if (loginInfoResponse is null)
         {
             return (null,
@@ -143,4 +145,5 @@ public class AuthService : ServiceBase, IAuthService
         // var result = await authService.AuthorizeAsync(accessor.HttpContext.User, null, authorizationRequirement);
         return result.Succeeded;
     }
+
 }

@@ -9,8 +9,8 @@ public class UserClaimPrincipal : ClaimsPrincipal
 {
     public AuthenticationProperties AuthenticationProperties { get; } = new();
     
-    public UserClaimPrincipal(string username, IReadOnlyCollection<string> roles, string refreshToken)
-        : base(CreateClaimIdentity(username, roles))
+    public UserClaimPrincipal(string username, IReadOnlyCollection<string> roles, string refreshToken, string? userImageUrl)
+        : base(CreateClaimIdentity(username, roles, userImageUrl))
     {
         var tokens = new[]
         {
@@ -20,7 +20,7 @@ public class UserClaimPrincipal : ClaimsPrincipal
         AuthenticationProperties.StoreTokens(tokens);
     }
 
-    private static ClaimsIdentity CreateClaimIdentity(string username, IReadOnlyCollection<string> roles)
+    private static ClaimsIdentity CreateClaimIdentity(string username, IReadOnlyCollection<string> roles, string? userImageUrl)
     {
         var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
         
@@ -36,6 +36,10 @@ public class UserClaimPrincipal : ClaimsPrincipal
             identity.AddClaim(new Claim(ClaimTypes.Role, role));
         }
         identity.AddClaim(new Claim(ClaimTypes.Role, "User"));
+        if (userImageUrl is not null)
+        {
+            identity.AddClaim(new Claim("image", userImageUrl));
+        }
         return identity;
     }
 }

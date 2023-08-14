@@ -56,7 +56,8 @@ public class RefreshTokenMiddleware(RequestDelegate next, ILogger<RefreshTokenMi
                 return;
             }
             logger.LogDebug("Middleware refreshed accesstoken for {User} accessing {Path}", context.User.Identity.Name, context.Request.Path);
-            var userClaimsPrincipal = new UserClaimPrincipal(authInfo.UserName, authInfo.Roles, authInfo.RefreshToken );
+            var userImage = IAuthService.GetImageUrlFromClaim(authResult.Principal!);
+            var userClaimsPrincipal = new UserClaimPrincipal(authInfo.UserName, authInfo.Roles, authInfo.RefreshToken, userImage);
 
             // Make sure we keep the status of external login
             var externalProvider = authResult.Properties?.GetExternalProvider();

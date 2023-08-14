@@ -2,7 +2,7 @@
 
 namespace FotoApi.Infrastructure.Security.Authentication;
 
-public sealed class LoginFailedException : ForbiddenException
+public sealed class LoginFailedException : UnAuthorizedException
 {
     public LoginFailedException()
         : base($"User entered the wrong username or password.")

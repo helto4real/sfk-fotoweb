@@ -1,6 +1,8 @@
-﻿using Auth0.AspNetCore.Authentication;
+﻿using System.Runtime.CompilerServices;
+using Auth0.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
 namespace Foto.WebServer.Authentication;
@@ -61,7 +63,11 @@ public static class AuthenticationExtensions
                 {
                     // Bind this section to the specified options
                     section.Bind(options);
-    
+
+                    if (options is GoogleOptions googleOptions)
+                    {
+                        googleOptions.ClaimActions.MapJsonKey("image", "picture");
+                    }
                     // This will save the information in the external cookie
                     if (options is RemoteAuthenticationOptions remoteAuthenticationOptions)
                     {

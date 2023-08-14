@@ -7,7 +7,7 @@ public class CvEditForm : EditForm
     protected override void OnParametersSet()
     {
         base.OnParametersSet(); // This is important!   
-        EditContext?.SetFieldCssClassProvider(new BootstrapValidationFieldClassProvider());
+        // EditContext?.SetFieldCssClassProvider(new BootstrapValidationFieldClassProvider());
         
     }
 }

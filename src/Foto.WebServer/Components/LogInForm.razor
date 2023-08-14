@@ -2,7 +2,6 @@
 @using Foto.WebServer.Services
 @using Foto.WebServer.Authentication
 @using Foto.WebServer.Dto
-@using Blazored.FluentValidation
 @inject IAuthService AuthService
 @inject ExternalProviders ExternalProviders
 <div class="container ">
@@ -93,7 +92,7 @@
         
     
         // It is impossible that Username or Password is null here, because the form is invalid if they are.
-        var loginInfo = new LoginUserInfo { Username = _model.Username!, Password = _model.Password! };
+        var loginInfo = new LoginUserInfo { UserName = _model.Username!, Password = _model.Password! };
         var (user, error) = await AuthService.LoginAsync(loginInfo);
         if (user is not null)
         {

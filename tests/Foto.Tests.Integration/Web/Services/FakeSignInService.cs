@@ -1,4 +1,5 @@
-﻿using Foto.WebServer.Services;
+﻿using Foto.WebServer.Dto;
+using Foto.WebServer.Services;
 
 namespace Foto.Tests.Integration.Web.Services;
 
@@ -17,5 +18,10 @@ public class FakeSignInService : ISignInService
     public Task<bool> IsCurrentUserExternalAsync()
     {
         return Task.FromResult(false);
+    }
+
+    public Task LoginAsync(LoginUserInfo loginUserInfo)
+    {
+        return Task.CompletedTask;
     }
 }

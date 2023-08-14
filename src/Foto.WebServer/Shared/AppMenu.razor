@@ -1,0 +1,38 @@
+@using Microsoft.AspNetCore.Components.Authorization
+@using Foto.WebServer.Authentication
+@inject NavigationManager NavigationManager
+
+<MudNavMenu Class="mt-4" Dense="true">
+    <AuthorizeView>
+        <Authorized>
+            <MudNavLink Href="/" Match="NavLinkMatch.All">Hem</MudNavLink>
+            <MudNavGroup Title="ST-bilder" Expanded="false">
+                <MudNavLink Href="st-bild/upload" Match="NavLinkMatch.Prefix">Ladda upp</MudNavLink>
+                <MudNavLink Href="/st-bild/list" Match="NavLinkMatch.Prefix">Visa</MudNavLink>
+            </MudNavGroup>
+            <AuthorizeView Policy="StBildAdministratiorPolicy" Context="stAdminCtx">
+                <MudNavGroup Title="Administrera" Expanded="false">
+                    <MudNavLink Href="/admin/st-bild/godkann" Match="NavLinkMatch.Prefix">Godkänn</MudNavLink>
+                    <MudNavLink Href="/admin/st-bild/paketera" Match="NavLinkMatch.Prefix">Paketera</MudNavLink>
+                    <MudNavLink Href="/admin/st-bild/hantera" Match="NavLinkMatch.Prefix">Hantera</MudNavLink>
+                    <MudNavLink Href="/admin/st-bild/paket" Match="NavLinkMatch.Prefix">Visa paket</MudNavLink>
+                </MudNavGroup>
+            </AuthorizeView>
+        </Authorized>
+        <NotAuthorized>
+            <MudNavLink Href="login" Match="NavLinkMatch.Prefix">Logga in</MudNavLink>
+        </NotAuthorized>
+    </AuthorizeView>
+    <AuthorizeView Roles="Admin">
+        <MudNavGroup Title="Admin" Expanded="false">
+            <MudNavGroup Title="Medlemmar" Expanded="false">
+                <MudNavLink Href="/admin/members/register" Match="NavLinkMatch.Prefix">Registrera</MudNavLink>
+                <MudNavLink Href="/admin/members/manage" Match="NavLinkMatch.Prefix">Hantera</MudNavLink>
+            </MudNavGroup>
+            <MudNavGroup Title="Användare" Expanded="false">
+                <MudNavLink Href="admin/users/list" Match="NavLinkMatch.Prefix">Hantera</MudNavLink>
+                <MudNavLink Href="admin/users/precreate" Match="NavLinkMatch.Prefix">Lägg till</MudNavLink>
+            </MudNavGroup>
+        </MudNavGroup>
+    </AuthorizeView>
+</MudNavMenu>

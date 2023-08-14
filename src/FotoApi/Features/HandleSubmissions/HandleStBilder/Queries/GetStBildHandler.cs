@@ -26,7 +26,7 @@ public class GetStBildHandler(PhotoServiceDbContext db, IPolicyChecker policyChe
         var isStAdmin = await policyChecker.CompliesToPolicy("StBildAdministratiorPolicy");
 
         if (!isStAdmin && stBild.OwnerReference != request.CurrentUser.Id)
-            throw new ForbiddenException("User not authorized to get stbild information for this id");
+            throw new UnAuthorizedException("User not authorized to get stbild information for this id");
 
         return _responseMapper.ToStBildResponse(stBild);
     }
