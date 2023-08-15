@@ -1,14 +1,15 @@
+@using MudBlazor.Utilities
 
 <MudPaper Elevation="0" Outlined="false" MinWidth="@($"{MaxWidth}px")" MaxWidth="@($"{MaxWidth}px")">
-    <MudCard >
+    <MudCard>
         <MudCardMedia Image="@Image"  Height="@Height" Style="object-fit: contain" />
         <MudCardContent>
-            <MudText Typo="Typo.h6">@Title</MudText>
-            <MudText Typo="Typo.body2">@Description</MudText>
+            <MudText  Typo="Typo.body2">@Title</MudText>
+            <MudText Style="color: var(--mud-palette-lines-inputs);" Typo="Typo.caption">@Description</MudText>
         </MudCardContent>
         @if (Actions is not null)
         {
-            <MudCardActions>
+            <MudCardActions Style="@BorderStyle">
                 @Actions
             </MudCardActions>
         }
@@ -16,7 +17,7 @@
 </MudPaper>
 
 @code {
-
+    public string BorderStyle => $"border-top-width: thin; border-top-color: var(--mud-palette-action-disabled-background)";
     [Parameter]
     public int MaxWidth { get; set; } = 250;
     

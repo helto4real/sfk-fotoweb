@@ -1,17 +1,19 @@
+@using Foto.WebServer.Dto
 <AppImageCard
-    Image="img/skutt.jpg"
+    Image="@($"/api/images/image/{StBild.ImageReference}?thumb")"
     MaxWidth="200"
     Height="133"
-    Title="Skutt"
-    Description="Skutt är en ekorre">
+    Title="@StBild.Title"
+    Description="@StBild.Description">
     <Actions>
-        <MudPaper Class="d-flex justify-space-between align-center flex-grow-1 gap-4" Elevation="0">
-            <MudTooltip Text="@EditOrViewToolTip">
-                <MudIconButton Icon="@EditOrViewIcon" Color="Color.Inherit"/>
+        <MudPaper Class="d-flex justify-space-between  flex-grow-1 " Elevation="0">
+            <MudTooltip Placement="Placement.Bottom" Inline="true" Text="@EditOrViewToolTip">
+                <MudIconButton Href="@($"/st-bild/edit/{StBild.Id}")" Icon="@EditOrViewIcon" Color="Color.Inherit"/>
             </MudTooltip>
-            <MudTooltip Inline="false" Text="@StatusToolTip" >
-                <MudIcon Class="mr-2" Icon="@StatusIcon" Color="@StatusColor"/>
+            <MudTooltip  Placement="Placement.Bottom" Inline="true" Text="@StatusToolTip">
+                <MudIconButton  Class="disable-hover" DisableElevation="true" DisableRipple="true"  Icon="@StatusIcon" Color="@StatusColor"/>
             </MudTooltip>
+                
         </MudPaper>
     </Actions>
 </AppImageCard>
@@ -19,20 +21,19 @@
 @code {
 
     [Parameter]
-    public string Image { get; set; } = default!;
+    public StBildInfo StBild { get; set; } = default!;
 
-    [Parameter]
-    public string Title { get; set; } = default!;
 
-    [Parameter]
-    public string Description { get; set; } = default!;
+    private bool CanEdit => GetStatus() is StImageStatus.Uploaded or StImageStatus.Rejected;
 
-    [Parameter]
-    public StImageStatus Status { get; set; } = StImageStatus.Uploaded;
-
-    public bool CanEdit => Status is StImageStatus.Uploaded or StImageStatus.Rejected;
-
-    public string StatusIcon => Status switch
+    private StImageStatus GetStatus()
+    {
+    // For now rejected is not available
+        if (StBild.IsUsed) return StImageStatus.Sent;
+        return StBild.IsAccepted ? StImageStatus.Approved : StImageStatus.Uploaded;
+    }
+    
+    public string StatusIcon => GetStatus() switch
     {
         StImageStatus.Uploaded => Icons.Material.Filled.ImageSearch,
         StImageStatus.Approved => Icons.Material.Filled.Check,
@@ -41,7 +42,7 @@
         _ => throw new ArgumentOutOfRangeException()
         };
 
-    public Color StatusColor => Status switch
+    public Color StatusColor => GetStatus() switch
     {
         StImageStatus.Uploaded => Color.Inherit,
         StImageStatus.Approved => Color.Success,
@@ -50,12 +51,12 @@
         _ => throw new ArgumentOutOfRangeException()
         };
 
-    public string StatusToolTip => Status switch
+    public string StatusToolTip => GetStatus() switch
     {
-        StImageStatus.Uploaded => "Under godkännande av ST-administratör",
-        StImageStatus.Approved => "Godkänd och inväntar att skickas till ST",
-        StImageStatus.Rejected => "Ej godkänd, ändringar krävs",
-        StImageStatus.Sent => "Skickad till ST",
+        StImageStatus.Uploaded => "Status: Under godkännande av ST-administratör",
+        StImageStatus.Approved => "Status: Godkänd och inväntar att skickas till ST",
+        StImageStatus.Rejected => "Status: Ej godkänd, ändringar krävs",
+        StImageStatus.Sent => "Status: Skickad till ST",
         _ => throw new ArgumentOutOfRangeException()
         };
     
