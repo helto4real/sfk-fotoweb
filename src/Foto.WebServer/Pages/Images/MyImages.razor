@@ -1,38 +1,38 @@
-﻿@page "/image/myimages"
-@layout MainLayout
-@using Foto.WebServer.Services
-@using Foto.WebServer.Dto
-@inherits AuthorizedBasePage
-@inject IImageService ImageService
-
-<div class="container d-flex flex-column justify-content-center align-items-center">
-    <div class="row row-cols-auto align-items-center">
-        <h2>Mina uppladdade bilder</h2>
-    </div>
-</div>
-
-<div class="mt-3">
-    <ImageViewer Images="@_userImages" OnDeleteImage="DeleteUserImage "/>
-</div>
-
-@code
-{
-    private IEnumerable<ImageItem>? _userImages { get; set; }
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            _userImages = await ImageService.GetImagesForUserAsync();
-            StateHasChanged();
-        }
-        await base.OnAfterRenderAsync(firstRender);
-    }
-
-    
-    private async Task DeleteUserImage(ImageItem imageItem)
-    {
-        await ImageService.DeleteImageAsync(imageItem.Id);
-        _userImages = await ImageService.GetImagesForUserAsync();
-        StateHasChanged();
-    }
-}
+﻿@* @page "/image/myimages" *@
+@* @layout MainLayout *@
+@* @using Foto.WebServer.Services *@
+@* @using Foto.WebServer.Dto *@
+@* @inherits AuthorizedBasePage *@
+@* @inject IImageService ImageService *@
+@* *@
+@* <div class="container d-flex flex-column justify-content-center align-items-center"> *@
+@*     <div class="row row-cols-auto align-items-center"> *@
+@*         <h2>Mina uppladdade bilder</h2> *@
+@*     </div> *@
+@* </div> *@
+@* *@
+@* <div class="mt-3"> *@
+@*     <ImageViewer Images="@_userImages" OnDeleteImage="DeleteUserImage "/> *@
+@* </div> *@
+@* *@
+@* @code *@
+@* { *@
+@*     private IEnumerable<ImageItem>? _userImages { get; set; } *@
+@*     protected override async Task OnAfterRenderAsync(bool firstRender) *@
+@*     { *@
+@*         if (firstRender) *@
+@*         { *@
+@*             _userImages = await ImageService.GetImagesForUserAsync(); *@
+@*             StateHasChanged(); *@
+@*         } *@
+@*         await base.OnAfterRenderAsync(firstRender); *@
+@*     } *@
+@* *@
+@*      *@
+@*     private async Task DeleteUserImage(ImageItem imageItem) *@
+@*     { *@
+@*         await ImageService.DeleteImageAsync(imageItem.Id); *@
+@*         _userImages = await ImageService.GetImagesForUserAsync(); *@
+@*         StateHasChanged(); *@
+@*     } *@
+@* } *@
