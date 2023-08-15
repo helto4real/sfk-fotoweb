@@ -1,145 +1,142 @@
 ﻿@using FluentValidation
 @using System.Globalization
 @using System.Text.Json.Serialization
+@using FluentValidation.Results
 @using Foto.WebServer.Dto
 @using Foto.WebServer.Services
+@using Severity = MudBlazor.Severity
+@inject AppSnackBar AppSnackBar
 @inject IImageService ImageService
+@inject NavigationManager NavigationManager
 
- <div class="container ">
-    <div class="row g-3 mb-5 justify-content-center align-items-center">
-        <div class="col col-8" style="max-width: 400px;">
-            <CvEditForm id="uploadForm" EditContext="@_editContext" class="form" OnValidSubmit="@HandleValidSubmit">
-                
-                <FluentValidationValidator/>
+<!--suppress CssUnresolvedCustomProperty -->
+<AppForm @bind-Disabled="@_showProgressBar" @ref="_form" Model="@_model" Validation="@(_validator.ValidateValue)" ValidationDelay="0">
+    <Form>
+        <AppTextField @bind-Value="@_model.Title"
+                      For="@(() => _model.Title)"
+                      Label="Rubrik (Rubrikförslag, lämpligen tre, fyra ord)"/>
 
-                <div class="mb-3">
-                    <label for="title" class="form-label">Rubrik: (Rubrikförslag, lämpligen tre, fyra ord)</label>
-                    <InputText id="title" type="title" class="form-control :invalid" @bind-Value="@_model.Title" />
-                    <ValidationMessage class="text-danger" For="@(() => _model.Title)" />
-                </div>
-                <div class="mb-3">
-                    <label for="name" class="form-label">Fotograf:</label>
-                    <InputText id="name" type="title" class="form-control :invalid" autocomplete="name" @bind-Value="@_model.Name" />
-                    <ValidationMessage class="text-danger" For="@(() => _model.Name)" />
-                </div>
-                <div class="mb-3">
-                    <label for="beskrivning" class="form-label">Beskrivning: (Beskriv ditt foto)</label>
-                    <InputTextArea  id="beskrivning" maxlength="300" type="title" class="form-control :invalid" @bind-Value="@_model.Description"/>
-                    <ValidationMessage class="text-danger" For="@(() => _model.Description)" />
-                </div>
-                <div class="mb-3">
-                    <label for="about" class="form-label">Om dig: (ålder, bostadsort, favoritmotiv, kameramärke, favoritfotograf, hemsida)</label>
-                    <InputTextArea  id="about" maxlength="300" type="title" class="form-control :invalid" @bind-Value="@_model.AboutThePhotographer"/>
-                    <ValidationMessage class="text-danger" For="@(() => _model.AboutThePhotographer)" />
-                </div>
-                <div class="mb-3">
-                    <label for="location" class="form-label">Vart bilden är tagen: (t.ex. plats, närmaste stad)</label>
-                    <InputText id="location" type="title" class="form-control :invalid" @bind-Value="@_model.Location" />
-                    <ValidationMessage class="text-danger" For="@(() => _model.Location)" />
-                </div>
-                <div class="mb-3">
-                    <label for="time" class="form-label">När är bilden tagen:</label>
-                    <InputDate id="time" class="form-control :invalid" @bind-Value="@_model.Time" />
-                    <ValidationMessage class="text-danger" For="@(() => _model.Time)" />
-                </div>
-                <div class="mb-3">
-                    <label for="imagefile" class="form-label">Ladda upp dit foto (2079x1382 pixels)</label>
-                    @if (!_clearInputFileSelector)
-                    {
-                        <InputFile class="form-control" MaxFileSize="@IImageService.MaxAllowedImageSize" id="imagefile" OnChange="@HandleFileSelection"/>
-                    }
-                    <ValidationMessage class="text-danger" For="@(() => _model.ImageFile)" />
-                    <ValidationMessage class="text-danger" For="@(() => _model.ImageSize)" />
-                    <ValidationMessage class="text-danger" For="@(() => _model.ImageName)" />
-                </div>
-                <div class="d-flex justify-content-start align-items-center">
-                    <button type="submit" class="btn btn-primary" disabled="@(_isSubmitting || !IsValid)">Ladda upp st-bild</button>
-                    <div class="spinner-border spinner-border-sm ms-1" role="status" aria-hidden="true" style="display: @(_isSubmitting? "block":"none");" >
-                        <span class="visually-hidden">Sparar ST-bild ...</span>
-                    </div>
-                </div>
-            </CvEditForm>
-        </div>
-    </div>
-</div>
+        <AppTextField @bind-Value="@_model.Name"
+                      For="@(() => _model.Name)"
+                      Label="Fotograf"/>
+
+        <AppTextField @bind-Value="@_model.Description"
+                      For="@(() => _model.Description)"
+                      Lines="3"
+                      MaxLength="300"
+                      HelperText="Beskriv kort din bild, max 300 tecken."
+                      Label="Beskrivning av bilden"/>
+
+        <AppTextField @bind-Value="@_model.AboutThePhotographer"
+                      For="@(() => _model.AboutThePhotographer)"
+                      Lines="3"
+                      MaxLength="300"
+                      HelperText="T.ex. ålder, bostadsort, favoritmotiv, kameramärke, favoritfotograf, hemsida"
+                      Label="Om dig"/>
+
+        <AppTextField @bind-Value="@_model.Location"
+                      For="@(() => _model.Location)"
+                      HelperText="T.ex. plats, närmaste stad"
+                      Label="Vart bilden är tagen"/>
+
+        <AppTextField @bind-Value="@_model.Time"
+                      InputType="InputType.Date"
+                      For="@(() => _model.Time)"
+                      Label="När bilden tagen:"/>
+
+        <MudPaper Elevation="0" Outlined="true" Class="border-solid mt-4" Style="border-color: var(--mud-palette-lines-inputs);">
+            <div class="d-flex">
+                <MudText Align="Align.Left" Class="flex-auto my-auto ml-2" Typo="Typo.body1">@_model.ImageName</MudText>
+                <MudFileUpload Accept=".jpg, .jpeg" T="IBrowserFile" For="@(() => _model.ImageFile)" @bind-Files="_model.ImageFile">
+                    <ButtonTemplate>
+                        <MudButton HtmlTag="label"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Surface"
+                                   Class="my-3 mr-2"
+                                   StartIcon="@Icons.Material.Filled.Image"
+                                   for="@context">
+                            Välj bild
+                        </MudButton>
+                    </ButtonTemplate>
+                </MudFileUpload>
+            </div>
+        </MudPaper>
+    </Form>
+    <Actions >
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!IsValid)" Class="ml-auto mr-2" OnClick="@(async () => await HandleValidSubmit())">Spara</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Surface" Disabled="@(_showProgressBar)" Class="mr-auto ml-2" OnClick="@(() => NavigationManager.NavigateTo("/"))">Avbryt</MudButton>
+    </Actions>
+</AppForm>
+
+@if (_showProgressBar)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true"/>
+}
 
 @if (!string.IsNullOrEmpty(_alertMessage))
 {
-    <div class="alert alert-danger">@_alertMessage</div>
-}
-
-@if (_uploadedImages.Any())
-{
-    <ImageViewer Images="@_uploadedImages"/>
+    <MudAlert Class="mt-3" Severity="Severity.Error">@_alertMessage</MudAlert>
 }
 
 @code {
     string? _alertMessage;
+    private bool _showSuccessMessage;
     private StBildUploadModel _model = new();
     private List<ImageItem> _uploadedImages = new();
-    private EditContext? _editContext;
-    private bool _isSubmitting;
-    
-    protected override void OnInitialized()
-    {
-        _editContext = new(_model);
-    }
-    
-    public bool IsValid => _model.ImageFile is not null && _editContext is not null && _editContext.Validate();
+    private bool _showProgressBar = false;
+    private StBildUploadModelValidator _validator = new();
+    private AppForm _form = default!;
+
+    public bool IsValid => _model.ImageFile is not null && _form.IsValid && !_showProgressBar;
+
     private async Task HandleValidSubmit()
     {
-        _isSubmitting = true;
-        StateHasChanged();
-        // The time needs to be in UTC format. 
-        _model.Time = _model.Time.ToUniversalTime();
-        var (imageItem, error) = await ImageService.UploadImageWithMetadata(_model.ImageFile, _model.Title, _model, "st-bild");
-        _isSubmitting = false;
-        StateHasChanged();
-        if (imageItem != null)
+        await _form.Validate();
+        if (!_form.IsValid)
         {
-            _uploadedImages.Add(imageItem);
-            _model = new();
-            ClearInputFile();
-            _alertMessage = null;
+            return;
         }
-        else
+
+        try
         {
-            if (error is not null && error.Detail.IndexOf("wrong size", StringComparison.InvariantCultureIgnoreCase)>0)
+            _showProgressBar = true;
+            // The time needs to be in UTC format. 
+            _model.Time = _model.Time.ToUniversalTime();
+            var (imageItem, error) = await ImageService.UploadImageWithMetadata(_model.ImageFile, _model.Title, _model, "st-bild");
+            await Task.Delay(3000);
+            if (imageItem != null)
             {
-                _alertMessage = "Den bild du laddade upp är inte exakt 2079x1382 pixlar. Ladda upp en ny bild.";
+                _uploadedImages.Add(imageItem);
+                _model = new();
+                _alertMessage = null;
+                AppSnackBar.Alert("Uppladdning av ST-bild lyckades!", Severity.Success);
             }
             else
             {
-                _alertMessage = error?.Detail;
+                if (error is not null && error.Detail.IndexOf("wrong size", StringComparison.InvariantCultureIgnoreCase) > 0)
+                {
+                    _alertMessage = "Den bild du laddade upp är inte exakt 2079x1382 pixlar. Ladda upp en ny bild.";
+                }
+                else
+                {
+                    _alertMessage = error?.Detail;
+                }
             }
         }
+        finally
+        {
+            _showProgressBar = false;
+        }
     }
-    
-    private void HandleFileSelection(InputFileChangeEventArgs e)
-    {
-        _model.ImageFile = e.File;
-        _editContext?.Validate();
-        StateHasChanged();
-    }
-    
+
     private bool _clearInputFileSelector;
-    /// <summary>
-    ///     This is a hack to clear the input file selector.
-    /// </summary>
-    private void ClearInputFile()
-    {
-        _clearInputFileSelector = true;
-        StateHasChanged();
-        _clearInputFileSelector = false;
-        StateHasChanged();
-    }
 
     public class StBildUploadModel
     {
         private string? _imageName;
         private long _imageSize;
         IBrowserFile? _imageFile;
-        
+
         public string ImageName => _imageName ?? string.Empty;
         public long ImageSize => _imageSize;
 
@@ -149,7 +146,7 @@
         public DateTime Time { get; set; } = new DateTime(2023, 1, 1);
         public string Description { get; set; } = default!;
         public string AboutThePhotographer { get; set; } = default!;
-        
+
         [JsonIgnore]
         public IBrowserFile? ImageFile
         {
@@ -170,49 +167,47 @@
                 }
             }
         }
-
     }
-    private static string[] AllowedExtensions = {".jpg", ".jpeg"};
-    public class LoginOrCreateUserModelValidator : AbstractValidator<StBildUploadModel> 
+
+    private static string[] _allowedExtensions = { ".jpg", ".jpeg" };
+
+    public class StBildUploadModelValidator : ValidatorBase<StBildUploadModel>
     {
-        public LoginOrCreateUserModelValidator()
+        public StBildUploadModelValidator()
         {
             RuleFor(x => x.ImageFile)
                 .NotEmpty()
+                .WithMessage("Välj bild.")
                 .DependentRules(() =>
                 {
                     RuleFor(x => x.ImageName)
-                        .Must(x => AllowedExtensions.Contains(Path.GetExtension(x).ToLowerInvariant()))
+                        .Must(x => _allowedExtensions.Contains(Path.GetExtension(x).ToLowerInvariant()))
                         .WithMessage("Bilden måste vara en jpg bild, (*.jpg eller *.jpeg)");
 
                     RuleFor(x => x.ImageSize)
                         .LessThanOrEqualTo(IImageService.MaxAllowedImageSize)
                         .WithMessage($"Bilden får inte vara större än {IImageService.MaxAllowedImageSize / 1024 / 1024}Mb.");
                 });
-                RuleFor(x => x.Description)
-                    .NotEmpty()
-                    .WithMessage("Beskrivning måste anges.")
-                    .MaximumLength(300)
-                    .WithMessage("Beskrivningen får max vara 300 tecken");
-                RuleFor(x => x.Name)
-                    .NotEmpty()
-                    .WithMessage("Namn på fotograf måste anges.");
-                RuleFor(x => x.Title)
-                    .NotEmpty()
-                    .WithMessage("Rubrik måste anges.");
-                RuleFor(x => x.Location)
-                    .NotEmpty()
-                    .WithMessage("Plats måste anges.");
-                RuleFor(x => x.AboutThePhotographer)
-                    .NotEmpty()
-                    .WithMessage("Om fotografen måste anges.");
-                RuleFor(x => x.Time)
-                    .LessThanOrEqualTo(e => DateTime.Now.AddDays(1))
-                    .WithMessage("Tidpunkt kan inte vara framåt i tiden");
-                ;
-
-            
+            RuleFor(x => x.Description)
+                .NotEmpty()
+                .WithMessage("Beskrivning måste anges.")
+                .MaximumLength(300)
+                .WithMessage("Beskrivningen får max vara 300 tecken");
+            RuleFor(x => x.Name)
+                .NotEmpty()
+                .WithMessage("Namn på fotograf måste anges.");
+            RuleFor(x => x.Title)
+                .NotEmpty()
+                .WithMessage("Rubrik måste anges.");
+            RuleFor(x => x.Location)
+                .NotEmpty()
+                .WithMessage("Plats måste anges.");
+            RuleFor(x => x.AboutThePhotographer)
+                .NotEmpty()
+                .WithMessage("Om fotografen måste anges.");
+            RuleFor(x => x.Time)
+                .LessThanOrEqualTo(e => DateTime.Now.AddDays(1))
+                .WithMessage("Tidpunkt kan inte vara framåt i tiden");
         }
     }
-
 }

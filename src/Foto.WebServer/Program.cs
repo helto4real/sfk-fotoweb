@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using FluentValidation;
 using Foto.WebServer.Api;
 using Foto.WebServer.Authentication;
+using Foto.WebServer.Components;
 using Foto.WebServer.Dto;
 using Foto.WebServer.Pages;
 using Foto.WebServer.Services;
@@ -48,7 +49,13 @@ builder.Services.AddReverseProxy()
     .LoadFromConfig(proxySettings);
 
 builder.Services.AddServerSideBlazor();
-builder.Services.AddMudServices();
+builder.Services.AddMudServices(c =>
+{
+    c.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomLeft;
+});
+
+builder.Services.AddScoped<AppSnackBar>();
+
 builder.Services.AddScoped<MudThemeProvider>();
 
 var photoApiUrl = builder.Configuration.GetServiceUri("fotoapp")?.ToString() ??
