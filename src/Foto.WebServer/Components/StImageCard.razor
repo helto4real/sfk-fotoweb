@@ -1,6 +1,7 @@
 @using Foto.WebServer.Dto
 <AppImageCard
     Image="@($"/api/images/image/{StBild.ImageReference}?thumb")"
+    FullImage="@($"/api/images/image/{StBild.ImageReference}")"
     MaxWidth="200"
     Height="133"
     Title="@StBild.Title"
@@ -13,7 +14,6 @@
             <MudTooltip  Placement="Placement.Bottom" Inline="true" Text="@StatusToolTip">
                 <MudIconButton  Class="disable-hover" DisableElevation="true" DisableRipple="true"  Icon="@StatusIcon" Color="@StatusColor"/>
             </MudTooltip>
-                
         </MudPaper>
     </Actions>
 </AppImageCard>
@@ -22,7 +22,6 @@
 
     [Parameter]
     public StBildInfo StBild { get; set; } = default!;
-
 
     private bool CanEdit => GetStatus() is StImageStatus.Uploaded or StImageStatus.Rejected;
 
