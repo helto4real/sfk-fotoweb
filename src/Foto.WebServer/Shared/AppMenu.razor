@@ -9,15 +9,15 @@
             <MudNavGroup Title="ST-bilder" Expanded="false">
                 <MudNavLink Href="st-bild/upload" Match="NavLinkMatch.Prefix">Ladda upp</MudNavLink>
                 <MudNavLink Href="/st-bild/list" Match="NavLinkMatch.Prefix">Visa</MudNavLink>
+                <AuthorizeView Policy="StBildAdministratiorPolicy" Context="stAdminCtx">
+                    <MudNavGroup Title="Administrera" Expanded="false">
+                        <MudNavLink Href="/admin/st-bild/godkann" Match="NavLinkMatch.Prefix">Godkänn</MudNavLink>
+                        <MudNavLink Href="/admin/st-bild/paketera" Match="NavLinkMatch.Prefix">Paketera</MudNavLink>
+                        <MudNavLink Href="/admin/st-bild/hantera" Match="NavLinkMatch.Prefix">Hantera</MudNavLink>
+                        <MudNavLink Href="/admin/st-bild/paket" Match="NavLinkMatch.Prefix">Visa paket</MudNavLink>
+                    </MudNavGroup>
+                </AuthorizeView>
             </MudNavGroup>
-            <AuthorizeView Policy="StBildAdministratiorPolicy" Context="stAdminCtx">
-                <MudNavGroup Title="Administrera" Expanded="false">
-                    <MudNavLink Href="/admin/st-bild/godkann" Match="NavLinkMatch.Prefix">Godkänn</MudNavLink>
-                    <MudNavLink Href="/admin/st-bild/paketera" Match="NavLinkMatch.Prefix">Paketera</MudNavLink>
-                    <MudNavLink Href="/admin/st-bild/hantera" Match="NavLinkMatch.Prefix">Hantera</MudNavLink>
-                    <MudNavLink Href="/admin/st-bild/paket" Match="NavLinkMatch.Prefix">Visa paket</MudNavLink>
-                </MudNavGroup>
-            </AuthorizeView>
         </Authorized>
         <NotAuthorized>
             <MudNavLink Href="login" Match="NavLinkMatch.Prefix">Logga in</MudNavLink>
