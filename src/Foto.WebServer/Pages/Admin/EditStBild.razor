@@ -1,81 +1,81 @@
 ﻿@page "/admin/st-bild/edit/{stbildId:guid}"
-@inherits AuthorizedBasePage
-@attribute [Authorize(Policy = "StBildAdministratiorPolicy")]
 @using Foto.WebServer.Dto
 @using Foto.WebServer.Services
 @using Microsoft.AspNetCore.Authorization
+@inherits AuthorizedBasePage
+@attribute [Authorize(Policy = "StBildAdministratiorPolicy")]
 @inject IStBildService StBildService
 
-<PageTitle>Godkänn ST-bild</PageTitle>
+
+<PageTitle>@PageTitle</PageTitle>
 <AppContent ContentMaxWidth="MaxWidth.Small">
-    <Title>Godkänn ST-bild</Title>
-    <Ingress>Granska bildinformation och godkänn eller avvisa genom att trycka på knapparna!</Ingress>
+    <Title>@PageTitle</Title>
+    <Ingress>@PageIngress</Ingress>
     <Container>
         @if (_stBild is not null)
         {
             @if (_stBild.IsUsed)
             {
-                <MudAlert Severity="@Severity.Warning">
+                <AppAlert Class="mb-4" Severity="@Severity.Warning">
                     Bilden är redan paketerad och skickad till ST och det går inte längre att ändra godkännande.
-                </MudAlert>
+                </AppAlert>
             }
-            else
-            {
-                <AppForm >
-                    <Form>
-                        <MudField Variant="Variant.Text"
-                                  Label="Rubrik">
-                            @_stBild.Title
-                            @_stBild.Name
-                        </MudField>
-                        <MudField Variant="Variant.Text"
-                                  Label="Fotograf">
-                            @_stBild.Description
-                        </MudField>
-                        <MudField Variant="Variant.Text"
-                                  Lines="3"
-                                  MaxLength="300"
-                                  Label="Beskrivning av bilden">
-                            @_stBild.AboutThePhotographer
-                        </MudField>
-                        <MudField Variant="Variant.Text"
-                                  Lines="3"
-                                  MaxLength="300"
-                                  Label="Om dig">
-                            @_stBild.Location
-                        </MudField>
-                        <MudField Variant="Variant.Text"
-                                  Label="Vart bilden är tagen">
-                            @_stBild.Time
-                        </MudField>
-                        <MudField Variant="Variant.Text"
-                                  InputType="InputType.Date"
-                                  Label="När bilden tagen:">
-                        </MudField>
+            <AppForm >
+                <Form>
+                    <MudField Variant="Variant.Text"
+                              Label="Rubrik">
+                        @_stBild.Title
+                        @_stBild.Name
+                    </MudField>
+                    <MudField Variant="Variant.Text"
+                              Label="Fotograf">
+                        @_stBild.Description
+                    </MudField>
+                    <MudField Variant="Variant.Text"
+                              Lines="3"
+                              MaxLength="300"
+                              Label="Beskrivning av bilden">
+                        @_stBild.AboutThePhotographer
+                    </MudField>
+                    <MudField Variant="Variant.Text"
+                              Lines="3"
+                              MaxLength="300"
+                              Label="Om dig">
+                        @_stBild.Location
+                    </MudField>
+                    <MudField Variant="Variant.Text"
+                              Label="Vart bilden är tagen">
+                        @_stBild.Time
+                    </MudField>
+                    <MudField Variant="Variant.Text"
+                              InputType="InputType.Date"
+                              Label="När bilden tagen:">
+                    </MudField>
 
-                    </Form>
-                    <Actions>
-                        <MudContainer Class="d-flex justify-center">
-                            <MudButton StartIcon="@Icons.Material.Filled.Check" Color="Color.Success" OnClick="OnAccept">Godkänn</MudButton>
-                            <MudButton StartIcon="@Icons.Material.Filled.Stop" Color="Color.Error" OnClick="OnReject">Avvisa</MudButton>
-                            <MudButton StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Inherit" OnClick="OnCancel">Avbryt</MudButton>
-                        </MudContainer>
-                    </Actions>
-                </AppForm>
-            }
+                </Form>
+                <Actions>
+                    <MudContainer Class="d-flex justify-center">
+                        <MudButton Disabled="_isPackaged" StartIcon="@Icons.Material.Filled.Check" Color="Color.Success" OnClick="OnAccept">Godkänn</MudButton>
+                        <MudButton Disabled="_isPackaged" StartIcon="@Icons.Material.Filled.Stop" Color="Color.Error" OnClick="OnReject">Avvisa</MudButton>
+                        <MudButton StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Inherit" OnClick="OnCancel">Avbryt</MudButton>
+                    </MudContainer>
+                </Actions>
+            </AppForm>
         }
     </Container>
 </AppContent>
 
 @if (_responseHandler.HasAlert)
 {
-    <MudAlert Severity="Severity.Error">
+    <AppAlert Severity="Severity.Error">
         @_responseHandler.Message
-    </MudAlert>
+    </AppAlert>
 }
 
 @code {
 
+    private string PageTitle => _isPackaged ? "Visa ST-bild" : "Godkänn ST-bild";
+    private string PageIngress => _isPackaged ? "Visar skickad ST-bild" : "Granska bildinformation och godkänn eller avvisa genom att trycka på knapparna!";
     private StBildInfo? _stBild;
 
     private bool _isPackaged;
@@ -92,7 +92,7 @@
         if (firstRender)
         {
             var response = await StBildService.GetStBildAsync(StbildId);
-            _stBild = _responseHandler.CheckResponse(response) ?? this._stBild;
+            _stBild = _responseHandler.CheckResponse(response) ?? _stBild;
 
             if (_stBild is not null)
                 _isPackaged = _stBild.IsUsed;

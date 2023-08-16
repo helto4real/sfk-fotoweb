@@ -16,14 +16,14 @@
         @if (!_emailConfirmed)
         {
             <MudContainer>
-                <MudAlert Severity="Severity.Warning">
+                <AppAlert Severity="Severity.Warning">
                     <h5>Bekräfta din e-postadress!</h5>
                     <p >
                         Du har inte bekräftat din e-postadress (@_email). Klicka på länken i det e-postmeddelande du fick när du registrerade.
                         Det är viktigt att du konfirmerar din e-post adress så vi vet att vi har rätt kontaktuppgifter till dig. Kontakta
                         administratören om du inte fått något e-postmeddelande eller om din e-post inte är rätt.
                     </p>
-                </MudAlert>
+                </AppAlert>
             </MudContainer>
         }
     </Container>

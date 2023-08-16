@@ -1,57 +1,56 @@
 ﻿@page "/admin/members/manage"
 
 @layout MainLayout
-@using Foto.WebServer.Services
 @using Foto.WebServer.Dto
+@using Foto.WebServer.Services
 @using Microsoft.AspNetCore.Authorization
 @inherits AuthorizedBasePage
 @inject IMemberService MemberService;
 @attribute [Authorize(Roles = "Admin")]
 
-<div class="container d-flex flex-column justify-content-center align-items-center mb-3">
-    <div class="row row-cols-auto align-items-center">
-        <h2>Hantera medlemmar</h2>
-    </div>
-</div>
+<PageTitle>Hantera medlemmar</PageTitle>
 
-<div class="container">
-    <div class="row g-3 mb-5 justify-content-center align-items-center">
-        <div class="col col-8" style="max-width: 550px;">
-            <table class="table table-striped table-bordered table-hover">
-                <thead>
-                <tr>
-                    <th scope="col">Namn</th>
-                    <th scope="col">E-post</th>
-                    <th scope="col">
-                        <NavLink href="/admin/members/register">
-                            <button type="button" class="btn btn btn-primary">Lägg till</button>
-                        </NavLink>
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach (var member in _members)
-                {
-                    <tr >
-                        <td>@($"{member.FirstName} {member.LastName}")</td>
-                        <td>@member.Email</td>
-                        <td><NavLink href="@GetMemberEditLink(member.Id)"><span>Redigera</span></NavLink></td>
-                    </tr>
-                }
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
+<AppContent ContentMaxWidth="MaxWidth.Small" ContentClass="d-flex flex-column justify-content-center align-items-center mt-5">
+    <Title>Hantera medlemmar</Title>
+    <Ingress>Hanterar medlemsinformation</Ingress>
+    <Container>
+        <MudTable Filter="new Func<MemberInfo, bool>(FilterFunc)" Hover="true" Items="@_members">
+            <ToolBarContent>
+                <MudTextField Immediate="true" @bind-Value="_searchString" Placeholder="Sök" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Namn</MudTh>
+                <MudTh>E-post</MudTh>
+                <MudTh>Redigera</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Namn">
+                    <MudText>@($"{context.FirstName} {context.LastName}")</MudText>
+                </MudTd>
+                <MudTd DataLabel="E-post">
+                    <MudText>@context.Email</MudText>
+                </MudTd>
+                <MudTd DataLabel="Bild">
+                    <MudButton Href="@GetMemberEditLink(context.Id)" Variant="Variant.Text" Color="Color.Primary">Redigera</MudButton>
+                </MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager RowsPerPageString="Visa:" PageSizeOptions="new[] { 10, 25, 50, 100, int.MaxValue }" HorizontalAlignment="HorizontalAlignment.Left" HidePageNumber="true" HidePagination="false" HideRowsPerPage="false"/>
+            </PagerContent>
+        </MudTable>
+        <MudButton Class="mr-auto" Href="@("/admin/members/register")" Variant="@Variant.Text" Color="Color.Primary">Registrera ny medlem</MudButton>
+    </Container>
+</AppContent>
 
 @if (_responseHandler.HasAlert)
 {
-    <div class="alert alert-danger">@_responseHandler.Message</div>
+    <AppAlert Severity="Severity.Error">@_responseHandler.Message</AppAlert>
 }
 
 @code {
     private List<MemberInfo> _members = new();
     private readonly ResponseHandler _responseHandler = new();
+    private string _searchString = "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -63,8 +62,20 @@
         }
     }
 
+    private bool FilterFunc(MemberInfo element)
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+        if (element.FirstName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.LastName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
     string GetMemberEditLink(Guid id)
     {
         return $"/admin/members/register/{id}";
     }
+
 }

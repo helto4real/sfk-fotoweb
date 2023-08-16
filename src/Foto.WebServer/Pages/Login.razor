@@ -1,9 +1,9 @@
 @page "/login"
 @using FluentValidation
-@using Foto.WebServer.Dto
-@using Foto.WebServer.Services
 @using MudBlazor.Services
 @using Severity = MudBlazor.Severity
+@using Foto.WebServer.Services
+@using Foto.WebServer.Dto
 @inject ISignInService SignInService
 @inject IUserService UserService
 @inject NavigationManager NavigationManager
@@ -32,12 +32,12 @@
                 </MudButton>
             </Form>
             <Actions >
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="m-0 mx-auto" OnClick="@(async () => await Submit())">Logga in</MudButton>
+                <MudButton Variant="Variant.Text" Color="Color.Primary" Class="m-0 mx-auto" OnClick="@(async () => await Submit())">Logga in</MudButton>
             </Actions>
         </AppForm>
         @if (ErrorMessage is not null)
         {
-            <MudAlert Class="mt-3" Severity="Severity.Error">@ErrorMessage</MudAlert>
+            <AppAlert Class="mt-3" Severity="Severity.Error">@ErrorMessage</AppAlert>
         }
         <MudText Align="Align.Center" Typo="Typo.body1" Class="mt-6">
             Logga in med Google
@@ -61,7 +61,7 @@
                 </AppForm>
                 @if (EmailResetMessage is not null)
                 {
-                    <MudAlert Class="mt-3" Severity="Severity.Success">@EmailResetMessage</MudAlert>
+                    <AppAlert Class="mt-3" Severity="Severity.Success">@EmailResetMessage</AppAlert>
                 }
             </DialogContent>
             <DialogActions>
@@ -74,17 +74,17 @@
 </AppContent>
 
 @code {
-    private LoginFormValidator _validator = new();
-    private EmailModelValidator _emailValidator = new();
-    private LoginModel model = new();
-    private EmailModel emailModel = new();
+    private readonly LoginFormValidator _validator = new();
+    private readonly EmailModelValidator _emailValidator = new();
+    private readonly LoginModel model = new();
+    private readonly EmailModel emailModel = new();
     private string? ErrorMessage { get; set; }
     public string? EmailResetMessage { get; set; }
     private bool _showPasswordReset;
     private IKeyInterceptor keyInterceptor;
 
 
-    private DialogOptions dialogOptions = new()
+    private readonly DialogOptions dialogOptions = new()
     {
         FullWidth = true,
         CloseOnEscapeKey = true,
@@ -140,7 +140,7 @@
 
     private async Task Submit()
     {
-        var (user, error) = await SignInService.LoginAsync(new LoginUserInfo() { UserName = model.UserName!, Password = model.Password });
+        var (user, error) = await SignInService.LoginAsync(new LoginUserInfo { UserName = model.UserName!, Password = model.Password });
     // var (user, error) = await AuthService.LoginAsync(new LoginUserInfo(){UserName = model.UserName!, Password = model.Password!});
 
         if (user is null)

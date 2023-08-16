@@ -2,19 +2,23 @@
 <AppImageCard
     Image="@($"/api/images/image/{StBild.ImageReference}?thumb")"
     FullImage="@($"/api/images/image/{StBild.ImageReference}")"
-    MaxWidth="200"
-    Height="133"
+    MaxWidth="@MaxWidth"
+    Height="@Height"
     Title="@StBild.Title"
+    HideActions="@HideActions"
     Description="@StBild.Description">
     <Actions>
-        <MudPaper Class="d-flex justify-space-between  flex-grow-1 " Elevation="0">
-            <MudTooltip Placement="Placement.Bottom" Inline="true" Text="@EditOrViewToolTip">
-                <MudIconButton Href="@($"/st-bild/edit/{StBild.Id}")" Icon="@EditOrViewIcon" Color="Color.Inherit"/>
-            </MudTooltip>
-            <MudTooltip  Placement="Placement.Bottom" Inline="true" Text="@StatusToolTip">
-                <MudIconButton  Class="disable-hover" DisableElevation="true" DisableRipple="true"  Icon="@StatusIcon" Color="@StatusColor"/>
-            </MudTooltip>
-        </MudPaper>
+        @if (!HideActions)
+        {
+            <MudPaper Class="d-flex justify-space-between  flex-grow-1 " Elevation="0">
+                <MudTooltip Placement="Placement.Bottom" Inline="true" Text="@EditOrViewToolTip">
+                    <MudIconButton Href="@($"/st-bild/edit/{StBild.Id}")" Icon="@EditOrViewIcon" Color="Color.Inherit"/>
+                </MudTooltip>
+                <MudTooltip Placement="Placement.Bottom" Inline="true" Text="@StatusToolTip">
+                    <MudIconButton Class="disable-hover" DisableElevation="true" DisableRipple="true" Icon="@StatusIcon" Color="@StatusColor"/>
+                </MudTooltip>
+            </MudPaper>
+        }
     </Actions>
 </AppImageCard>
 
@@ -22,6 +26,15 @@
 
     [Parameter]
     public StBildInfo StBild { get; set; } = default!;
+
+    [Parameter]
+    public int MaxWidth { get; set; } = 230;
+
+    [Parameter]
+    public int Height { get; set; } = 153;
+
+    [Parameter]
+    public bool HideActions { get; set; } = false;
 
     private bool CanEdit => GetStatus() is StImageStatus.Uploaded or StImageStatus.Rejected;
 
@@ -31,7 +44,7 @@
         if (StBild.IsUsed) return StImageStatus.Sent;
         return StBild.IsAccepted ? StImageStatus.Approved : StImageStatus.Uploaded;
     }
-    
+
     public string StatusIcon => GetStatus() switch
     {
         StImageStatus.Uploaded => Icons.Material.Filled.ImageSearch,
@@ -58,10 +71,10 @@
         StImageStatus.Sent => "Status: Skickad till ST",
         _ => throw new ArgumentOutOfRangeException()
         };
-    
-    public string EditOrViewIcon => CanEdit ? Icons.Material.Filled.Edit : Icons.Material.Filled.Visibility;  
+
+    public string EditOrViewIcon => CanEdit ? Icons.Material.Filled.Edit : Icons.Material.Filled.Visibility;
     public string EditOrViewToolTip => CanEdit ? "Redigera ST-bild" : "Visa ST-bild";
-    
+
     public enum StImageStatus
     {
         Uploaded,

@@ -11,7 +11,6 @@ public class AppSnackBar(ISnackbar snackbar)
             c.VisibleStateDuration = 5000;
             c.SnackbarVariant = Variant.Filled;
             c.ShowCloseIcon = true;
-            c.CloseAfterNavigation = true;
         });
     }
 }

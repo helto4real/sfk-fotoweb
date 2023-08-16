@@ -20,8 +20,8 @@ public class FakeSignInService : ISignInService
         return Task.FromResult(false);
     }
 
-    public Task LoginAsync(LoginUserInfo loginUserInfo)
+    public Task<(AccountInfo?, ErrorDetail?)> LoginAsync(LoginUserInfo loginUserInfo)
     {
-        return Task.CompletedTask;
+        return Task.FromResult<(AccountInfo?, ErrorDetail?)>((null, null));
     }
 }

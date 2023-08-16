@@ -7,7 +7,7 @@
             <MudText Class="text-overflow-ellipsis" Typo="Typo.body1">@Title</MudText>
             <MudText Class="text-overflow-ellipsis" Style="color: var(--mud-palette-lines-inputs);" Typo="Typo.body2">@Description</MudText>
         </MudCardContent>
-        @if (Actions is not null)
+        @if (Actions is not null && !HideActions)
         {
             <MudCardActions Style="@BorderStyle">
                 @Actions
@@ -56,6 +56,9 @@
     public string Description { get; set; } = default!;
 
     [Parameter]
+    public bool HideActions { get; set; } = false;
+    
+    [Parameter]
     public RenderFragment? Actions { get; set; }
 
     private void ShowFullImage()
@@ -63,5 +66,4 @@
         _imageVisible = true;
         StateHasChanged();
     }
-
 }

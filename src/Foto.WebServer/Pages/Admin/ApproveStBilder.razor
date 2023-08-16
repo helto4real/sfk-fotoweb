@@ -36,16 +36,16 @@
         }
         else
         {
-            <MudAlert Severity="Severity.Info">
+            <AppAlert Severity="Severity.Info">
                 Det finns inga nya bilder att godkänna!
-            </MudAlert>
+            </AppAlert>
         }
     </Container>
 </AppContent>
 
 @code {
     private List<StBildInfo> _stBilder = new();
-    private bool ShowPackagedImages { get; set; } = false;
+    private bool ShowPackagedImages { get; } = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -62,8 +62,19 @@
         _stBilder = await StBildService.GetStBilder(ShowPackagedImages);
     }
 
-    public string GetIconForStatus(StBildInfo stBildInfo) => stBildInfo.IsAccepted ? Icons.Material.Filled.Check : Icons.Material.Filled.ImageSearch;
-    public Color GetColorForStatus(StBildInfo stBildInfo) => stBildInfo.IsAccepted ? Color.Success : Color.Inherit;
-    public string GetTooltipForStatus(StBildInfo stBildInfo) => stBildInfo.IsAccepted ? "Godkänd" : "Skall granskas";
+    public string GetIconForStatus(StBildInfo stBildInfo)
+    {
+        return stBildInfo.IsAccepted ? Icons.Material.Filled.Check : Icons.Material.Filled.ImageSearch;
+    }
+
+    public Color GetColorForStatus(StBildInfo stBildInfo)
+    {
+        return stBildInfo.IsAccepted ? Color.Success : Color.Inherit;
+    }
+
+    public string GetTooltipForStatus(StBildInfo stBildInfo)
+    {
+        return stBildInfo.IsAccepted ? "Godkänd" : "Skall granskas";
+    }
 
 }
