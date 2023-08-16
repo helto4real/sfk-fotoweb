@@ -6,6 +6,7 @@
 @inherits AuthorizedBasePage
 @inject IStBildService StBildService
 @inject IAuthService AuthService
+@inject AppSnackBar AppSnackBar
 
 <!--suppress CssUnresolvedCustomProperty -->
 
@@ -73,9 +74,12 @@
                                   Label="När bilden tagen:"/>
 
                 </Form>
-                <Actions >
-                    <MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.Save" Color="Color.Primary" Disabled="@(!IsValid || _isDisabled || _isReadOnly)" Class="ml-auto mr-2" OnClick="@(async () => await HandleValidSubmit())">Spara</MudButton>
-                    <MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Surface" Disabled="@(_showProgressBar || _isDisabled)" Class="mr-auto ml-2" OnClick="OnCancel">Avbryt</MudButton>
+                <Actions>
+                    <MudContainer Class="d-flex">
+                    <MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.Save" Color="Color.Primary" Disabled="@(!IsValid || _isDisabled || _isReadOnly)" Class="" OnClick="@(async () => await HandleValidSubmit())">Spara</MudButton>
+                    <MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Surface" Disabled="@(_showProgressBar || _isDisabled)" Class="" OnClick="OnCancel">Avbryt</MudButton>
+                    <MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" Disabled="@(!IsValid || _isDisabled || _isReadOnly)" Class="ml-auto" OnClick="@(async () => await HandleDeleteStBild())">Radera</MudButton>
+                    </MudContainer>
                 </Actions>
             </AppForm>
         }
@@ -117,6 +121,19 @@
         await base.OnAfterRenderAsync(firstRender);
     }
 
+    private async Task HandleDeleteStBild()
+    {
+        if (_stBild is not null)
+        {
+            var response = await StBildService.DeleteStBildAsync(_stBild.Id);
+            if (_responseHandler.CheckResponse(response))
+            {
+                AppSnackBar.Alert("ST-bild borttagen.", Severity.Success);
+                NavigationManager?.NavigateTo("/st-bild/list");
+            }
+        }
+    }
+    
     private async Task HandleValidSubmit()
     {
         if (_stBild is not null && _form is not null)
@@ -172,5 +189,6 @@
     {
         NavigationManager?.NavigateTo("/st-bild/list");
     }
+
 
 }

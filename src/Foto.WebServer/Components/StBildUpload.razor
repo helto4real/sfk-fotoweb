@@ -14,7 +14,8 @@
     <Form>
         <AppTextField @bind-Value="@_model.Title"
                       For="@(() => _model.Title)"
-                      Label="Rubrik (Rubrikförslag, lämpligen tre, fyra ord)"/>
+                      Label="Rubrik"
+                      HelperText="Rubrikförslag, lämpligen tre, fyra ord"/>
 
         <AppTextField @bind-Value="@_model.Name"
                       For="@(() => _model.Name)"
@@ -51,7 +52,7 @@
                     <ButtonTemplate>
                         <MudButton HtmlTag="label"
                                    Variant="Variant.Text"
-                                   Color="Color.Surface"
+                                   Color="Color.Primary"
                                    Class="my-3 mr-2"
                                    StartIcon="@Icons.Material.Filled.Image"
                                    for="@context">

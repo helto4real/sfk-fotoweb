@@ -120,4 +120,11 @@ public class StBildService : ServiceBase, IStBildService
         var result = await HandleResponse(response);
         return result;
     }
+
+    public async Task<ErrorDetail?> DeleteStBildAsync(Guid stBildId)
+    {
+        var response = await _signInService.RefreshTokenOnExpired(async () =>
+            await _httpClient.DeleteAsync($"/api/stbilder/{stBildId}"));
+        return await HandleResponse(response);
+    }
 }
