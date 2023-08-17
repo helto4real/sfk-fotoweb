@@ -78,7 +78,7 @@ internal class FotoApplication : WebApplicationFactory<Program>
 
         // We need to configure signing keys for CI scenarios where
         // there's no user-jwts tool
-        var keyBytes = new byte[32];
+        var keyBytes = new byte[48];
         RandomNumberGenerator.Fill(keyBytes);
         var base64Key = Convert.ToBase64String(keyBytes);
 
