@@ -32,7 +32,7 @@ public static class AdminApi
             return TypedResults.Ok(response);
         });
         
-        group.MapDelete("token/{id}", async Task<Results<Ok, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
+        group.MapDelete("token/{id:guid}", async Task<Results<Ok, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
             (Guid id, DeleteTokenFromIdHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
             await pipe.Pipe(id, handler.Handle, ct);

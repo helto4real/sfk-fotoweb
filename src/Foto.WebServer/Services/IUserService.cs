@@ -9,7 +9,6 @@ public interface IUserService
     Task<ErrorDetail?> UpdateUserAsync(UserInfo user);
     Task<ErrorDetail?> DeleteUserAsync(string username);
     Task<(IEnumerable<User>?, ErrorDetail?)> GetAllUsers();
-    Task<(User?, ErrorDetail?)> CreateUserAsync(NewUserInfo user);
     Task<(User?, ErrorDetail?)> PreCreateUserAsync(string? email);
     Task<ErrorDetail?> ConfirmEmailAsync(string token);
     Task<ErrorDetail?> ChangeLoginInfoAsync(UpdateLoginInfo loginInfo);

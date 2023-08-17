@@ -3,7 +3,7 @@
 @using Foto.WebServer.Services
 @using Microsoft.AspNetCore.Authorization
 @inherits AuthorizedBasePage
-@attribute [Authorize(Policy = "StBildAdministratiorPolicy")]
+@attribute [Authorize(Policy = "StBildAdministratorPolicy")]
 @inject IStBildService StBildService
 
 <PageTitle>Godkänn ST-bilder</PageTitle>
@@ -45,7 +45,7 @@
 
 @code {
     private List<StBildInfo> _stBilder = new();
-    private bool ShowPackagedImages { get; } = false;
+    private bool ShowPackagedImages => false; // Fix later when supporting show packaged images
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

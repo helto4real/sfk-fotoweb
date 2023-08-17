@@ -34,7 +34,7 @@
     public int Height { get; set; } = 153;
 
     [Parameter]
-    public bool HideActions { get; set; } = false;
+    public bool HideActions { get; set; }
 
     private bool CanEdit => GetStatus() is StImageStatus.Uploaded or StImageStatus.Rejected;
 

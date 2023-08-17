@@ -25,7 +25,7 @@ public class AuthorizedHttpClientHandler(IAuthService authService, IHttpContextA
 
         if (refreshToken is null)
         {
-            logger.LogError("Refreshtoken could not be found in cookie!");
+            logger.LogError("Refresh token could not be found in cookie!");
             return null; // Cookie is not present, weird!
         }
         
@@ -33,11 +33,6 @@ public class AuthorizedHttpClientHandler(IAuthService authService, IHttpContextA
         var (accessToken, _) =
             authService.GetAccessTokenFromRefreshToken(refreshToken, authResult.Principal!.Identity!.Name!);
        
-        if (accessToken is not null)
-        {
-            return new AuthenticationHeaderValue("Bearer", accessToken);
-        }
-            
-        return null; //Fail authorize the user
+        return accessToken is not null ? new AuthenticationHeaderValue("Bearer", accessToken) : null; //Fail authorize the user
     }
 }

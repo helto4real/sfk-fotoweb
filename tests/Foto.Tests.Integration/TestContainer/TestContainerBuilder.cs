@@ -24,7 +24,7 @@ public class TestContainerBuilder : ContainerBuilder<TestContainerBuilder, TestC
     public string UserName => DefaultUsername;
     public string Password => DefaultPassword;
 
-    protected override TestContainerBuilder Init() =>
+    protected sealed override TestContainerBuilder Init() =>
         base.Init()
             .WithImage($"postgres:{DefaultVersion}")
             .WithPortBinding(5432, true)

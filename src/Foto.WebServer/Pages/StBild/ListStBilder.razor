@@ -23,7 +23,7 @@
         }
         else
         {
-            <AppAlert Severity="Severity.Warning" Variant="Variant.Text">
+            <AppAlert Severity="Severity.Warning">
                 <p >
                     Inga ST bilder uppladdade att visa. Ladda upp en bild genom att klicka på "Ladda upp ST-bild" i menyn.
                 </p>
@@ -56,17 +56,6 @@
     {
         ShowPackagedImages = Convert.ToBoolean(e.Value);
         return PopulateStBilderList();
-    }
-
-    private string GetEditLink(Guid imageId)
-    {
-        return $"/st-bild/edit/{imageId}";
-    }
-
-    private string GetImageStatus(StBildInfo stBild)
-    {
-        if (stBild.IsUsed) return "Skickad";
-        return stBild.IsAccepted ? "Godkänd" : "Hanteras";
     }
 
 }

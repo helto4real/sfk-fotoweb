@@ -11,11 +11,9 @@ public class UserDeletedStBilderNotificationHandler(PhotoServiceDbContext db,
     public Task Handle(UserDeletedNotification notification, CancellationToken cancellationToken)
     {
         var userImages = db.StBilder.Where(i => i.OwnerReference == notification.UserName);
-        if (userImages.Any())
-        {
-            logger.LogInformation($"Removing {userImages.Count()} StBilder belonging to user {notification.UserName}");
-            db.StBilder.RemoveRange(userImages);
-        }
+        if (!userImages.Any()) return Task.CompletedTask;
+        logger.LogInformation($"Removing {userImages.Count()} StBilder belonging to user {notification.UserName}");
+        db.StBilder.RemoveRange(userImages);
 
         return Task.CompletedTask;
     }

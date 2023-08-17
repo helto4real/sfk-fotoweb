@@ -17,7 +17,7 @@
         <div class="col col-4">
             @if (_loginInfo is not null)
             {
-                <CvEditForm id="uploadForm" Model="_loginInfo" class="form" OnValidSubmit="@HandleValidSubmit" Context="NewContext">
+                <CvEditForm id="uploadForm" Model="_loginInfo" class="form" OnValidSubmit="@HandleValidSubmit" Context="newContext">
                     <div class="form-group mt-1">
                         <span for="current-username" class="">Användarnamn:</span>
                         <input id="current-username" type="text" class="form-control app-input-wide" value="@_loginInfo.CurrentUserName" disabled readonly/>
@@ -73,7 +73,7 @@
 }
 
 @code {
-    private readonly ResponseHandler _responseHandler = new ResponseHandler();
+    private readonly ResponseHandler _responseHandler = new();
     private UpdateLoginInfo? _loginInfo;
     private UserInfo? _user;
     private bool _isExternal;
@@ -89,7 +89,7 @@
 
             if (_user is not null)
             {
-                _loginInfo = new UpdateLoginInfo()
+                _loginInfo = new UpdateLoginInfo
                 {
                     CurrentUserName = _user.Username,
                     CurrentEmail = _user.Email

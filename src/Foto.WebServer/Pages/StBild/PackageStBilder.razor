@@ -1,6 +1,6 @@
 ﻿@page "/admin/st-bild/paketera"
 @inherits AuthorizedBasePage
-@attribute [Authorize(Policy = "StBildAdministratiorPolicy")]
+@attribute [Authorize(Policy = "StBildAdministratorPolicy")]
 @inject IStBildService StBildService
 @inject INotificationService<int> PackageNotifications
 @inject AppSnackBar AppSnackBar
@@ -73,13 +73,16 @@
         if (progress == 100)
         {
             AppSnackBar.Alert("Paketering lyckades", Severity.Success);
-            _ = new Timer(async state =>
+
+            async void OnPackageReady(object? _)
             {
                 Progress = -1;
                 _stBilder = await StBildService.GetApprovedNotPackagedStBilderAsync();
                 CanPackage = _stBilder.Any();
                 await InvokeAsync(StateHasChanged);
-            }, null, TimeSpan.FromSeconds(5), Timeout.InfiniteTimeSpan);
+            }
+
+            _ = new Timer(OnPackageReady, null, TimeSpan.FromSeconds(5), Timeout.InfiniteTimeSpan);
         }
         Progress = progress;
         await InvokeAsync(StateHasChanged);
@@ -89,8 +92,7 @@
     {
         CanPackage = false;
         StateHasChanged();
-        if (_stBilder is not null)
-            await StBildService.PackageStBilder(new GuidIds { Ids = _stBilder.Select(e => e.Id).ToList() });
+        await StBildService.PackageStBilder(new GuidIds { Ids = _stBilder.Select(e => e.Id).ToList() });
     }
 
     public async ValueTask DisposeAsync()

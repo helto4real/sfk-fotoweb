@@ -66,14 +66,11 @@
     {
         if (string.IsNullOrWhiteSpace(_searchString))
             return true;
-        if (element.FirstName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.LastName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        return false;
+        return element.FirstName.Contains(_searchString, StringComparison.OrdinalIgnoreCase) || 
+               element.LastName.Contains(_searchString, StringComparison.OrdinalIgnoreCase);
     }
 
-    string GetMemberEditLink(Guid id)
+    private static string GetMemberEditLink(Guid id)
     {
         return $"/admin/members/register/{id}";
     }

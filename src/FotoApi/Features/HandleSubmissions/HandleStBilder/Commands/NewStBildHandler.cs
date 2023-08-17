@@ -12,10 +12,9 @@ public class NewStBildHandler(PhotoServiceDbContext db) : IHandler<NewStBildRequ
     {
         var stBild = _responseMapper.ToStBild(request);
         await db.StBilder.AddAsync(
-            stBild
-        );
+            stBild, ct);
 
-        await db.SaveChangesAsync();
+        await db.SaveChangesAsync(ct);
 
         return new IdentityResponse(stBild.Id);
     }

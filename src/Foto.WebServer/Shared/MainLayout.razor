@@ -41,7 +41,7 @@
     </MudDrawer>
     <MudMainContent >
         <MudToolBar DisableGutters="true" Style="position: fixed;">
-            <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" OnClick="@((e) => DrawerToggle())" Class="ml-3" />
+            <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" OnClick="@(() => DrawerToggle())" Class="ml-3" />
         </MudToolBar>
         <MudContainer Style="margin-top: 15px"  MaxWidth="MaxWidth.Large">
             @Body
@@ -66,7 +66,7 @@
 {
     bool _drawerOpen = true;
     bool _isDarkMode;
-    string? _userImageUrl = null;
+    string? _userImageUrl;
     private bool _userAuthenticated;
 
     string ModeButtonIcon => _isDarkMode ? Icons.Material.Filled.WbSunny : Icons.Material.Filled.Brightness2;
@@ -117,7 +117,7 @@
         {
             var shouldRefresh = false;
 
-            if (HttpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false)
+            if (HttpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false)
             {
                 _userImageUrl = IAuthService.GetImageUrlFromClaim(HttpContextAccessor.HttpContext.User);
                 _userAuthenticated = true;

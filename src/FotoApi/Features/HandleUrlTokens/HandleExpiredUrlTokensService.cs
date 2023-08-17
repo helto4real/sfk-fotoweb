@@ -2,9 +2,7 @@
 
 namespace FotoApi.Features.HandleUrlTokens;
 
-public interface IHandleExpiredUrlTokensService : IHostedService
-{
-};
+public interface IHandleExpiredUrlTokensService : IHostedService;
 public class HandleExpiredUrlTokensService : IHandleExpiredUrlTokensService
 {
     // Remove expired tokens every 5 minutes

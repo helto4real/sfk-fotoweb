@@ -24,7 +24,7 @@ public class LoginExternalUserHandler(UserManager<User> userManager,
         {
             // We only create a new user if the token is valid
             if (!await db.UrlTokens.AnyAsync(e =>
-                    e.Token == command.UrlToken && e.UrlTokenType == UrlTokenType.AllowAddUser))
+                    e.Token == command.UrlToken && e.UrlTokenType == UrlTokenType.AllowAddUser, cancellationToken: ct))
                 throw new UrlTokenNotFoundException(command.UrlToken);
 
             // Check if user has been pre-registered
@@ -41,30 +41,28 @@ public class LoginExternalUserHandler(UserManager<User> userManager,
             if (result.Succeeded)
                 loginUser.EmailConfirmed = true; // We always set this since it is external user
         }
-        
-        if (result.Succeeded)
-        {
-            var (refreshToken, expireTime) = tokenService.GenerateRefreshToken();
-            
-            loginUser.RefreshToken = refreshToken;
-            loginUser.RefreshTokenExpirationDate = expireTime;
-            
-            await userManager.UpdateAsync(loginUser);
 
-            var userRoles = (await userManager.GetRolesAsync(loginUser)).AsReadOnly();
+        if (!result.Succeeded) throw new UserException(result.Errors.Select(e => e.Description));
+        
+        var (refreshToken, expireTime) = tokenService.GenerateRefreshToken();
             
-            return (new UserAuthorizedResponse
-            {
-                UserName = command.UserName,
-                FirstName = "FirstName",
-                LastName = "LastName",
-                Email = loginUser.Email!,
-                Token = tokenService.GenerateToken(loginUser.UserName!, userRoles),
-                RefreshToken = refreshToken,
-                RefreshTokenExpiration = expireTime,
-                Roles = userRoles
-            });
-        }
-        throw new UserException(result.Errors.Select(e => e.Description));
+        loginUser.RefreshToken = refreshToken;
+        loginUser.RefreshTokenExpirationDate = expireTime;
+            
+        await userManager.UpdateAsync(loginUser);
+
+        var userRoles = (await userManager.GetRolesAsync(loginUser)).AsReadOnly();
+            
+        return new UserAuthorizedResponse
+        {
+            UserName = command.UserName,
+            FirstName = "FirstName",
+            LastName = "LastName",
+            Email = loginUser.Email!,
+            Token = tokenService.GenerateToken(loginUser.UserName!, userRoles),
+            RefreshToken = refreshToken,
+            RefreshTokenExpiration = expireTime,
+            Roles = userRoles
+        };
     }
 }

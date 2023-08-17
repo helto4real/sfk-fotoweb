@@ -35,7 +35,7 @@
             DisableBackdropClick = false
         };
 
-    public string BorderStyle => $"border-top-width: thin; border-top-color: var(--mud-palette-action-disabled-background)";
+    private static string BorderStyle => "border-top-width: thin; border-top-color: var(--mud-palette-action-disabled-background)";
 
     [Parameter]
     public int MaxWidth { get; set; } = 250;
@@ -56,7 +56,7 @@
     public string Description { get; set; } = default!;
 
     [Parameter]
-    public bool HideActions { get; set; } = false;
+    public bool HideActions { get; set; }
     
     [Parameter]
     public RenderFragment? Actions { get; set; }

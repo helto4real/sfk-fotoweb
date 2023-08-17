@@ -25,7 +25,7 @@ internal class FotoApplication : WebApplicationFactory<Program>
     private readonly string _photoAppConnectionString;
     private readonly string _messagingConnectionString;
     private readonly EnvironmentConfigManager _environmentConfigManager;
-    public FakePhotostore PhotoStoreMock { get; } = new();
+    public FakePhotoStore PhotoStoreMock { get; } = new();
     public Mock<IMailSender> MailSenderMock => new();
     public Mock<IMailQueue> MailQueue => new();
     
@@ -68,9 +68,9 @@ internal class FotoApplication : WebApplicationFactory<Program>
                 o.Password.RequireLowercase = false;
                 o.Password.RequireUppercase = false;
             });
-            services.AddSingleton<IMailSender>(s => MailSenderMock.Object);
-            services.AddScoped<IPhotoStore>(n => PhotoStoreMock.Object);
-            services.AddSingleton<IMailQueue>(s => MailQueue.Object);
+            services.AddSingleton<IMailSender>(_ => MailSenderMock.Object);
+            services.AddScoped<IPhotoStore>(_ => PhotoStoreMock.Object);
+            services.AddSingleton<IMailQueue>(_ => MailQueue.Object);
             // Just not start the services by replacing them with a do nothing service
             services.AddSingleton<IMailSenderService, DoNothingService>();
             services.AddSingleton<IHandleExpiredUrlTokensService, DoNothingService>();

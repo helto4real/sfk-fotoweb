@@ -2,12 +2,4 @@
 
 namespace Foto.WebServer.Shared;
 
-public class CvEditForm : EditForm
-{
-    protected override void OnParametersSet()
-    {
-        base.OnParametersSet(); // This is important!   
-        // EditContext?.SetFieldCssClassProvider(new BootstrapValidationFieldClassProvider());
-        
-    }
-}
+public class CvEditForm : EditForm;

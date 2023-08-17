@@ -3,9 +3,9 @@
 @using Foto.WebServer.Services
 @using Microsoft.AspNetCore.Authorization
 @inherits AuthorizedBasePage
-@attribute [Authorize(Policy = "StBildAdministratiorPolicy")]
+@attribute [Authorize(Policy = "StBildAdministratorPolicy")]
 @inject IStBildService StBildService
-
+@inject AppSnackBar AppSnackBar
 
 <PageTitle>@PageTitle</PageTitle>
 <AppContent ContentMaxWidth="MaxWidth.Small">
@@ -110,6 +110,7 @@
     {
         if (_stBild is not null)
             await StBildService.SetAcceptStatusForStBild(_stBild.Id, true);
+        AppSnackBar.Alert("Bild godkänd.", Severity.Success);
         NavigateBack();
     }
 
@@ -118,15 +119,13 @@
         if (_stBild is not null)
             await StBildService.SetAcceptStatusForStBild(_stBild.Id, false);
 
+        AppSnackBar.Alert("Bild avvisad.", Severity.Success);
         NavigateBack();
     }
 
     private void NavigateBack()
     {
-        if (IsFromAcceptList)
-            NavigationManager?.NavigateTo("/admin/st-bild/godkann");
-        else
-            NavigationManager?.NavigateTo("/admin/st-bild/hantera");
+        NavigationManager?.NavigateTo(IsFromAcceptList ? "/admin/st-bild/godkann" : "/admin/st-bild/hantera");
     }
 
 }

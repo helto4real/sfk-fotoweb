@@ -35,8 +35,8 @@ public static class AuthorizationHandlerExtensions
                       .AddRequirements(new CheckAdminUserRequirement());
     }
 
-    private class CheckCurrentUserRequirement : IAuthorizationRequirement { }
-    private class CheckAdminUserRequirement : IAuthorizationRequirement { }
+    private class CheckCurrentUserRequirement : IAuthorizationRequirement;
+    private class CheckAdminUserRequirement : IAuthorizationRequirement;
 
     // This authorization handler verifies that the user exists even if there's
     // a valid token
@@ -54,21 +54,15 @@ public static class AuthorizationHandlerExtensions
         }
     }    
     
-    private class CheckAdminUserAuthHandler : AuthorizationHandler<CheckAdminUserRequirement>
+    private class CheckAdminUserAuthHandler(CurrentUser currentUser) : AuthorizationHandler<CheckAdminUserRequirement>
     {
-        private readonly CurrentUser _currentUser;
-
-        public CheckAdminUserAuthHandler(CurrentUser currentUser)
-        {
-            this._currentUser = currentUser;
-        }
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, CheckAdminUserRequirement requirement)
         {
             
             // TODO: Check user if the user is locked out as well
-            if (_currentUser.User is null) return Task.CompletedTask;
+            if (currentUser.User is null) return Task.CompletedTask;
             
-            if (_currentUser.IsAdmin)
+            if (currentUser.IsAdmin)
                 context.Succeed(requirement);
             else
                 context.Fail();

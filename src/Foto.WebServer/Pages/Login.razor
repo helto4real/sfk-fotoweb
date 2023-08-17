@@ -1,6 +1,5 @@
 @page "/login"
 @using FluentValidation
-@using MudBlazor.Services
 @using Severity = MudBlazor.Severity
 @using Foto.WebServer.Services
 @using Foto.WebServer.Dto
@@ -16,18 +15,18 @@
     <Ingress>Här loggar du in på FotoWeb. Om din e-postadress som är registrerad hos oss är kopplad till ett Google konto kan du logga in med det genom att trycka på Google ikonen.</Ingress>
 
     <Container>
-        <AppForm Id="loginform" Model="@model" Validation="@(_validator.ValidateValue)" ValidationDelay="0">
+        <AppForm Id="loginform" Model="@_model" Validation="@(_validator.ValidateValue)" ValidationDelay="0">
             <Form>
-                <AppTextField @bind-Value="@model.UserName"
-                              For="@(() => model.UserName)"
+                <AppTextField @bind-Value="@_model.UserName"
+                              For="@(() => _model.UserName)"
                               Label="Användarnamn:"/>
 
-                <AppTextField @bind-Value="@model.Password"
-                              For="@(() => model.Password)"
+                <AppTextField @bind-Value="@_model.Password"
+                              For="@(() => _model.Password)"
                               InputType="InputType.Password"
                               Label="Lösenord:"/>
                 <MudButton Style="filter: invert(0.50)!important;" Size="Size.Small" ButtonType="ButtonType.Button" Variant="Variant.Text"
-                           OnClick="@(() => { EmailResetMessage = null; emailModel.Email = string.Empty; _showPasswordReset = true; })">
+                           OnClick="@(() => { EmailResetMessage = null; _emailModel.Email = string.Empty; _showPasswordReset = true; })">
                     Glömt lösenord?
                 </MudButton>
             </Form>
@@ -47,16 +46,16 @@
                 <MudIconButton Class="mt-3 mx-auto" Href="/api/auth/login/Google" Icon="@Icons.Custom.Brands.Google" Variant="Variant.Outlined" Color="Color.Primary" aria-label="github"></MudIconButton>
             </MudTooltip>
         </MudContainer>
-        <MudDialog @bind-IsVisible="_showPasswordReset" Options="dialogOptions">
+        <MudDialog @bind-IsVisible="_showPasswordReset" Options="_dialogOptions">
             <TitleContent>
                 <MudText Typo="Typo.h6">
                     <MudIcon Icon="@Icons.Material.Filled.Email" Class="mr-3"/> Skicka återställningslänk
                 </MudText>
             </TitleContent>
             <DialogContent>
-                <AppForm Model="@emailModel" Validation="@(_emailValidator.ValidateValue)" ValidationDelay="0">
+                <AppForm Model="@_emailModel" Validation="@(_emailValidator.ValidateValue)" ValidationDelay="0">
                     <Form>
-                        <AppTextField AutoFocus="true" @bind-Value="@emailModel.Email" For="@(() => emailModel.Email)" Label="E-post"/>
+                        <AppTextField AutoFocus="true" @bind-Value="@_emailModel.Email" For="@(() => _emailModel.Email)" Label="E-post"/>
                     </Form>
                 </AppForm>
                 @if (EmailResetMessage is not null)
@@ -76,15 +75,13 @@
 @code {
     private readonly LoginFormValidator _validator = new();
     private readonly EmailModelValidator _emailValidator = new();
-    private readonly LoginModel model = new();
-    private readonly EmailModel emailModel = new();
+    private readonly LoginModel _model = new();
+    private readonly EmailModel _emailModel = new();
     private string? ErrorMessage { get; set; }
     public string? EmailResetMessage { get; set; }
     private bool _showPasswordReset;
-    private IKeyInterceptor keyInterceptor;
 
-
-    private readonly DialogOptions dialogOptions = new()
+    private readonly DialogOptions _dialogOptions = new()
     {
         FullWidth = true,
         CloseOnEscapeKey = true,
@@ -93,14 +90,14 @@
 
     public record LoginModel
     {
-        public string UserName { get; set; }
-        public string Password { get; set; }
-        public string ConfirmPassword { get; set; }
+        public string UserName { get; set; } = default!;
+        public string Password { get; set; } = default!;
+        public string ConfirmPassword { get; set; } = default!;
     }
 
     public record EmailModel
     {
-        public string Email { get; set; }
+        public string Email { get; set; } = default!;
     }
 
     public class EmailModelValidator : ValidatorBase<EmailModel>
@@ -140,19 +137,13 @@
 
     private async Task Submit()
     {
-        var (user, error) = await SignInService.LoginAsync(new LoginUserInfo { UserName = model.UserName!, Password = model.Password });
+        var (user, error) = await SignInService.LoginAsync(new LoginUserInfo { UserName = _model.UserName, Password = _model.Password });
     // var (user, error) = await AuthService.LoginAsync(new LoginUserInfo(){UserName = model.UserName!, Password = model.Password!});
 
         if (user is null)
         {
-            if (error?.StatusCode == 401)
-            {
-                ErrorMessage = "Fel användarnamn eller lösenord.";
-            }
-            else
-            {
-                ErrorMessage = "Okänt fel, prova igen senare. Om fel kvarstår kontakta support.";
-            }
+            ErrorMessage = error?.StatusCode == 401 ? "Fel användarnamn eller lösenord." 
+                : "Okänt fel, prova igen senare. Om fel kvarstår kontakta support.";
             return;
         }
     // await SignInService.LoginAsync(new LoginUserInfo() { UserName = model.UserName!, Password = model.Password });
@@ -161,8 +152,8 @@
 
     private async Task SendPasswordResentMail()
     {
-        if (await _emailValidator.ValidateAsync(emailModel) is not { IsValid: true }) return;
-        await UserService.SendPasswordResetEmail(emailModel.Email);
+        if (await _emailValidator.ValidateAsync(_emailModel) is not { IsValid: true }) return;
+        await UserService.SendPasswordResetEmail(_emailModel.Email);
         EmailResetMessage = "Återställningslänk skickad till angiven e-postadress. Kontrollera din inkorg (även skräpkorgen).";
     }
 

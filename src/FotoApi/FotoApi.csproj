@@ -79,6 +79,8 @@
   
   <ItemGroup>
     <Compile Remove=".db\**" />
+    <Compile Remove="Abstractions\Messaging\IHttpRequest.cs" />
+    <Compile Remove="Infrastructure\Validation\ValidationBehaviour.cs" />
   </ItemGroup>
   
   <ItemGroup>

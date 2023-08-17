@@ -8,7 +8,7 @@ using FotoApi.Infrastructure.Security.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FotoApi;
+namespace FotoApi.Api;
 
 internal static class PhotoImagesApi
 {
@@ -65,11 +65,11 @@ internal static class PhotoImagesApi
             {
                 // The image always needs to contain metadata
                 if (!ctx.Request.Form.ContainsKey("title"))
-                    return TypedResults.BadRequest(new ErrorDetail(){Title = "Title is required", StatusCode = StatusCodes.Status400BadRequest});
+                    return TypedResults.BadRequest(new ErrorDetail {Title = "Title is required", StatusCode = StatusCodes.Status400BadRequest});
                 
-                string? metadataType = ctx.Request.Form.ContainsKey("metadataType")
+                var metadataType = ctx.Request.Form.ContainsKey("metadataType")
                     ? ctx.Request.Form["metadataType"].ToString() : null;
-                string? metadata = ctx.Request.Form.ContainsKey("metadata")
+                var metadata = ctx.Request.Form.ContainsKey("metadata")
                     ? ctx.Request.Form["metadata"].ToString()
                     : null;
                 

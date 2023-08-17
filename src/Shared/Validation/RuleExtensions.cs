@@ -1,9 +1,8 @@
 ﻿using FluentValidation;
-using FluentValidation.Validators;
 
 namespace Shared.Validation;
 
-public static class RuleExcentsions
+public static class RuleExtensions
 {
 //     public static IRuleBuilderOptions<T, string> Matches<T>(this IRuleBuilder<T, string> ruleBuilder,
 // #if NET7_0_OR_GREATER
@@ -32,7 +31,7 @@ public static class RuleExcentsions
             .MaximumLength(32)
             .MinimumLength(6)
             .WithMessage("Lösenordet måste vara mellan 6 och 32 tecken.")
-            .Matches("^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z])(?=.*[^a-zA-Z\\d]).*$")
+            .Matches(@"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z])(?=.*[^a-zA-Z\d]).*$")
             .WithMessage("Lösenordet måste innehålla små och stora bokstäver, siffror samt specialtecken.");
     }
 }

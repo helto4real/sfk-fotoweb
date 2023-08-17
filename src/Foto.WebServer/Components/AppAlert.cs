@@ -7,7 +7,7 @@ public class AppAlert : MudAlert
     public AppAlert()
     {
         ContentAlignment = HorizontalAlignment.Center;
-        Variant = Variant.Outlined;
+        Variant = Variant.Text;
     }
     
 }

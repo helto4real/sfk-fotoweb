@@ -5,16 +5,13 @@ namespace Foto.WebServer.Services;
 
 public class StBildService : ServiceBase, IStBildService
 {
-    private readonly IHttpContextAccessor _accessor;
-
     private readonly HttpClient _httpClient;
     private readonly ISignInService _signInService;
 
     public StBildService(HttpClient httpClient, IOptions<AppSettings> appSettings,
-        IHttpContextAccessor accessor, ISignInService signInService, ILogger<StBildService> logger) : base(logger)
+        ISignInService signInService, ILogger<StBildService> logger) : base(logger)
     {
         _httpClient = httpClient;
-        _accessor = accessor;
         _signInService = signInService;
         httpClient.BaseAddress = new Uri(appSettings.Value.FotoApiUrl);
         httpClient.DefaultRequestHeaders.Add("User-Agent", "FotoWebbServer");
@@ -38,39 +35,32 @@ public class StBildService : ServiceBase, IStBildService
     {
         stBild.Time = stBild.Time.ToUniversalTime();
         await _signInService.RefreshTokenOnExpired(async () =>
-            await _httpClient.PutAsJsonAsync($"/api/stbilder/{stBild.Id}", stBild));
+            await _httpClient.PutAsJsonAsync($"/api/stbilder", stBild));
     }
 
     public async Task<List<StBildInfo>> GetStBilderForCurrentUser(bool showPackagedImages)
     {
         var response = await _signInService.RefreshTokenOnExpired(async () =>
             await _httpClient.GetAsync($"/api/stbilder/user/{showPackagedImages}"));
-        if (response.IsSuccessStatusCode)
-        {
-            var stBilder = await response.Content.ReadFromJsonAsync<List<StBildInfo>>();
-            if (stBilder is not null)
-            {
-                foreach (var stBildInfo in stBilder) stBildInfo.Time = stBildInfo.Time.ToLocalTime();
+        
+        if (!response.IsSuccessStatusCode) return new List<StBildInfo>();
+        
+        var stBilder = await response.Content.ReadFromJsonAsync<List<StBildInfo>>();
+            
+        if (stBilder is null) return new List<StBildInfo>();
+            
+        foreach (var stBildInfo in stBilder) stBildInfo.Time = stBildInfo.Time.ToLocalTime();
+        return stBilder;
 
-                return stBilder;
-            }
-        }
-
-        return new List<StBildInfo>();
     }
 
     public async Task<List<StBildInfo>> GetStBilder(bool showPackagedImages)
     {
         var response = await _signInService.RefreshTokenOnExpired(async () =>
             await _httpClient.GetAsync($"/api/stbilder/{showPackagedImages}"));
-        if (response.IsSuccessStatusCode)
-        {
-            var stBilder = await response.Content.ReadFromJsonAsync<List<StBildInfo>>();
-            if (stBilder is not null)
-                return stBilder;
-        }
-
-        return new List<StBildInfo>();
+        if (!response.IsSuccessStatusCode) return new List<StBildInfo>();
+        var stBilder = await response.Content.ReadFromJsonAsync<List<StBildInfo>>();
+        return stBilder ?? new List<StBildInfo>();
     }
 
     public async Task<List<StBildInfo>> GetApprovedNotPackagedStBilderAsync()
@@ -78,14 +68,9 @@ public class StBildService : ServiceBase, IStBildService
         var response =
             await _signInService.RefreshTokenOnExpired(async () =>
                 await _httpClient.GetAsync("/api/stbilder/packageble"));
-        if (response.IsSuccessStatusCode)
-        {
-            var stBilder = await response.Content.ReadFromJsonAsync<List<StBildInfo>>();
-            if (stBilder is not null)
-                return stBilder;
-        }
-
-        return new List<StBildInfo>();
+        if (!response.IsSuccessStatusCode) return new List<StBildInfo>();
+        var stBilder = await response.Content.ReadFromJsonAsync<List<StBildInfo>>();
+        return stBilder ?? new List<StBildInfo>();
     }
 
     public async Task<bool> PackageStBilder(GuidIds guidIds)

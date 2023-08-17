@@ -40,7 +40,7 @@ public sealed class TokenService : ITokenService
         _issuer = config["Jwt:Issuer"]!;
         _audience = config["Jwt:Audience"]!;
 
-        if (int.TryParse(config["JWT:RefreshTokenValidityInDays"], out int refreshTokenValidityInDays))
+        if (int.TryParse(config["JWT:RefreshTokenValidityInDays"], out var refreshTokenValidityInDays))
         {
             _refreshTokenValidityInDays = refreshTokenValidityInDays;
         }
@@ -120,14 +120,10 @@ public sealed class TokenService : ITokenService
 
         var principle = handler.ValidateToken(accessToken, tokenValidationParameters, out var securityToken);
 
-        JwtSecurityToken jwtSecurityToken = securityToken as JwtSecurityToken ?? throw new InvalidOperationException("Invalid JWT token");
+        var jwtSecurityToken = securityToken as JwtSecurityToken ?? throw new InvalidOperationException("Invalid JWT token");
         
-        if (jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha512, StringComparison.InvariantCultureIgnoreCase))
-        {
-            return principle.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        }
-
-        return null;
+        return jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha512, StringComparison.InvariantCultureIgnoreCase) ? 
+            principle.FindFirst(ClaimTypes.NameIdentifier)?.Value : null;
     }
 }
 // public sealed class TokenService : ITokenService

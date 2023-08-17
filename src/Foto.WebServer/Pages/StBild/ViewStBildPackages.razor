@@ -36,7 +36,7 @@
                         </MudTd>
                     }
                     <MudTd DataLabel="Länk">
-                        <MudLink Href="@GetPackageDownloadLine(context.Id)" download=@($"ST-bilder paket-{context.PackageNumber}.zip")>Ladda ner</MudLink>
+                        <MudLink Href="@GetPackageDownloadLink(context.Id)" download=@($"ST-bilder paket-{context.PackageNumber}.zip")>Ladda ner</MudLink>
                     </MudTd>
                 </RowTemplate>
             </MudTable>
@@ -73,7 +73,7 @@
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    private string GetPackageDownloadLine(Guid packageId)
+    private static string GetPackageDownloadLink(Guid packageId)
     {
         return $"/api/downloads/stpackage/{packageId}";
     }

@@ -9,7 +9,7 @@ public class AcceptStBildHandler(PhotoServiceDbContext db) : IHandler<AcceptStBi
 {
     public async Task Handle(AcceptStBildRequest request, CancellationToken ct)
     {
-        var stBild = await db.StBilder.FindAsync(request.StBildId);
+        var stBild = await db.StBilder.FindAsync(new object?[] { request.StBildId }, cancellationToken: ct);
 
         if (stBild == null)
             throw new StBildNotFoundException(request.StBildId);

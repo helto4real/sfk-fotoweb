@@ -15,7 +15,7 @@ public class TestContainerLifeTime : IAsyncLifetime
     
     public async Task DisposeAsync()
     {
-        var (stdout, stderr) = await _postgressDb.GetLogsAsync();
+        var (_, stderr) = await _postgressDb.GetLogsAsync();
         Console.WriteLine($"Testcontainer logs:{Environment.NewLine}{stderr}{Environment.NewLine}End of TestContainer logs");
         await _postgressDb.StopAsync();
     }

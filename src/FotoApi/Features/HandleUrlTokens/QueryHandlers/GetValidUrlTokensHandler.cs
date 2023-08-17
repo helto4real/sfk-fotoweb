@@ -17,7 +17,7 @@ public class GetValidUrlTokensHandler(PhotoServiceDbContext db) : IEmptyRequestH
                 UrlTokenType = t.UrlTokenType,
                 ExpirationDate = t.ExpirationDate
             })
-            .ToListAsync();
+            .ToListAsync(cancellationToken: cancellationToken);
 
         return tokens;
     }

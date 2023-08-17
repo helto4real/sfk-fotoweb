@@ -58,5 +58,11 @@
 
 
 
+    <ItemGroup>
+      <Compile Remove="Authentication\UserRoles.cs" />
+      <Compile Remove="Dto\TokenInfo.cs" />
+    </ItemGroup>
+
+
     
 </Project>

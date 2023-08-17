@@ -90,11 +90,11 @@
     [Parameter]
     [SupplyParameterFromQuery(Name = "success")]
     public string? Success { get; set; } = string.Empty;
-    
-    public bool IsFail => !string.IsNullOrEmpty(Success);
 
-    public bool HasToken => !string.IsNullOrEmpty(Token);
-    public string EscapedToken => string.IsNullOrEmpty(Token) ? string.Empty : Uri.EscapeDataString(Token);
+    private bool IsFail => !string.IsNullOrEmpty(Success);
+
+    private bool HasToken => !string.IsNullOrEmpty(Token);
+    private string EscapedToken => string.IsNullOrEmpty(Token) ? string.Empty : Uri.EscapeDataString(Token);
 
     private readonly ResponseHandler _responseHandler = new();
 
@@ -116,7 +116,7 @@
         StateHasChanged();
     }
 
-    string GetClassFromProvider(string provider)
+    static string GetClassFromProvider(string provider)
     {
         return provider switch
         {

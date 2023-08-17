@@ -32,6 +32,10 @@
         <Using Include="System.Net.Http" />
         <Using Include="System.Net" />
         <Using Include="Xunit" />
+    <ItemGroup>
+      <Compile Remove="TodoApiTests.cs" />
+    </ItemGroup>
+
     </ItemGroup>
 
 

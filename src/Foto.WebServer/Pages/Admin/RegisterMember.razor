@@ -45,11 +45,11 @@
                     @foreach (var role in _roles)
                     {
                             <MudCheckBox T="bool"  Checked="@(_member.Roles.Any(r => r.Name == role.Name))"
-                                         CheckedChanged="b => OnRoleSelectChangedAsync(role.Name, b)" Label="@(@RoleNameTranslator.GetRoleName(role.Name))"/>
+                                         CheckedChanged="b => OnRoleSelectChangedAsync(role.Name, b)" Label="@(RoleNameTranslator.GetRoleName(role.Name))"/>
                     }
             </Form>
             <Actions>
-                <MudButton OnClick="HandleValidSubmit" Variant="Variant.Filled" Color="Color.Primary" 
+                <MudButton StartIcon="@Icons.Material.Filled.Save" OnClick="HandleValidSubmit" Variant="Variant.Text" Color="Color.Primary" 
                            Disabled="@(!IsValid())" Class="mr-auto">@RegisterSaveButtonName</MudButton>
             </Actions>
         </AppForm>
@@ -101,7 +101,7 @@
                 var rolesResult = await AdminService.GetRolesAsync();
                 _roles = _responseHandler.CheckResponse(rolesResult)?.ToList() ?? _roles;
                 // Add default role
-                _member.Roles.Add(new RoleInfo() { Name = "Member" });
+                _member.Roles.Add(new RoleInfo { Name = "Member" });
             }
             StateHasChanged();
         }
@@ -164,12 +164,6 @@
         }
     }
 
-    private Task OnCancel()
-    {
-        NavigationManager?.NavigateTo("/admin/members/manage");
-        return Task.CompletedTask;
-    }
-
     private async Task OnDeactivateAsync()
     {
         try
@@ -221,7 +215,7 @@
         _member.Roles.RemoveAll(r => r.Name == role);
         if (state ?? false)
         {
-            _member.Roles.Add(new RoleInfo() { Name = role });
+            _member.Roles.Add(new RoleInfo { Name = role });
         }
     }
 

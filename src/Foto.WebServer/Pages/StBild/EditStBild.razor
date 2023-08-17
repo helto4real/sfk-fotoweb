@@ -5,7 +5,6 @@
 @using Severity = MudBlazor.Severity
 @inherits AuthorizedBasePage
 @inject IStBildService StBildService
-@inject IAuthService AuthService
 @inject AppSnackBar AppSnackBar
 
 <!--suppress CssUnresolvedCustomProperty -->
@@ -148,6 +147,7 @@
             {
                 _showProgressBar = true;
                 await StBildService.UpdateStBildAsync(_stBild);
+                AppSnackBar.Alert("ST-bild uppdaterad.", Severity.Success);
     // Navigate back to the StBild list page
                 NavigationManager?.NavigateTo("/st-bild/list");
             }

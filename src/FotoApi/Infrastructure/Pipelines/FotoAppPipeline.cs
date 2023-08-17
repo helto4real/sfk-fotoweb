@@ -44,12 +44,10 @@ public class FotoAppPipeline(CurrentUser currentUser, IServiceProvider servicePr
 
     private static void InjectCurrentUser<TRequest>(TRequest request, CurrentUser currentUser)
     {
-        if (request is ICurrentUser currentUserRequest)
-        {
-            if (currentUser.User is null)
-                throw new UnauthorizedAccessException("User is not logged in");
-            currentUserRequest.CurrentUser = currentUser;
-        }
+        if (request is not ICurrentUser currentUserRequest) return;
+        if (currentUser.User is null)
+            throw new UnauthorizedAccessException("User is not logged in");
+        currentUserRequest.CurrentUser = currentUser;
     }
 
 

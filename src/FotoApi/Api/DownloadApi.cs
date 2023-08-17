@@ -1,11 +1,7 @@
-﻿using FotoApi.Features.HandleSubmissions.HandleStBilder.Commands;
-using FotoApi.Features.HandleSubmissions.HandleStBilder.Dto;
-using FotoApi.Features.HandleSubmissions.HandleStBilder.Queries;
+﻿using FotoApi.Features.HandleSubmissions.HandleStBilder.Queries;
 using FotoApi.Infrastructure.Api;
-using FotoApi.Infrastructure.ExceptionsHandling;
 using FotoApi.Infrastructure.Pipelines;
 using FotoApi.Infrastructure.Security.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace FotoApi.Api;
 
@@ -26,7 +22,7 @@ public static class DownloadApi
         group.RequirePerUserRateLimit();
         // Get image stream by id
         group.MapGet("stpackage/{id:guid}", async Task<IResult> 
-                (Guid id, HttpRequest req, GetStPackageStreamHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
+                (Guid id, GetStPackageStreamHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
                 {
                     var file = await pipe.Pipe(id, handler.Handle, ct);
                     return Results.Stream(file, "application/zip");
@@ -35,7 +31,7 @@ public static class DownloadApi
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status403Forbidden)
             .Produces<Stream>(contentType: "application/zip")
-            .RequireAuthorization("StBildAdministratiorPolicy");
+            .RequireAuthorization("StBildAdministratorPolicy");
         return group;
     }
 }

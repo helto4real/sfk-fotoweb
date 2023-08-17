@@ -18,7 +18,7 @@ public record UpdateLoginInfo
     [JsonIgnore] public string? ConfirmPassword { get; set; }
     [JsonIgnore] public string? CurrentUserName { get; init; }
     [JsonIgnore] public string? CurrentEmail { get; init; }
-};
+}
 
 public class UpdateLoginInfoValidator : AbstractValidator<UpdateLoginInfo>
 {

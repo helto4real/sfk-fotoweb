@@ -1,10 +1,8 @@
 using System.Text.Json.Serialization;
-using FluentValidation;
 using Foto.WebServer.Api;
 using Foto.WebServer.Authentication;
 using Foto.WebServer.Components;
 using Foto.WebServer.Dto;
-using Foto.WebServer.Pages;
 using Foto.WebServer.Services;
 using Foto.WebServer.Shared.Logging;
 using Microsoft.AspNetCore.Http.Json;
@@ -26,7 +24,7 @@ builder.Services.Configure<AppSettings>(appSettingSection);
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
     options.ConsentCookie.Name = "ConsentCookie";
-    options.CheckConsentNeeded = context => true;
+    options.CheckConsentNeeded = _ => true;
 });
 
 builder.Services.AddMemoryCache();
@@ -81,7 +79,7 @@ builder.Services.AddHttpClient<IMemberService, MemberService>()
 builder.Services.AddHttpClient<IStBildService, StBildService>()
     .AddHttpMessageHandler(sp => sp.GetRequiredService<AuthorizedHttpClientHandler>());
 builder.Services.AddHttpClient<IImageService, ImageService>()
-    .AddHttpMessageHandler(sp => sp.GetRequiredService<AuthorizedHttpClientHandler>());;
+    .AddHttpMessageHandler(sp => sp.GetRequiredService<AuthorizedHttpClientHandler>());
 
 // Register notification service
 builder.Services.AddScoped(typeof(INotificationService<>), typeof(NotificationService<>));

@@ -9,7 +9,7 @@ public class DeleteMemberHandler(PhotoServiceDbContext db, UserManager<User> use
 {
     public async Task Handle(Guid memberId, CancellationToken ct = default)
     {
-        var member = await db.Members.FindAsync(memberId, ct);
+        var member = await db.Members.FindAsync(new object?[] { memberId, ct }, cancellationToken: ct);
         if (member is null) throw new MemberNotFoundException(memberId);
 
         var userName = member.OwnerReference;

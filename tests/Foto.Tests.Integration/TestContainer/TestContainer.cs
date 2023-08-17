@@ -10,7 +10,7 @@ public class TestContainer : DockerContainer
     
     public string UserName => _configuration.Username;
     public string Password => _configuration.Password;
-    public TestContainer(TestContainerConfiguration configuration, ILogger logger) : base(configuration, logger)
+    public TestContainer(TestContainerConfiguration configuration, ILogger<TestContainer> logger) : base(configuration, logger)
     {
         _configuration = configuration;
     }

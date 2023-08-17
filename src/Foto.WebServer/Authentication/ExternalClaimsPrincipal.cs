@@ -32,7 +32,7 @@ public class ExternalClaimsPrincipal
         return new ClaimsPrincipal(claimsIdentity);
     }
 
-    public ClaimsIdentity CreateExternalClaimsIdentity(IReadOnlyCollection<string> roles, string? userImageUrl)
+    private ClaimsIdentity CreateExternalClaimsIdentity(IReadOnlyCollection<string> roles, string? userImageUrl)
     {
         var identity = new ClaimsIdentity(new[]
         {

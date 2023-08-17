@@ -10,7 +10,7 @@
             {
                 <div class="col card m-1 p-0 text-center" style="width: 10rem; height: 13rem;">
                     <div class="card-header p-1">
-                    <h6 class="card-subtitle text-center mt-0 mb-0 text-body-secondary" style="font-size: 0.6em;">@(image.Title.Length > 20? image.Title.Substring(0,20) : image.Title)</h6>
+                    <h6 class="card-subtitle text-center mt-0 mb-0 text-body-secondary" style="font-size: 0.6em;">@(image.Title.Length > 20? image.Title[..20] : image.Title)</h6>
                     </div>
                     <div class="card-body p-0 d-flex m-auto">
                     <img class="img-thumbnail mt-2 rounded-3" src="/api/images/image/@image.Id?thumb" style="max-width: 8.2em; max-height: 8.2em; object-fit:scale-down;" alt="@image.Title" data-bs-toggle="modal" data-bs-target="#@image.Id">

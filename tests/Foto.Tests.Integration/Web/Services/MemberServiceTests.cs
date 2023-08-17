@@ -17,7 +17,7 @@ public class MemberServiceTests : IntegrationTestsBase
     {
         // Arrange
         var client = CreateClient("admin", true);
-        var options = Options.Create(new AppSettings() { FotoApiUrl = client.BaseAddress!.ToString() });
+        var options = Options.Create(new AppSettings { FotoApiUrl = client.BaseAddress!.ToString() });
         var memberService = new MemberService(
             client,
             options,
@@ -57,7 +57,7 @@ public class MemberServiceTests : IntegrationTestsBase
         var existingUserEmail = "existing_user_member@domain.com";
 
         var client = CreateClient("admin", true);
-        var options = Options.Create(new AppSettings() { FotoApiUrl = client.BaseAddress!.ToString() });
+        var options = Options.Create(new AppSettings { FotoApiUrl = client.BaseAddress!.ToString() });
         var memberService = new MemberService(
             client,
             options,
@@ -101,7 +101,7 @@ public class MemberServiceTests : IntegrationTestsBase
         var updatedMemberEmail = "updated_user_member@domain.com";
 
         var client = CreateClient("admin", true);
-        var options = Options.Create(new AppSettings() { FotoApiUrl = client.BaseAddress!.ToString() });
+        var options = Options.Create(new AppSettings { FotoApiUrl = client.BaseAddress!.ToString() });
         var memberService = new MemberService(
             client,
             options,
@@ -147,7 +147,7 @@ public class MemberServiceTests : IntegrationTestsBase
         var existingMemberEmail = "existingmember@somedomain.com";
         var client = CreateClient("admin", true);
         await CreateMemberAsync(existingMemberEmail);
-        var options = Options.Create(new AppSettings() { FotoApiUrl = client.BaseAddress!.ToString() });
+        var options = Options.Create(new AppSettings { FotoApiUrl = client.BaseAddress!.ToString() });
 
         var memberService = new MemberService(
             client,
@@ -183,7 +183,7 @@ public class MemberServiceTests : IntegrationTestsBase
         await CreateMemberAsync("listmember2@domain.com");
         await CreateMemberAsync("listmember3@domain.com");
 
-        var options = Options.Create(new AppSettings() { FotoApiUrl = client.BaseAddress!.ToString() });
+        var options = Options.Create(new AppSettings { FotoApiUrl = client.BaseAddress!.ToString() });
 
         var memberService = new MemberService(
             client,
@@ -208,7 +208,7 @@ public class MemberServiceTests : IntegrationTestsBase
         var existingMemberEmail = "existingmember@domain.com";
         var client = CreateClient("admin", true);
         var existingMember = await CreateMemberAsync(existingMemberEmail);
-        var options = Options.Create(new AppSettings() { FotoApiUrl = client.BaseAddress!.ToString() });
+        var options = Options.Create(new AppSettings { FotoApiUrl = client.BaseAddress!.ToString() });
 
         var memberService = new MemberService(
             client,
@@ -238,7 +238,7 @@ public class MemberServiceTests : IntegrationTestsBase
     {
         // Arrange
         var client = CreateClient("admin", true);
-        var options = Options.Create(new AppSettings() { FotoApiUrl = client.BaseAddress!.ToString() });
+        var options = Options.Create(new AppSettings { FotoApiUrl = client.BaseAddress!.ToString() });
         var nonExistingMemberId = Guid.NewGuid();
 
         var memberService = new MemberService(
@@ -263,7 +263,7 @@ public class MemberServiceTests : IntegrationTestsBase
         var existingMemberEmail = "membertobedeleted@domain.com";
         var client = CreateClient("admin", true);
         var existingMember = await CreateMemberAsync(existingMemberEmail);
-        var options = Options.Create(new AppSettings() { FotoApiUrl = client.BaseAddress!.ToString() });
+        var options = Options.Create(new AppSettings { FotoApiUrl = client.BaseAddress!.ToString() });
 
         var memberService = new MemberService(
             client,
@@ -285,7 +285,7 @@ public class MemberServiceTests : IntegrationTestsBase
         var activeMemberEmail = "active_member@domain.com";
         var client = CreateClient("admin", true);
         var existingMember = await CreateMemberAsync(activeMemberEmail, false);
-        var options = Options.Create(new AppSettings() { FotoApiUrl = client.BaseAddress!.ToString() });
+        var options = Options.Create(new AppSettings { FotoApiUrl = client.BaseAddress!.ToString() });
         var db = CreateFotoAppDbContext();
 
         var memberService = new MemberService(
@@ -310,7 +310,7 @@ public class MemberServiceTests : IntegrationTestsBase
         var inactiveMemberEmail = "inactive_member@domain.com";
         var client = CreateClient("admin", true);
         var existingMember = await CreateMemberAsync(inactiveMemberEmail);
-        var options = Options.Create(new AppSettings() { FotoApiUrl = client.BaseAddress!.ToString() });
+        var options = Options.Create(new AppSettings { FotoApiUrl = client.BaseAddress!.ToString() });
         var db = CreateFotoAppDbContext();
 
         var memberService = new MemberService(
@@ -334,7 +334,7 @@ public class MemberServiceTests : IntegrationTestsBase
         // Arrange
         var client = CreateClient("admin", true);
         var nonExistingMemberId = Guid.NewGuid();
-        var options = Options.Create(new AppSettings() { FotoApiUrl = client.BaseAddress!.ToString() });
+        var options = Options.Create(new AppSettings { FotoApiUrl = client.BaseAddress!.ToString() });
 
         var memberService = new MemberService(
             client,
@@ -355,7 +355,7 @@ public class MemberServiceTests : IntegrationTestsBase
     {
         // Arrange
         var client = CreateClient("admin", true);
-        var options = Options.Create(new AppSettings() { FotoApiUrl = client.BaseAddress!.ToString() });
+        var options = Options.Create(new AppSettings { FotoApiUrl = client.BaseAddress!.ToString() });
         var nonExistingMemberId = Guid.NewGuid();
         var memberService = new MemberService(
             client,
@@ -377,7 +377,7 @@ public class MemberServiceTests : IntegrationTestsBase
     {
         // Arrange
         var client = CreateClient("admin", true);
-        var options = Options.Create(new AppSettings() { FotoApiUrl = client.BaseAddress!.ToString() });
+        var options = Options.Create(new AppSettings { FotoApiUrl = client.BaseAddress!.ToString() });
         var db = CreateFotoAppDbContext();
         var member = await CreateMemberAsync("inactive_member@anydomain.com", false, new List<string> { "Member" });
         var memberService = new MemberService(
@@ -400,7 +400,7 @@ public class MemberServiceTests : IntegrationTestsBase
     {
         // Arrange
         var client = CreateClient("admin", true);
-        var options = Options.Create(new AppSettings() { FotoApiUrl = client.BaseAddress!.ToString() });
+        var options = Options.Create(new AppSettings { FotoApiUrl = client.BaseAddress!.ToString() });
         var db = CreateFotoAppDbContext();
         var member = await CreateMemberAsync("active_member@anydomain.com", true, new List<string> { "Member" });
         var memberService = new MemberService(

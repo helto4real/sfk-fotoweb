@@ -46,7 +46,7 @@
     [Parameter]
     public string[] SocialProviders { get; set; } = Array.Empty<string>();
 
-    private List<UserInfo> _users = new();
+    private readonly List<UserInfo> _users = new();
     private readonly ResponseHandler _responseHandler = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -67,7 +67,7 @@
         await base.OnAfterRenderAsync(firstRender);
     }
     
-    string GetUserEditLink(string username)
+    static string GetUserEditLink(string username)
     {
         return $"/admin/users/edit/{username}";
     }    

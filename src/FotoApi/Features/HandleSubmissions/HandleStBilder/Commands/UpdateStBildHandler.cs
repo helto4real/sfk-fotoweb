@@ -8,7 +8,7 @@ public class UpdateStBildHandler(PhotoServiceDbContext db) : IHandler<StBildRequ
 {
     public async Task Handle(StBildRequest request, CancellationToken ct)
     {
-        var stBild = await db.StBilder.FindAsync(request.Id);
+        var stBild = await db.StBilder.FindAsync(new object?[] { request.Id }, cancellationToken: ct);
         if (stBild == null) throw new StBildNotFoundException(request.Id);
         stBild.Title = request.Title;
         stBild.Name = request.Name;

@@ -1,8 +1,3 @@
 namespace FotoApi.Infrastructure.Validation.Exceptions;
 
-public class UnAuthorizedException : ApiException
-{
-    public UnAuthorizedException(string message) : base("Unauthorized", message)
-    {
-    }
-}
+public class UnAuthorizedException(string message) : ApiException("Unauthorized", message);

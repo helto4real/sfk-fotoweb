@@ -53,13 +53,12 @@ public class SaveImageFromStreamHandler(PhotoServiceDbContext db, IPhotoStore ph
         await db.SaveChangesAsync(ct);
 
         // Todo: Send to handlers for metadata, this is kinda hacky right now, can we really have this dependency?
-        if (metadata is NewStBildRequest stBildCommand)
-        {
-            stBildCommand.OwnerReference = request.CurrentUser.Id;
-            stBildCommand.ImageReference = photoImage.Id;
-            await handler.Handle(stBildCommand, ct);
-        }
+        if (metadata is not NewStBildRequest stBildCommand) return _mapper.ToImageResponse(photoImage);
         
+        stBildCommand.OwnerReference = request.CurrentUser.Id;
+        stBildCommand.ImageReference = photoImage.Id;
+        await handler.Handle(stBildCommand, ct);
+
         return _mapper.ToImageResponse(photoImage);
     }
 

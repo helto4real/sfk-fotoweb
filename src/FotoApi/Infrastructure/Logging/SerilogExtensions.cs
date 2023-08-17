@@ -16,7 +16,7 @@ public static class SerilogExtensions
         builder.Host.UseSerilog((context, loggerConfiguration) =>
         {
             // https://github.com/serilog/serilog-settings-configuration
-            loggerConfiguration.ReadFrom.Configuration(context.Configuration, new ConfigurationReaderOptions(){SectionName = sectionName});
+            loggerConfiguration.ReadFrom.Configuration(context.Configuration, new ConfigurationReaderOptions {SectionName = sectionName});
 
             loggerConfiguration
                 .Enrich.WithProperty("Application", builder.Environment.ApplicationName)

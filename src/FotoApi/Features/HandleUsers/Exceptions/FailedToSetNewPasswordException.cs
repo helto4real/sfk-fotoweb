@@ -2,10 +2,5 @@
 
 namespace FotoApi.Features.HandleUsers.Exceptions;
 
-public sealed class FailedToSetNewPasswordException : BadRequestException
-{
-    public FailedToSetNewPasswordException(string user)
-        : base($"Misslyckades att sätta nytt lösenprd för användare  {user}.")
-    {
-    }
-}
+public sealed class FailedToSetNewPasswordException(string user) : 
+    BadRequestException($"Misslyckades att sätta nytt lösenord för användare  {user}.");

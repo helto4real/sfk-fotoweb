@@ -14,7 +14,7 @@ public class UserClaimPrincipal : ClaimsPrincipal
     {
         var tokens = new[]
         {
-            new AuthenticationToken { Name = TokenNames.AccessToken, Value = refreshToken },
+            new AuthenticationToken { Name = TokenNames.AccessToken, Value = refreshToken }
         };
         
         AuthenticationProperties.StoreTokens(tokens);
@@ -28,7 +28,7 @@ public class UserClaimPrincipal : ClaimsPrincipal
             new[]
             {
                 new Claim(ClaimTypes.Name, username),
-                new Claim(ClaimTypes.NameIdentifier, username),
+                new Claim(ClaimTypes.NameIdentifier, username)
             });
 
         foreach (var role in roles)

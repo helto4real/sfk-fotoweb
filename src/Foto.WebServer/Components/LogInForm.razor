@@ -51,7 +51,7 @@
                             <button type="button" @onclick="SocialLoginClickCallback"
                                     class="btn btn-danger btn-lg btn-block bg-secondary border-dark" disabled="@_isSubmitting">
                                 <i
-                                    class="@(GetClassFromProvider(@provider))"></i>
+                                    class="@(GetClassFromProvider(provider))"></i>
                             </button>
                         </a>
                     </div>
@@ -69,9 +69,9 @@
 @code {
     private readonly ResponseHandler _responseHandler = new();
 
-    bool _isSubmitting = false;
+    bool _isSubmitting;
     
-    private LoginOrCreateUserModel _model = new();
+    private readonly LoginOrCreateUserModel _model = new();
 
     [Parameter]
     public EventCallback OnLoggedIn { get; set; }
@@ -115,7 +115,7 @@
         }
     }
 
-    string GetClassFromProvider(string provider)
+    static string GetClassFromProvider(string provider)
     {
         return provider switch
         {
@@ -131,11 +131,6 @@
     {
         public string? Username { get; set; }
         public string? Password { get; set; }
-        public string? ConfirmPassword { get; set; }
-        public string? Email { get; set; }
-        public string? FirstName { get; set; }
-        public string? LastName { get; set; }
-        public bool IsLogin { get; set; }
     }
 
     public class LoginOrCreateUserModelValidator : AbstractValidator<LoginOrCreateUserModel>
@@ -156,7 +151,7 @@
                 .MaximumLength(32)
                 .MinimumLength(6)
                 .WithMessage("Lösenordet måste vara mellan 6 och 32 tecken.")
-                .Matches("^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z])(?=.*[^a-zA-Z\\d]).*$")
+                .Matches(@"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z])(?=.*[^a-zA-Z\d]).*$")
                 .WithMessage("Lösenordet måste innehålla små och stora bokstäver, siffror samt specialtecken.");
         }
     }

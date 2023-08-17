@@ -108,7 +108,7 @@
             if (imageItem != null)
             {
                 _uploadedImages.Add(imageItem);
-                _model = new();
+                _model = new StBildUploadModel();
                 _alertMessage = null;
                 AppSnackBar.Alert("Uppladdning av ST-bild lyckades!", Severity.Success);
             }
@@ -144,7 +144,7 @@
         public string Title { get; set; } = default!;
         public string Name { get; set; } = default!;
         public string Location { get; set; } = default!;
-        public DateTime Time { get; set; } = new DateTime(2023, 1, 1);
+        public DateTime Time { get; set; } = new(2023, 1, 1);
         public string Description { get; set; } = default!;
         public string AboutThePhotographer { get; set; } = default!;
 

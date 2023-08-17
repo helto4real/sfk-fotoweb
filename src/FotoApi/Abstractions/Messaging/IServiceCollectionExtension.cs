@@ -8,18 +8,10 @@ public static class ServiceCollectionExtension
     {
         var assembly = Assembly.GetExecutingAssembly();
         var types = assembly.GetTypes();
-        var handlers = types.Where(t => t.IsAssignableTo(typeof(IBaseHandler)) && !t.IsInterface && !t.IsAbstract);
+        var handlers = types.Where(t => t.IsAssignableTo(typeof(IBaseHandler)) && t is { IsInterface: false, IsAbstract: false });
         foreach (var handler in handlers)
         {
             services.AddScoped(handler);
-            // var interfaces = handler.GetInterfaces();
-            // foreach (var @interface in interfaces)
-            // {
-            //     if (@interface.IsAssignableTo(typeof(IBaseHandler)))
-            //     {
-            //         services.AddTransient(@interface, handler);
-            //     }
-            // }
         }
 
         return services;
@@ -29,7 +21,7 @@ public static class ServiceCollectionExtension
     {
         var assembly = Assembly.GetExecutingAssembly();
         var types = assembly.GetTypes();
-        var pipelines = types.Where(t => t.IsAssignableTo(typeof(IPipeline)) && !t.IsInterface && !t.IsAbstract);
+        var pipelines = types.Where(t => t.IsAssignableTo(typeof(IPipeline)) && t is { IsInterface: false, IsAbstract: false });
         foreach (var pipeline in pipelines)
         {
             services.AddScoped(pipeline);

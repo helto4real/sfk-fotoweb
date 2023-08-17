@@ -7,10 +7,10 @@ public enum UrlTokenType
     ResetPassword,
     ConfirmEmail,
     AllowAddUser,
-    AllowAddImage,
-};
+    AllowAddImage
+}
 
 public record NewTokenByType
 {
-    public UrlTokenType UrlTokenType { get; init; } = default!;
+    public UrlTokenType UrlTokenType { get; init; }
 }

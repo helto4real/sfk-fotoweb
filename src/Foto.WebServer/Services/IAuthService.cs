@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using System.Security.Principal;
 using Foto.WebServer.Dto;
 
 namespace Foto.WebServer.Services;
@@ -11,7 +10,6 @@ public interface IAuthService
     Task<AccountInfo?> GetOrRegisterUserAsync(string provider, ExternalUserInfo userInfo);
     (string?, ErrorDetail?) GetAccessTokenFromRefreshToken(string refreshToken, string userName);
     Task<(AccountInfo?, ErrorDetail?)> RefreshAccessTokenAsync(string refreshToken, string userName);
-    Task<bool> CompliesToPolicy(string policyName);
 
     static string? GetImageUrlFromClaim(ClaimsPrincipal principal)
     {

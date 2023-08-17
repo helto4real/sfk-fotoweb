@@ -5,12 +5,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace FotoApi.Infrastructure.Security.Authentication;
 
-public class AuthException : HubException
-{
-    public AuthException(string message) : base(message)
-    {
-    }
-}
+public class AuthException(string message) : HubException(message);
 
 public class AuthHubFilter : IHubFilter
 {
@@ -22,7 +17,7 @@ public class AuthHubFilter : IHubFilter
         var feature = invocationContext.Context.Features.Get<IConnectionHeartbeatFeature>();
         if (feature == null)
         {
-            return await next(invocationContext);;
+            return await next(invocationContext);
         }
 
         var context = invocationContext.Context.GetHttpContext();
@@ -40,7 +35,7 @@ public class AuthHubFilter : IHubFilter
         {
             invocationContext.Context.Abort();
     
-            await next(invocationContext);;;
+            await next(invocationContext);
         }
     
         feature.OnHeartbeat(state =>

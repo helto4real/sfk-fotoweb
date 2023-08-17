@@ -12,7 +12,7 @@ public class UpdateImageHandler(PhotoServiceDbContext db, CurrentUser currentUse
         var rowsAffected = await db.Images
             .Where(t => t.Id == request.Id && (t.OwnerReference == currentUser.Id || currentUser.IsAdmin))
             .ExecuteUpdateAsync(updates =>
-                updates.SetProperty(t => t.Title, request.Title));
+                updates.SetProperty(t => t.Title, request.Title), cancellationToken: ct);
 
         if (rowsAffected == 0)
             throw new ImageNotFoundException(request.Id);

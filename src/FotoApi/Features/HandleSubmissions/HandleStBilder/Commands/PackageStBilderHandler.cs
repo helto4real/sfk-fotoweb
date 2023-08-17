@@ -20,11 +20,11 @@ public class PackageStBilderHandler(
         ILogger<PackageStBilderHandler> logger)
     : IHandler<PackageStBilderRequest>
 {
-    private static readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
+    private static readonly SemaphoreSlim SemaphoreSlim = new(1, 1);
 
     public Task Handle(PackageStBilderRequest request, CancellationToken ct)
     {
-        if (_semaphoreSlim.CurrentCount == 0)
+        if (SemaphoreSlim.CurrentCount == 0)
             // We do not want to run this command more than once at a time
             return Task.CompletedTask;
         var newScope = serviceProvider.CreateScope();
@@ -34,15 +34,15 @@ public class PackageStBilderHandler(
 
     public async Task PackageStBilder(List<Guid> stBildIds, CurrentUser owner, IServiceScope scope)
     {
-        await _semaphoreSlim.WaitAsync();
+        await SemaphoreSlim.WaitAsync();
         try
         {
             var db = scope.ServiceProvider.GetRequiredService<PhotoServiceDbContext>();
-            var stBilderThatArePackageable = await db.StBilder.Where(e => e.IsAccepted && !e.IsUsed).ToListAsync();
+            var stBilderThatArePackable = await db.StBilder.Where(e => e.IsAccepted && !e.IsUsed).ToListAsync();
             var packageId = Guid.NewGuid();
 
             var nextPackageNumber = 1;
-            var imagesToPackage = stBilderThatArePackageable.Where(e => stBildIds.Contains(e.Id)).ToList();
+            var imagesToPackage = stBilderThatArePackable.Where(e => stBildIds.Contains(e.Id)).ToList();
             if (await db.StPackage.AnyAsync())
                 nextPackageNumber = await db.StPackage.MaxAsync(e => e.PackageNumber) + 1;
 
@@ -91,7 +91,7 @@ public class PackageStBilderHandler(
         finally
         {
             scope.Dispose();
-            _semaphoreSlim.Release();
+            SemaphoreSlim.Release();
         }
     }
 }

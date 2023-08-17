@@ -10,8 +10,6 @@ public static class CookieApi
 
         group.MapGet("consent", (HttpContext context) =>
         {
-            if (context?.Features is null)
-                throw new NullReferenceException("HttpContext.Features is null");
             var consentFeature = context.Features.Get<ITrackingConsentFeature>();
             if (consentFeature is null)
                 throw new NullReferenceException("ITrackingConsentFeature is null");

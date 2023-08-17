@@ -21,7 +21,7 @@
     <div class="container">
         <div class="row g-3 mb-5 justify-content-center align-items-center">
             <div class="col col-8" style="max-width: 350px;">
-                <EditForm Model="@User" OnValidSubmit="@HandleValidSubmit" Context="authirzationContext">
+                <EditForm Model="@User" OnValidSubmit="@HandleValidSubmit" Context="authorizationContext">
                     <DataAnnotationsValidator/>
                     <ValidationSummary/>
 
@@ -109,7 +109,7 @@ else
 
     private async Task OnDeleteUser()
     {
-        var confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"Är du säker på att du vill ta bort användaren {UserName}? Detta kommar ta bort all information och bilder om användaren!");
+        var confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"Är du säker på att du vill ta bort användaren {UserName}? Detta kommer ta bort all information och bilder om användaren!");
         if (confirmed)
         {
             var result = await UserService.DeleteUserAsync(UserName);

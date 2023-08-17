@@ -43,14 +43,14 @@
     public string[] SocialProviders { get; set; } = Array.Empty<string>();
 
     [CascadingParameter]
-    private Task<AuthenticationState>? authenticationState { get; set; }
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             var currentUser = await GetCurrentUserAsync();
-            if (currentUser?.Identity?.Name is not null)
+            if (currentUser.Identity?.Name is not null)
             {
                 var result = await UserService.GetCurrentUserAsync();
                 var user = _responseHandler.CheckResponse(result);

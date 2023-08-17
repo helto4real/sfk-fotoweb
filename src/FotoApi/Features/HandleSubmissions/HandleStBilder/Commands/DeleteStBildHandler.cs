@@ -16,7 +16,7 @@ public class DeleteStBildHandler(PhotoServiceDbContext db, IMessageBus bus) : IH
 {
     public async Task Handle(DeleteStBildRequest request, CancellationToken ct)
     {
-        var imageInfo = await db.StBilder.FindAsync(request.Id);
+        var imageInfo = await db.StBilder.FindAsync(new object?[] { request.Id }, cancellationToken: ct);
         if (imageInfo == null)
             throw new ImageNotFoundException(request.Id);
 

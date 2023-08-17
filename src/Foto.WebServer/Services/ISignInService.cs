@@ -59,25 +59,24 @@ public class SignInService(
     {
         // Call the provided function to get the response
         var response = await func();
+        if (response.StatusCode != HttpStatusCode.Unauthorized) return response;
+        // The token is expired, try to refresh it and call the function again with the new token
+        await RefreshTokens();
+
+        // Retry call with the new token
+        response = await func();
+
         if (response.StatusCode == HttpStatusCode.Unauthorized)
-        {
-            // The token is expired, try to refresh it and call the function again with the new token
-            await RefreshTokens();
-
-            // Retry call with the new token
-            response = await func();
-
-            if (response.StatusCode == HttpStatusCode.Unauthorized)
-                // The refresh of token did work or user is not authorized for real 
-                SignOut();
-        }
+            // The refresh of token did work or user is not authorized for real 
+            SignOut();
 
         return response;
     }
 
     public async Task<(AccountInfo?, ErrorDetail?)> LoginAsync(LoginUserInfo loginUserInfo)
     {
-        var requestPath = "/api/auth/login";
+        const string apiAuthLogin = "/api/auth/login";
+        var requestPath = apiAuthLogin;
         var result = await _jsRuntime.InvokeAsync<JsonArray>("login", requestPath, loginUserInfo);
         if (result[0] is not null)
         {

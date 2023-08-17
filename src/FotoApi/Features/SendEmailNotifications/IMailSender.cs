@@ -9,7 +9,6 @@ public interface IMailSender
 
 internal interface IMailQueue
 {
-    Task AddToQueueAsync(MailInfo mailInfo, CancellationToken ct);
     Task<MailInfo> GetNextFromQueueAsync(CancellationToken ct);
     bool TryRead([MaybeNullWhen(false)] out MailInfo nextEmailMessage);
 }

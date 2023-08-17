@@ -3,7 +3,7 @@ using FotoApi.Features.HandleUsers.CommandHandlers;
 using FotoApi.Features.HandleUsers.Dto;
 using FotoApi.Features.HandleUsers.Exceptions;
 using FotoApi.Features.HandleUsers.Notifications;
-using FotoApi.Features.HandleUsers.QueriyHandlers;
+using FotoApi.Features.HandleUsers.QueryHandlers;
 using FotoApi.Model;
 using FotoApi.Tests.Helpers;
 using Microsoft.AspNetCore.Identity;
@@ -22,8 +22,8 @@ public class UsersHandlersTests : IAsyncLifetime
     {
         // ARRANGE
         var userManager = _ctx.Sp.GetRequiredService<UserManager<User>>();
-        var admin = _ctx.CreateUserAsync("theadmin", true, "theadmin@domain.com");
-        var user = _ctx.CreateUserAsync("user", false, "user@domain.com");
+        await _ctx.CreateUserAsync("theadmin", true, "theadmin@domain.com");
+        await _ctx.CreateUserAsync("user", false, "user@domain.com");
         
         // ACT
         var handler = new GetUsersHandler(userManager);
@@ -44,7 +44,7 @@ public class UsersHandlersTests : IAsyncLifetime
     {
         // ARRANGE
         var userManager = _ctx.Sp.GetRequiredService<UserManager<User>>();
-        var user = _ctx.CreateUserAsync("user", false, "user@domain.com");
+        await _ctx.CreateUserAsync("user", false, "user@domain.com");
     
         // ACT
         var handler = new GetUserFromUsernameHandler(userManager);
@@ -75,7 +75,7 @@ public class UsersHandlersTests : IAsyncLifetime
     {
         // ARRANGE
         var userManager = _ctx.Sp.GetRequiredService<UserManager<User>>();
-        var user = _ctx.CreateUserAsync("user", false, "user@domain.com");
+        await _ctx.CreateUserAsync("user", false, "user@domain.com");
         _ctx.TokenService.Setup(x => x.GetUserIdByAccessTokenAsync(It.IsAny<string>())).Returns("user");
     
         // ACT
@@ -140,7 +140,7 @@ public class UsersHandlersTests : IAsyncLifetime
     {
         // ARRANGE
         var userManager = _ctx.Sp.GetRequiredService<UserManager<User>>();
-        var user = _ctx.CreateUserAsync("user", false, "user@domain.com");
+        await _ctx.CreateUserAsync("user", false, "user@domain.com");
         var request = new UserRequest
         {
             UserName = "user",
@@ -162,7 +162,7 @@ public class UsersHandlersTests : IAsyncLifetime
     {
         // ARRANGE
         var userManager = _ctx.Sp.GetRequiredService<UserManager<User>>();
-        var user = _ctx.CreateUserAsync("user", false, "user@domain.com");
+        await _ctx.CreateUserAsync("user", false, "user@domain.com");
         var request = new UserRequest
         {
             UserName = "user",
@@ -187,7 +187,7 @@ public class UsersHandlersTests : IAsyncLifetime
         // ARRANGE
         var userManager = _ctx.Sp.GetRequiredService<UserManager<User>>();
         var username = "update_user";
-        var user = _ctx.CreateUserAsync(username, true, "user@domain.com");
+        await _ctx.CreateUserAsync(username, true, "user@domain.com");
         var request = new UserRequest
         {
             UserName = username,
@@ -211,7 +211,7 @@ public class UsersHandlersTests : IAsyncLifetime
     {
         // ARRANGE
         var userManager = _ctx.Sp.GetRequiredService<UserManager<User>>();
-        var user = _ctx.CreateUserAsync("delete_user", false, "user@domain.com");
+        await _ctx.CreateUserAsync("delete_user", false, "user@domain.com");
     
         // ACT
         var handler = new DeleteUserHandler(userManager, _ctx.Bus.Object);
@@ -249,10 +249,10 @@ public class UsersHandlersTests : IAsyncLifetime
             // LastName = "LastName",
             Email = "newuser@domain.com",
             UrlToken = "token",
-            Password = "P@ssw0rd!",
+            Password = "P@ssw0rd!"
         };
         
-        dbContext.UrlTokens.Add(new UrlToken()
+        dbContext.UrlTokens.Add(new UrlToken
         {
             Id = Guid.NewGuid(),
             Data = "",
@@ -261,7 +261,7 @@ public class UsersHandlersTests : IAsyncLifetime
             UrlTokenType = UrlTokenType.AllowAddUser
         });
         await dbContext.SaveChangesAsync();
-        var createUserResult = await userManager.CreateAsync(new User()
+        var createUserResult = await userManager.CreateAsync(new User
         {
             Id = Guid.NewGuid().ToString(),
             UserName = "newuser@domain.com",
@@ -287,7 +287,7 @@ public class UsersHandlersTests : IAsyncLifetime
         var dbContext = _ctx.CreateDbContext();
 
         var newuser = await _ctx.CreateUserAsync("confirm_user@domain.com", false, "confirm_user@domain.com");
-        dbContext.UrlTokens.Add(new UrlToken()
+        dbContext.UrlTokens.Add(new UrlToken
         {
             Id = Guid.NewGuid(),
             Data = newuser.Id,

@@ -2,7 +2,7 @@
 using FotoApi.Model;
 using Microsoft.AspNetCore.Identity;
 
-namespace FotoApi.Features.HandleUsers.QueriyHandlers;
+namespace FotoApi.Features.HandleUsers.QueryHandlers;
 
 public class GetUsersHandler(UserManager<User> userManager) : IEmptyRequestHandler<List<UserResponse>>
 {

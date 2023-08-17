@@ -2,9 +2,4 @@
 
 namespace FotoApi.Infrastructure.Security.Authorization.Exceptions;
 
-public class RefreshTokenNotFoundOrWrongException : BadRequestException
-{
-    public RefreshTokenNotFoundOrWrongException() : base("Refresh tokeon not found or wrong")
-    {
-    }
-}
+public class RefreshTokenNotFoundOrWrongException() : BadRequestException("Refresh token not found or wrong");

@@ -13,7 +13,7 @@ public class GetStBildPackagesHandler(PhotoServiceDbContext db) : IHandler<bool,
             false=> db.StPackage.Where(n=>n.IsDelivered==false).OrderBy(p => p.CreatedDate)
         };
         var packages = await packagesQuery.ToListAsync(cancellationToken);
-        return packages.Select(x => new StBildPackageResponse()
+        return packages.Select(x => new StBildPackageResponse
         {
             Id = x.Id,
             IsDelivered = x.IsDelivered,

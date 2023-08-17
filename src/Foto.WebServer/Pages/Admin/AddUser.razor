@@ -16,7 +16,7 @@
 <div class="container">
     <div class="row g-3 mb-5 justify-content-center align-items-center">
         <div class="col col-8" style="max-width: 350px;">
-            <EditForm Model="@NewUserModel" OnValidSubmit="@HandleValidSubmit" Context="authirzationContext">
+            <EditForm Model="@NewUserModel" OnValidSubmit="@HandleValidSubmit" Context="authorizationContext">
                 <FluentValidationValidator/>
                 <div class="mb-3">
                     <label for="email" class="form-label">E-post</label>
@@ -62,7 +62,7 @@
         {
             _preCreatedUserNames.Add(user.UserName);
             // We succeeded in creating a user, so we can clear the form and allow create a new one
-            NewUserModel = new();
+            NewUserModel = new PreCreateUserModel();
         }
         StateHasChanged();
     }

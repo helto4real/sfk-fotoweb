@@ -21,7 +21,7 @@ public class AdminApiTests : IntegrationTestsBase
         Assert.Equal("admin", user.UserName);
     }
 
-    public AdminApiTests(TestContainerLifeTime testContinerLifetime) : base(testContinerLifetime)
+    public AdminApiTests(TestContainerLifeTime testContainerLifetime) : base(testContainerLifetime)
     {
     }
 }

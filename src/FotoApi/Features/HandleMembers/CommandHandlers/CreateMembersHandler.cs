@@ -52,7 +52,7 @@ public class CreateMembersHandler
             ZipCode = member.ZipCode,
             City = member.City,
             IsActive = member.IsActive,
-            Roles = request.Roles.Select(n => new RoleResponse(){Name = n.Name}).ToList()
+            Roles = request.Roles.Select(n => new RoleResponse {Name = n.Name}).ToList()
         };
     }
     
@@ -95,7 +95,7 @@ public class CreateMembersHandler
             if (!result.Succeeded)
             {
                 logger.LogError("Failed to update user Error: {Error}", result.Errors);
-                throw new SystemErrorException("Systemfel: Kunde inte uppdatera användarinformation, kotakta administratören.");
+                throw new SystemErrorException("Systemfel: Kunde inte uppdatera användarinformation, kontakta administratören.");
             }
         }
     }
@@ -105,33 +105,27 @@ public class CreateMembersHandler
         // First we check if user email has a user with that username
         
         var userWasCreated = false;
-        var user = await userManager.FindByNameAsync(request.Email);
+        // Then we check if there are an existing ser with that email
+        var user = await userManager.FindByNameAsync(request.Email) ?? await userManager.FindByEmailAsync(request.Email);
 
-        if (user is null)
+        if (user is not null) return (user, userWasCreated);
+        // There are no user with that email as user name or email, so we create a new user
+        user = new User
         {
-            // Then we check if there are an existing ser with that email
-            user = await userManager.FindByEmailAsync(request.Email);
+            UserName = request.Email,
+            Email = request.Email,
+            PhoneNumber = request.PhoneNumber,
+            RefreshToken = "",
+            RefreshTokenExpirationDate = DateTime.MinValue
+        };
+        var result = await userManager.CreateAsync(user);
+        if (!result.Succeeded)
+        {
+            logger.LogError("Failed to create user Error: {Error}", result.Errors);
+            throw new SystemErrorException("Systemfel: Kunde inte skapa användare, kotakta administratören.");
         }
-        if (user is null)
-        {
-            // There are no user with that email as user name or email, so we create a new user
-            user = new User
-            {
-                UserName = request.Email,
-                Email = request.Email,
-                PhoneNumber = request.PhoneNumber,
-                RefreshToken = "",
-                RefreshTokenExpirationDate = DateTime.MinValue
-            };
-            var result = await userManager.CreateAsync(user);
-            if (!result.Succeeded)
-            {
-                logger.LogError("Failed to create user Error: {Error}", result.Errors);
-                throw new SystemErrorException("Systemfel: Kunde inte skapa användare, kotakta administratören.");
-            }
 
-            userWasCreated = true;
-        }
+        userWasCreated = true;
 
         return (user, userWasCreated);
     }

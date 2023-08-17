@@ -7,18 +7,16 @@ public class ResponseHandler
     public string? Message { get; set; }
     public bool HasAlert => Message is not null;
 
-    public bool CheckResponse(ErrorDetail? result) 
+    public bool CheckResponse(ErrorDetail? result)
     {
         if (result is null)
         {
             Clear();
             return true;
         }
-        else
-        {
-            Message = result.Detail;
-            return false;
-        }
+
+        Message = result.Detail;
+        return false;
     }
 
     public T? CheckResponse<T>((T?, ErrorDetail?) result) where T : class
@@ -28,7 +26,8 @@ public class ResponseHandler
            Clear();
            return result.Item1;
         }
-        else if (result.Item1 is null && result.Item2 is null)
+
+        if (result.Item1 is null && result.Item2 is null)
         {
             Message = "Okänt fel";
         }
@@ -44,6 +43,6 @@ public class ResponseHandler
         return null;
     }
 
-    public void Clear() => Message = null;
+    private void Clear() => Message = null;
 
 }

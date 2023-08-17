@@ -7,16 +7,14 @@ public class MemberService : ServiceBase, IMemberService
 {
     private readonly HttpClient _httpClient;
     private readonly ISignInService _signInService;
-    private readonly ILogger<AdminService> _logger;
 
     public MemberService(HttpClient httpClient,
         IOptions<AppSettings> appSettings,
         ISignInService signInService,
-        ILogger<AdminService> logger) : base(logger)
+        ILogger<MemberService> logger) : base(logger)
     {
         _httpClient = httpClient;
         _signInService = signInService;
-        _logger = logger;
         httpClient.BaseAddress = new Uri(appSettings.Value.FotoApiUrl);
         httpClient.DefaultRequestHeaders.Add("User-Agent", "FotoWebbServer");
     }

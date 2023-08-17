@@ -39,7 +39,7 @@ public static class AuthApi
                 return Results.Unauthorized();
             }
             
-            var (authInfo, _) = await authService.RefreshAccessTokenAsync(refreshToken!, context.User!.Identity!.Name!);
+            var (authInfo, _) = await authService.RefreshAccessTokenAsync(refreshToken!, context.User.Identity!.Name!);
             if (authInfo is null)
             {
                 return Results.BadRequest("Invalid refresh token");
@@ -99,7 +99,7 @@ public static class AuthApi
         group.MapPost("login", async Task<Results<Ok<AccountInfo>, 
             BadRequest<ErrorDetail>>> (LoginUserInfo loginInfo, HttpContext context, IAuthService authService) =>
         {
-            var result = await authService.LoginAsync(new LoginUserInfo()
+            var result = await authService.LoginAsync(new LoginUserInfo
             {
                 UserName = loginInfo.UserName,
                 Password = loginInfo.Password
@@ -112,12 +112,16 @@ public static class AuthApi
                 return TypedResults.BadRequest(error);
             }
 
-            var userClaimsPrincipal = new UserClaimPrincipal(login.UserName, login.Roles, login.RefreshToken, null);
-        
-            // Since we are successfully authenticated, we redirect the user to the home page.
-            userClaimsPrincipal.AuthenticationProperties.RedirectUri = "/";
-        
-            
+            var userClaimsPrincipal = new UserClaimPrincipal(login.UserName, login.Roles, login.RefreshToken, null)
+                {
+                    AuthenticationProperties =
+                    {
+                        // Since we are successfully authenticated, we redirect the user to the home page.
+                        RedirectUri = "/"
+                    }
+                };
+
+
             await Results.SignIn(userClaimsPrincipal,
                 userClaimsPrincipal.AuthenticationProperties,
                 CookieAuthenticationDefaults.AuthenticationScheme).ExecuteAsync(context);
@@ -175,7 +179,7 @@ public static class AuthApi
                     // The user is not pre-registered, so we need to move them back to the pre-registration page
                     await context.SignOutAsync(AuthConstants.ExternalScheme);
                     return Results.Redirect(
-                        $@"/register/?token={Uri.EscapeDataString(urlToken ?? string.Empty)}&success=false");
+                        $@"/register/?token={Uri.EscapeDataString(urlToken)}&success=false");
                 }
             }
             // Delete the external cookie

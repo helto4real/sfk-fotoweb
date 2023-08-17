@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace Foto.Tests.Integration.Web.Services;
 
@@ -17,10 +18,10 @@ public class ImageServiceTests: IntegrationTestsBase
     {
         // Arrange
         var client = CreateClient("admin", true);
-        var options = Options.Create(new AppSettings() { FotoApiUrl = client.BaseAddress!.ToString() });
+        var options = Options.Create(new AppSettings { FotoApiUrl = client.BaseAddress!.ToString() });
         var fileName = "somefile.jpg";
         var db = CreateFotoAppDbContext();
-        var stBildMetaData = new StBildMetadata()
+        var stBildMetaData = new StBildMetadata
         {
             Title = "Title",
             Name = "Name",
@@ -76,7 +77,7 @@ public class StBildMetadata
     public string Title { get; set; } = default!;
     public string Name { get; set; } = default!;
     public string Location { get; set; } = default!;
-    public DateTime Time { get; set; } = new DateTime(2023, 1, 1);
+    public DateTime Time { get; set; } = new(2023, 1, 1);
     public string Description { get; set; } = default!;
     public string AboutThePhotographer { get; set; } = default!;
 
