@@ -22,7 +22,7 @@ public class MemberServiceTests : IntegrationTestsBase
             client,
             options,
             new FakeSignInService(),
-            new Mock<ILogger<AdminService>>().Object
+            new Mock<ILogger<MemberService>>().Object
         );
 
         // Act
@@ -62,7 +62,7 @@ public class MemberServiceTests : IntegrationTestsBase
             client,
             options,
             new FakeSignInService(),
-            new Mock<ILogger<AdminService>>().Object
+            new Mock<ILogger<MemberService>>().Object
         );
 
         await CreateUserAsync(existingUserEmail, null, existingUserEmail);
@@ -106,7 +106,7 @@ public class MemberServiceTests : IntegrationTestsBase
             client,
             options,
             new FakeSignInService(),
-            new Mock<ILogger<AdminService>>().Object
+            new Mock<ILogger<MemberService>>().Object
         );
 
         var member = await CreateMemberAsync(updatedMemberEmail);
@@ -153,7 +153,7 @@ public class MemberServiceTests : IntegrationTestsBase
             client,
             options,
             new FakeSignInService(),
-            new Mock<ILogger<AdminService>>().Object
+            new Mock<ILogger<MemberService>>().Object
         );
 
         // Act
@@ -189,7 +189,7 @@ public class MemberServiceTests : IntegrationTestsBase
             client,
             options,
             new FakeSignInService(),
-            new Mock<ILogger<AdminService>>().Object
+            new Mock<ILogger<MemberService>>().Object
         );
 
         // Act
@@ -214,7 +214,7 @@ public class MemberServiceTests : IntegrationTestsBase
             client,
             options,
             new FakeSignInService(),
-            new Mock<ILogger<AdminService>>().Object
+            new Mock<ILogger<MemberService>>().Object
         );
         // Act
         var (member, error) = await memberService.GetMemberByIdAsync(existingMember.Id);
@@ -245,7 +245,7 @@ public class MemberServiceTests : IntegrationTestsBase
             client,
             options,
             new FakeSignInService(),
-            new Mock<ILogger<AdminService>>().Object
+            new Mock<ILogger<MemberService>>().Object
         );
         // Act
         var (member, error) = await memberService.GetMemberByIdAsync(nonExistingMemberId);
@@ -269,7 +269,7 @@ public class MemberServiceTests : IntegrationTestsBase
             client,
             options,
             new FakeSignInService(),
-            new Mock<ILogger<AdminService>>().Object
+            new Mock<ILogger<MemberService>>().Object
         );
         // Act
         var error = await memberService.DeleteMemberByIdAsync(existingMember.Id);
@@ -292,7 +292,7 @@ public class MemberServiceTests : IntegrationTestsBase
             client,
             options,
             new FakeSignInService(),
-            new Mock<ILogger<AdminService>>().Object
+            new Mock<ILogger<MemberService>>().Object
         );
         // Act
         var error = await memberService.ActivateMemberByIdAsync(existingMember.Id);
@@ -317,7 +317,7 @@ public class MemberServiceTests : IntegrationTestsBase
             client,
             options,
             new FakeSignInService(),
-            new Mock<ILogger<AdminService>>().Object
+            new Mock<ILogger<MemberService>>().Object
         );
         // Act
         var error = await memberService.DeactivateMemberByIdAsync(existingMember.Id);
@@ -340,7 +340,7 @@ public class MemberServiceTests : IntegrationTestsBase
             client,
             options,
             new FakeSignInService(),
-            new Mock<ILogger<AdminService>>().Object
+            new Mock<ILogger<MemberService>>().Object
         );
         // Act
         var error = await memberService.DeactivateMemberByIdAsync(nonExistingMemberId);
@@ -361,7 +361,7 @@ public class MemberServiceTests : IntegrationTestsBase
             client,
             options,
             new FakeSignInService(),
-            new Mock<ILogger<AdminService>>().Object
+            new Mock<ILogger<MemberService>>().Object
         );
 
         // Act
@@ -384,7 +384,7 @@ public class MemberServiceTests : IntegrationTestsBase
             client,
             options,
             new FakeSignInService(),
-            new Mock<ILogger<AdminService>>().Object
+            new Mock<ILogger<MemberService>>().Object
         );
 
         // Act
@@ -407,7 +407,7 @@ public class MemberServiceTests : IntegrationTestsBase
             client,
             options,
             new FakeSignInService(),
-            new Mock<ILogger<AdminService>>().Object
+            new Mock<ILogger<MemberService>>().Object
         );
 
         // Act

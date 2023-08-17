@@ -3,9 +3,9 @@ using Moq;
 
 namespace Foto.Tests.Integration.Web.Services;
 
-public class FakePhotostore : Mock<IPhotoStore>
+public class FakePhotoStore : Mock<IPhotoStore>
 {
-    public FakePhotostore()
+    public FakePhotoStore()
     {
         var fakeIPhoto = new Mock<IPhoto>();
         fakeIPhoto.Setup(x => x.SaveThumbnailAsync()).ReturnsAsync(true);
