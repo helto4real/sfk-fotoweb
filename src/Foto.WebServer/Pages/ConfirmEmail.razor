@@ -3,21 +3,22 @@
 @using Foto.WebServer.Services
 @inject IUserService UserService
 
-<div class="container">
-    <div class="row g-3 mb-5 justify-content-center align-items-center">
-        <div class="col col-8" style="max-width: 350px;">
-            <h2>Epost-konfirmering</h2>
-            @if (IsConfirmed)
-            {
-                <p>Din e-post är nu konfirmerad du kommer nu automatiskt flyttas till inloggningssidan.</p>
-            }
-            else
-            {
-                <p>Du har antagligen klickat på en gammal länk. Använd senaste mailet du fått från systemet! Du kommer automatiskt komma till inloggningssidan. Logga in och följ instruktioner för att skicka konfirmeringen igen.</p>
-            }
-        </div>
-    </div>
-</div>
+<PageTitle>Konfirmering av e-post</PageTitle>
+
+<AppContent ContentMaxWidth="MaxWidth.Small">
+    <Title>Konfirmering av e-post</Title>
+    <Ingress></Ingress>
+    <Container>
+        @if (IsConfirmed)
+        {
+            <AppAlert Severity="Severity.Success">Din e-post är nu konfirmerad du kommer nu automatiskt flyttas till inloggningssidan.</AppAlert>
+        }
+        else
+        {
+            <AppAlert Severity="Severity.Error">Konfirmering av e-post misslyckades. Du har antagligen klickat på en gammal länk. Använd senaste mailet du fått från systemet!</AppAlert>
+        }
+    </Container>
+</AppContent>
 
 @code {
 
@@ -31,13 +32,7 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        _timer.AutoReset = false;
-        _timer.Elapsed += (_, _) =>
-        {
-            NavigationManager?.NavigateTo("/login", true);
-            _timer.Dispose();
-        };
-        _timer.Enabled = true;
+
         if (firstRender)
         {
             if (Token is not null)
@@ -46,6 +41,17 @@
                 IsConfirmed = result is null;
                 StateHasChanged();
             }
+
+            if (!IsConfirmed)
+                return;
+            
+            _timer.AutoReset = false;
+            _timer.Elapsed += (_, _) =>
+            {
+                NavigationManager?.NavigateTo("/login", true);
+                _timer.Dispose();
+            };
+            _timer.Enabled = true;
         }
 
         await base.OnAfterRenderAsync(firstRender);

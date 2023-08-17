@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using FluentValidation;
+using Foto.WebServer.Shared;
 using Shared.Validation;
 
 namespace Foto.WebServer.Dto;
@@ -13,6 +14,7 @@ public record UpdateLoginInfo
     public string? CurrentPassword { get; set; }
     public string? NewPassword { get; set; }
     public string? NewEmail { get; set; }
+    public string? ConfirmNewEmail { get; set; }
     public bool IsUserExternal { get; set; }
 
     [JsonIgnore] public string? ConfirmPassword { get; set; }
@@ -20,7 +22,7 @@ public record UpdateLoginInfo
     [JsonIgnore] public string? CurrentEmail { get; init; }
 }
 
-public class UpdateLoginInfoValidator : AbstractValidator<UpdateLoginInfo>
+public class UpdateLoginInfoValidator : ValidatorBase<UpdateLoginInfo>
 {
     public UpdateLoginInfoValidator()
     {
@@ -43,6 +45,11 @@ public class UpdateLoginInfoValidator : AbstractValidator<UpdateLoginInfo>
         });
 
         When(x => !string.IsNullOrWhiteSpace(x.NewEmail),
-            () => { RuleFor(x => x.NewEmail).EmailAddress().WithMessage("E-post måste vara en giltig e-postadress"); });
+            () =>
+            {
+                RuleFor(x => x.NewEmail).EmailAddress().WithMessage("E-post måste vara en giltig e-postadress");
+                RuleFor(x => x.ConfirmNewEmail).Equal(x => x.NewEmail)
+                    .WithMessage("E-postadresserna måste matcha.");
+            });
     }
 }
