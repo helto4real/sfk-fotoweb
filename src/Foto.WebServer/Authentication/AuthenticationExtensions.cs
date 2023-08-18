@@ -1,11 +1,12 @@
 ﻿using Auth0.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
 namespace Foto.WebServer.Authentication;
 
-public class AuthConstants
+public static class AuthConstants
 {
     public static string ExternalScheme { get; } = "External";
 }
@@ -48,37 +49,41 @@ public static class AuthenticationExtensions
             ["Google"] = static (builder, configure) => builder.AddGoogle(configure),
             ["Microsoft"] = static (builder, configure) => builder.AddMicrosoftAccount(configure),
             ["Auth0"] = static (builder, configure) => builder.AddAuth0WebAppAuthentication(configure)
-                                                              .WithAccessToken(configure),
+                                                              .WithAccessToken(configure)
         };
     
         foreach (var (providerName, provider) in externalProviders)
         {
             var section = builder.Configuration.GetSection($"Authentication:Schemes:{providerName}");
-    
-            if (section.Exists())
+
+            if (!section.Exists()) continue;
+            provider(authenticationBuilder, options =>
             {
-                provider(authenticationBuilder, options =>
+                // Bind this section to the specified options
+                section.Bind(options);
+
+                if (options is GoogleOptions googleOptions)
                 {
-                    // Bind this section to the specified options
-                    section.Bind(options);
-    
+                    googleOptions.ClaimActions.MapJsonKey("image", "picture");
+                }
+
+                switch (options)
+                {
                     // This will save the information in the external cookie
-                    if (options is RemoteAuthenticationOptions remoteAuthenticationOptions)
-                    {
+                    case RemoteAuthenticationOptions remoteAuthenticationOptions:
                         remoteAuthenticationOptions.SignInScheme = AuthConstants.ExternalScheme;
-                    }
-                    else if (options is Auth0WebAppOptions auth0WebAppOptions)
-                    {
+                        break;
+                    case Auth0WebAppOptions auth0WebAppOptions:
                         // Skip the cookie handler since we already add it
                         auth0WebAppOptions.SkipCookieMiddleware = true;
-                    }
-                });
-    
-                if (providerName is "Auth0")
-                {
-                    // Set this up once
-                    SetAuth0SignInScheme(builder);
+                        break;
                 }
+            });
+    
+            if (providerName is "Auth0")
+            {
+                // Set this up once
+                SetAuth0SignInScheme(builder);
             }
         }
     

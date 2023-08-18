@@ -5,12 +5,8 @@ using FotoApi.Infrastructure.Validation.Exceptions;
 
 namespace FotoApi.Infrastructure.ExceptionsHandling;
 
-internal sealed class ExceptionHandlingMiddleware : IMiddleware
+internal sealed class ExceptionHandlingMiddleware(ILogger<ExceptionHandlingMiddleware> logger) : IMiddleware
 {
-    private readonly ILogger<ExceptionHandlingMiddleware> _logger;
-
-    public ExceptionHandlingMiddleware(ILogger<ExceptionHandlingMiddleware> logger) => _logger = logger;
-
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         try
@@ -19,7 +15,7 @@ internal sealed class ExceptionHandlingMiddleware : IMiddleware
         }
         catch (Exception e)
         {
-            _logger.LogError(e, e.Message);
+            logger.LogError(e, e.Message);
 
             await HandleExceptionAsync(context, e);
         }
@@ -51,6 +47,7 @@ internal sealed class ExceptionHandlingMiddleware : IMiddleware
             NotFoundException => StatusCodes.Status404NotFound,
             ValidationException => StatusCodes.Status400BadRequest,
             ForbiddenException =>StatusCodes.Status403Forbidden,
+            UnAuthorizedException => StatusCodes.Status401Unauthorized,
             _ => StatusCodes.Status500InternalServerError
         };
 
@@ -61,6 +58,7 @@ internal sealed class ExceptionHandlingMiddleware : IMiddleware
             ValidationException => "Validation error",
             BadRequestException => "Bad request",
             ForbiddenException => "Forbidden",
+            UnAuthorizedException => "Unauthorized",
             _ => "Server Error"
         };
 

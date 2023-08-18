@@ -10,7 +10,7 @@ public class EmailRequestValidator : AbstractValidator<EmailRequest>
     {
         RuleFor(x => x.Email)
             .NotEmpty()
-            .WithMessage("Avändarnamn i form av e-post måste anges")
+            .WithMessage("Användarnamn i form av e-post måste anges")
             .EmailAddress()
             .WithMessage("Användarnamn måste vara en giltig e-postadress");
     }

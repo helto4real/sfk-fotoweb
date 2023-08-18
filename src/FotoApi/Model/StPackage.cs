@@ -8,7 +8,7 @@ public record StPackage : TimeTrackedEntity
     public string PackageRelativPath { get; set; } = default!;
 }
 
-public record StPackageItem()
+public record StPackageItem
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public Guid StPackageReference { get; init; }

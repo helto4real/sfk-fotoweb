@@ -1,87 +1,86 @@
 @page "/user/edit"
 @using Foto.WebServer.Services
 @using Foto.WebServer.Dto
-@using Blazored.FluentValidation
 @inherits AuthorizedBasePage
 @inject IUserService UserService;
 @inject ISignInService SignInService;
+@inject AppSnackBar AppSnackBar;
 
-<div class="container">
-    <div class="row  g-3 mb-5 justify-content-center align-items-center">
-        <div class="col col-8" style="max-width: 550px;">
-            <h2>Ändra kontouppgifter</h2>
-            Här kan du ändra din e-post address. @DisplayPasswordText Om du behöver ändra
-            ditt användarnamn så måste du kontakta en administratör.
-        </div>
-    </div>
-    <div class="row g-3 mb-5 justify-content-center align-items-center">
-        <div class="col col-4">
-            @if (_loginInfo is not null)
-            {
-                <CvEditForm id="uploadForm" Model="_loginInfo" class="form" OnValidSubmit="@HandleValidSubmit" Context="NewContext">
-                    <FluentValidationValidator @ref="_fluentValidationValidator"/>
-                    <div class="form-group mt-1">
-                        <span for="current-username" class="">Användarnamn:</span>
-                        <input id="current-username" type="text" class="form-control app-input-wide" value="@_loginInfo.CurrentUserName" disabled readonly/>
-                    </div>
-                    <div class="form-group mt-1">
-                        <label for="current-email" class="form-label">E-post:</label>
-                        <input id="current-email" type="text" class="form-control app-input-wide" value="@_loginInfo.CurrentEmail" disabled readonly/>
-                    </div>
-                    @if (!_isExternal)
-                    {
-                        <div class="form-group mt-1">
-                            <label for="password" class="form-label">Nuvarande lösenord:</label>
-                            <InputText id="password" type="password" class="form-control app-input-wide" @bind-Value="_loginInfo.CurrentPassword"/>
-                            <ValidationMessage class="text-danger" For="@(() => _loginInfo.CurrentPassword)"/>
-                        </div>
-                        <div class="form-group mt-1">
-                            <label for="new-password" class="form-label">Nytt lösenord:</label>
-                            <InputText id="new-password" type="password" class="form-control app-input-wide" @bind-Value="_loginInfo.NewPassword"/>
-                            <ValidationMessage class="text-danger" For="@(() => _loginInfo.NewPassword)"/>
-                        </div>
-                        <div class="form-group mt-1">
-                            <label for="confirmPassword">Bekräfta lösenord</label>
-                            <InputText id="confirmPassword" type="password" class="form-control app-input-wide" @bind-Value="_loginInfo.ConfirmPassword"/>
-                            <ValidationMessage class="text-danger" For="@(() => _loginInfo.ConfirmPassword)"/>
-                        </div>
-                    }
-                    <div class="form-group mt-1">
-                        <label for="new-email">Ny e-post:</label>
-                        <InputText id="new-email" class="form-control app-input-wide" @bind-Value="@_loginInfo.NewEmail"/>
-                        <ValidationMessage class="text-danger" For="@(() => _loginInfo.NewEmail)"/>
-                    </div>
+<PageTitle>Ändra kontouppgifter</PageTitle>
 
-                    <div class="d-flex justify-content-between align-items-center mt-4 app-input-wide">
-                        @if (CanSubmit)
-                        {
-                            <button type="submit" class="btn btn-primary app-button-wide">Spara</button>
-                        }
-                        else
-                        {
-                            <button type="submit" class="btn btn-primary app-button-wide" disabled>Spara</button>
-                        }
-                        <button type="button" class="btn btn-secondary app-button-wide" @onclick="OnCancel">Avbryt</button>
-                    </div>
-                </CvEditForm>
-            }
-        </div>
-    </div>
-</div>
+<AppContent ContentMaxWidth="MaxWidth.Small" ContentClass="d-flex flex-column justify-content-center align-items-center mt-5">
+    <Title>Ändra kontouppgifter</Title>
+    <Ingress>Ändra dina kontouppgifter i systemet. @DisplayPasswordText</Ingress>
+    <Container>
+        <AppForm @ref="_form" Model="_loginInfo" Validation="@(_validator.ValidateValue)" ValidationDelay="0">
+            <Form>
+                <MudField Label="Nuvarande användarnamn">@_loginInfo.CurrentUserName</MudField>
+                <MudField Label="Nuvarande e-post">@_loginInfo.CurrentEmail</MudField>
+                
+                @if (!_isExternal)
+                {   
+                    <AppTextField 
+                        Label="Nuvarande lösenord" 
+                        For="@(() => _loginInfo.CurrentPassword)" 
+                        @bind-Value="_loginInfo.CurrentPassword"/>
+                    
+                    <AppTextField 
+                        Label="Nytt lösenord" 
+                        For="@(() => _loginInfo.NewPassword)" 
+                        @bind-Value="_loginInfo.NewPassword"/>
+                   
+                    <AppTextField 
+                        Label="Bekräfta lösenord" 
+                        For="@(() => _loginInfo.ConfirmPassword)" 
+                        @bind-Value="_loginInfo.ConfirmPassword"/>                
+                }
+                    
+                <AppTextField 
+                    Label="Ny e-post" 
+                    For="@(() => _loginInfo.NewEmail)" 
+                    @bind-Value="_loginInfo.NewEmail"/>                
+                
+                <AppTextField 
+                    Label="Bekräfta ny e-post" 
+                    For="@(() => _loginInfo.ConfirmNewEmail)" 
+                    @bind-Value="_loginInfo.ConfirmNewEmail"/>
+                
+            </Form>
+            <Actions>
+                <MudButton StartIcon="@Icons.Material.Filled.Save" OnClick="HandleValidSubmit" Variant="Variant.Text" Color="Color.Primary" 
+                                           Disabled="@(!IsValid())" >Spara</MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.Cancel" OnClick="OnCancel" Variant="Variant.Text" Color="Color.Surface" 
+                                            Class="mr-auto">Avbryt</MudButton>
+            </Actions>
+        </AppForm>
+    </Container>
+</AppContent>
 
+@if (_showEmailVerification)
+{
+    <AppAlert Class="mt-3" Severity="Severity.Warning">Du har ändrat e-postadress. Du behöver konfirmera den genom att klicka på länken du får i din e-post!</AppAlert>
+}
 @if (_responseHandler.HasAlert)
 {
-    <div class="alert alert-danger">@_responseHandler.Message</div>
+    <AppAlert Class="mt-3" Severity="Severity.Error">@_responseHandler.Message</AppAlert>
 }
 
 @code {
-    private readonly ResponseHandler _responseHandler = new ResponseHandler();
-    private UpdateLoginInfo? _loginInfo;
+    private readonly ResponseHandler _responseHandler = new();
+    private UpdateLoginInfo _loginInfo = new();
     private UserInfo? _user;
-    private FluentValidationValidator? _fluentValidationValidator;
     private bool _isExternal;
-
-    private bool CanSubmit => _loginInfo is not null && (_fluentValidationValidator?.Validate() ?? false);
+    private bool _showEmailVerification;
+    private readonly UpdateLoginInfoValidator _validator = new();
+    private AppForm? _form;
+    
+    public bool IsValid()
+    {
+        if (string.IsNullOrWhiteSpace(_loginInfo.NewEmail) &&
+            string.IsNullOrWhiteSpace(_loginInfo.NewPassword))
+            return false;
+        return _validator.Validate(_loginInfo).IsValid;
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -92,7 +91,7 @@
 
             if (_user is not null)
             {
-                _loginInfo = new UpdateLoginInfo()
+                _loginInfo = new UpdateLoginInfo
                 {
                     CurrentUserName = _user.Username,
                     CurrentEmail = _user.Email
@@ -106,10 +105,21 @@
 
     private async Task HandleValidSubmit()
     {
-        if (_loginInfo is not null)
+        _ = _form ?? throw new NullReferenceException("Form is null!");
+        
+        await _form.Validate();
+        if (!_form.IsValid)
+            return;
+        
+        var response = await UserService.ChangeLoginInfoAsync(_loginInfo);
+
+        if (_responseHandler.CheckResponse(response))
         {
-            var response = await UserService.ChangeLoginInfoAsync(_loginInfo);
-            _responseHandler.CheckResponse(response);
+            if (_loginInfo.NewEmail != _loginInfo.CurrentEmail)
+            {
+                _showEmailVerification = true;
+            }
+            AppSnackBar.Alert("Dina kontouppgifter har ändrats.", Severity.Success);
         }
     }
 
@@ -118,6 +128,6 @@
         NavigationManager?.NavigateTo("/");
     }
 
-    private object DisplayPasswordText => !_isExternal ? "Du kan också ändra ditt lösenord." : string.Empty;
+    private string DisplayPasswordText => !_isExternal ? "Du kan också ändra ditt lösenord." : string.Empty;
 
 }

@@ -7,13 +7,13 @@ public class GetStBildPackagesHandler(PhotoServiceDbContext db) : IHandler<bool,
 {
     public async Task<List<StBildPackageResponse>> Handle(bool returnDelivered, CancellationToken cancellationToken = default)
     {
-        var packages = returnDelivered switch
+        var packagesQuery = returnDelivered switch
         {
-            true => await db.StPackage.ToListAsync(cancellationToken),
-            false => await db.StPackage.Where(x => !x.IsDelivered).ToListAsync(cancellationToken)
+            true => db.StPackage.OrderByDescending(p => p.CreatedDate),
+            false=> db.StPackage.Where(n=>n.IsDelivered==false).OrderBy(p => p.CreatedDate)
         };
-
-        return packages.Select(x => new StBildPackageResponse()
+        var packages = await packagesQuery.ToListAsync(cancellationToken);
+        return packages.Select(x => new StBildPackageResponse
         {
             Id = x.Id,
             IsDelivered = x.IsDelivered,

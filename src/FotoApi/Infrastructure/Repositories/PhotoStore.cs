@@ -21,7 +21,6 @@ public class PhotoStore : IPhotoStore, IPhoto, IDisposable
     private readonly string _photoUserFolderAndPath;
     private readonly string _imagePath;
 
-    private const string ImageFolder = ".images";
     private const string ImageRootFolder = ".images/user_images";
     private const string StPackageRootFolder = ".images/st-packages";
 
@@ -62,7 +61,7 @@ public class PhotoStore : IPhotoStore, IPhoto, IDisposable
         }
         await using (FileStream fs = new(_imagePath, FileMode.Create))
         {
-            await _image.SaveAsync(fs, new JpegEncoder() { Quality = 80 });
+            await _image.SaveAsync(fs, new JpegEncoder { Quality = 80 });
         }  
 
         return this;
@@ -70,7 +69,6 @@ public class PhotoStore : IPhotoStore, IPhoto, IDisposable
 
     public void DeletePhoto(string  relativePath)
     {
-        if (_env is null) return;
         if (_currentUser?.User?.Id is null) return;
         
         var fullPath = Path.Combine(_env.ContentRootPath, ImageRootFolder, relativePath);
@@ -116,7 +114,7 @@ public class PhotoStore : IPhotoStore, IPhoto, IDisposable
             _image.Mutate(x => x.Resize(new ResizeOptions
             {
                 Size = new Size(width, height),
-                Mode = ResizeMode.Max,
+                Mode = ResizeMode.Max
             }));
         }
     }
@@ -202,8 +200,8 @@ public class PhotoStore : IPhotoStore, IPhoto, IDisposable
 
     public static async Task CopyFileAsync(string sourcePath, string destinationPath)
     {
-        using (var sourceStream = new FileStream(sourcePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, useAsync: true))
-        using (var destinationStream = new FileStream(destinationPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, bufferSize: 4096, useAsync: true))
+        await using (var sourceStream = new FileStream(sourcePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, useAsync: true))
+        await using (var destinationStream = new FileStream(destinationPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, bufferSize: 4096, useAsync: true))
         {
             await sourceStream.CopyToAsync(destinationStream);
         }
@@ -226,22 +224,15 @@ public class PhotoStore : IPhotoStore, IPhoto, IDisposable
 
         return uniqueFilPath;
     }
-    
-    public static string MakeFilenameSafe(string filename)
+
+    private static string MakeFilenameSafe(string filename)
     {
         var invalidChars = Path.GetInvalidFileNameChars();
         var safeFilename = new StringBuilder(filename.Length);
 
         foreach (var c in filename)
         {
-            if (invalidChars.Contains(c))
-            {
-                safeFilename.Append('_');
-            }
-            else
-            {
-                safeFilename.Append(c);
-            }
+            safeFilename.Append(invalidChars.Contains(c) ? '_' : c);
         }
 
         return safeFilename.ToString();
@@ -264,7 +255,7 @@ public class PhotoStore : IPhotoStore, IPhoto, IDisposable
         
         await using (FileStream fs = new(ThumbnailPath, FileMode.Create))
         {
-            await _image.SaveAsync(fs, new JpegEncoder() { Quality = 80 });
+            await _image.SaveAsync(fs, new JpegEncoder { Quality = 80 });
         }
         
         return true;
@@ -274,20 +265,14 @@ public class PhotoStore : IPhotoStore, IPhoto, IDisposable
     {
         var imagePath = Path.Combine(_env.ContentRootPath, ImageRootFolder, relativeImagePath);
         
-        if (!File.Exists(imagePath))
-            return null;
-
-        return new FileStream(imagePath, FileMode.Open);
+        return !File.Exists(imagePath) ? null : new FileStream(imagePath, FileMode.Open);
     }
     
     public FileStream? GetThumbnailStreamFromRelativePath(string relativeImagePath)
     {
         var thumbnailPath = Path.Combine(_env.ContentRootPath, ImageRootFolder, ConvertToThumbnailPath(relativeImagePath));
         
-        if (!File.Exists(thumbnailPath))
-            return null;
-        
-        return new FileStream(thumbnailPath, FileMode.Open);
+        return !File.Exists(thumbnailPath) ? null : new FileStream(thumbnailPath, FileMode.Open);
     }
 }
 
@@ -296,7 +281,7 @@ public interface IPhotoStore
     FileStream? GetStreamFromRelativePath(string relativeImagePath);
     FileStream? GetThumbnailStreamFromRelativePath(string relativeImagePath);
     Task<IPhoto?> SavePhotoAsync(Stream inputStream, (int, int) imageSize, bool resize);
-    void DeletePhoto(string reativePath);
+    void DeletePhoto(string relativePath);
     string PhotoUserFolderAndPath { get; }
 
     Task PackageStBild(string imageLocalRelativeFilePath, Guid packageId, StBild stBild);

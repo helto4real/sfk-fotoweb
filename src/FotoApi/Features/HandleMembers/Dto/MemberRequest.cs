@@ -1,6 +1,8 @@
 ﻿using FluentValidation;
 using FotoApi.Infrastructure.Security.Authorization.Dto;
 using Shared.Validation;
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
 
 namespace FotoApi.Features.HandleMembers.Dto;
 

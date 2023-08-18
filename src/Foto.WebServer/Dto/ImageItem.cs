@@ -1,7 +1,7 @@
 ﻿namespace Foto.WebServer.Dto;
 
-public class ImageItem
+public record ImageItem
 {
-    public Guid Id { get; set; }
-    public string Title { get; set; } = default!;
+    public Guid Id { get; init; }
+    public string Title { get; init; } = default!;
 }

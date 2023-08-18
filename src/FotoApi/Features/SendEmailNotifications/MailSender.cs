@@ -5,13 +5,7 @@ namespace FotoApi.Features.SendEmailNotifications;
 
 internal class MailSender : IMailSender, IMailQueue
 {
-    private readonly ILogger<MailSender> _logger;
     private readonly Channel<MailInfo> _mailQueue = Channel.CreateUnbounded<MailInfo>();
-
-    public MailSender(ILogger<MailSender> logger)
-    {
-        _logger = logger;
-    }
 
     public async Task AddToQueueAsync(MailInfo mailInfo, CancellationToken ct)
     {

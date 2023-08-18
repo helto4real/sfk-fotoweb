@@ -8,7 +8,7 @@ public class GetStPackageStreamHandler(IPhotoStore photoStore, PhotoServiceDbCon
 {
     public async Task<Stream> Handle(Guid id, CancellationToken ct = default)
     {
-        var stPackage = await db.StPackage.FindAsync(id, ct);
+        var stPackage = await db.StPackage.FindAsync(new object?[] { id, ct }, cancellationToken: ct);
         
         if (stPackage == null)
             throw new PackageNotFoundException(id);

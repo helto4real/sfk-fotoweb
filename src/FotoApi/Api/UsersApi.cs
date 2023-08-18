@@ -1,20 +1,14 @@
-﻿using System.Security.Claims;
-using System.Text.Unicode;
-using FotoApi.Features.HandleUsers.CommandHandlers;
+﻿using FotoApi.Features.HandleUsers.CommandHandlers;
 using FotoApi.Features.HandleUsers.Dto;
-using FotoApi.Features.HandleUsers.Notifications;
-using FotoApi.Features.HandleUsers.QueriyHandlers;
+using FotoApi.Features.HandleUsers.QueryHandlers;
 using FotoApi.Features.Shared.Dto;
 using FotoApi.Infrastructure.ExceptionsHandling;
 using FotoApi.Infrastructure.Pipelines;
-using FotoApi.Infrastructure.Security.Authentication;
 using FotoApi.Infrastructure.Security.Authentication.Dto;
 using FotoApi.Infrastructure.Security.Authorization;
 using FotoApi.Infrastructure.Security.Authorization.CommandHandlers;
 using FotoApi.Infrastructure.Security.Authorization.Dto;
 using FotoApi.Infrastructure.Security.Authorization.Exceptions;
-using LanguageExt;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http.HttpResults;
 using LoginUserRequest = FotoApi.Infrastructure.Security.Authorization.Dto.LoginUserRequest;
 

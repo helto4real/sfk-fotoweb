@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Foto.WebServer.Shared;
 using Shared.Validation;
 
 namespace Foto.WebServer.Dto;
@@ -18,7 +19,7 @@ public record MemberInfo
     public List<RoleInfo> Roles { get; set; } = new();
 }
 
-public class MemberInfoValidator : AbstractValidator<MemberInfo>
+public class MemberInfoValidator : ValidatorBase<MemberInfo>
 {
     public MemberInfoValidator()
     {

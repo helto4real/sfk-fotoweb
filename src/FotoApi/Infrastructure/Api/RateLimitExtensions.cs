@@ -18,16 +18,13 @@ public static class RateLimitExtensions
                 // We always have a user name
                 var username = context.User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-                return RateLimitPartition.GetTokenBucketLimiter(username, key =>
+                return RateLimitPartition.GetTokenBucketLimiter(username, _ => new()
                 {
-                    return new()
-                    {
-                        ReplenishmentPeriod = TimeSpan.FromSeconds(10),
-                        AutoReplenishment = true,
-                        TokenLimit = 100,
-                        TokensPerPeriod = 100,
-                        QueueLimit = 100,
-                    };
+                    ReplenishmentPeriod = TimeSpan.FromSeconds(10),
+                    AutoReplenishment = true,
+                    TokenLimit = 100,
+                    TokensPerPeriod = 100,
+                    QueueLimit = 100
                 });
             });
         });

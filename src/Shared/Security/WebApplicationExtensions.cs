@@ -12,7 +12,7 @@ public static class WebApplicationExtensions
             options.AddAdminPolicy();
             options.AddMemberPolicy();
             options.AddCompetitionAdministratorsPolicy();
-            options.AddStBildAdministratiorPolicy();
+            options.AddStBildAdministratorPolicy();
         });
         return builder;
     }
@@ -44,9 +44,9 @@ public static class WebApplicationExtensions
         });
     }
     
-    private static void AddStBildAdministratiorPolicy(this AuthorizationOptions options)
+    private static void AddStBildAdministratorPolicy(this AuthorizationOptions options)
     {
-        options.AddPolicy("StBildAdministratiorPolicy", policy =>
+        options.AddPolicy("StBildAdministratorPolicy", policy =>
         {
             policy.RequireAuthenticatedUser();
             policy.RequireClaim(ClaimTypes.Role, "StbildAdministrator", "Admin");

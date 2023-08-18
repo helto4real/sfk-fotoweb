@@ -1,107 +1,99 @@
 ﻿@page "/admin/st-bild/edit/{stbildId:guid}"
-@inherits AuthorizedBasePage
-@attribute [Authorize(Policy = "StBildAdministratiorPolicy")]
 @using Foto.WebServer.Dto
 @using Foto.WebServer.Services
 @using Microsoft.AspNetCore.Authorization
+@inherits AuthorizedBasePage
+@attribute [Authorize(Policy = "StBildAdministratorPolicy")]
 @inject IStBildService StBildService
+@inject AppSnackBar AppSnackBar
 
-<div class="container d-flex flex-column justify-content-center align-items-center">
-    <div class="row row-cols-auto align-items-center">
-            <h2>Godkänn ST-bild</h2>
-    </div>
-</div>
-<div class="container mt-3">
-    <div class="row g-3 mb-5 justify-content-center align-items-center">
-        @if (_stBild is null)
+<PageTitle>@PageTitle</PageTitle>
+<AppContent ContentMaxWidth="MaxWidth.Small">
+    <Title>@PageTitle</Title>
+    <Ingress>@PageIngress</Ingress>
+    <Container>
+        @if (_stBild is not null)
         {
-            <p>
-                <em>Laddar sida...</em>
-            </p>
-        }
-        else
-        {
-            @if (_isPackaged)
+            @if (_stBild.IsUsed)
             {
-                <div class="alert alert-warning" role="alert">
-                    <h4 class="alert-heading">Bilden är redan skickad till ST!</h4>
-                    <p>Bilden är redan skickad till ST och det går inte längre att ändra godkännande.</p>
-                </div>
+                <AppAlert Class="mb-4" Severity="@Severity.Warning">
+                    Bilden är redan paketerad och skickad till ST och det går inte längre att ändra godkännande.
+                </AppAlert>
             }
-            <CvEditForm id="uploadForm" Model="_stBild" class="form" Context="NewContext">
-                <div class="mb-3">
-                    <img class="img-thumbnail mt-2" src="/api/images/image/@_stBild.ImageReference?thumb" style="max-width: 8.2em; max-height: 8.2em; object-fit:scale-down;" alt="@_stBild.Title" data-bs-toggle="modal" data-bs-target="#@_stBild.ImageReference">
-                </div>
-                <div class="modal fade" id="@_stBild.ImageReference" tabindex="-1" aria-labelledby="@(_stBild.Title)" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered modal-fullscreen" data-bs-toggle="modal" data-bs-target="#@_stBild.ImageReference">
-                        <div class="modal-content">
-                            <div class="modal-body d-flex p-3">
-                                <img src="/api/images/image/@_stBild.ImageReference" class="img-fluid m-auto" alt="@_stBild.Title" style="max-width: 100%; max-height: 100%;">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <label for="title" class="form-label">Rubrik: (Rubrikförslag, lämpligen tre, fyra ord)</label>
-                    <InputText id="title" type="title" class="form-control :invalid" readonly="true" @bind-Value="@_stBild.Title"/>
-                </div>
-                <div class="mb-3">
-                    <label for="name" class="form-label">Fotograf:</label>
-                    <InputText id="name" type="title" class="form-control :invalid " readonly="true" @bind-Value="@_stBild.Name"/>
-                </div>
-                <div class="mb-3">
-                    <label for="beskrivning" class="form-label">Beskrivning: (Beskriv ditt foto)</label>
-                    <InputTextArea id="beskrivning" maxlength="300" type="title" class="form-control :invalid" readonly="true" @bind-Value="@_stBild.Description"/>
-                </div>
-                <div class="mb-3">
-                    <label for="about" class="form-label">Om dig: (ålder, bostadsort, favoritmotiv, kameramärke, favoritfotograf, hemsida)</label>
-                    <InputTextArea id="about" maxlength="300" type="title" class="form-control :invalid" readonly="true" @bind-Value="@_stBild.AboutThePhotographer"/>
-                </div>
-                <div class="mb-3">
-                    <label for="location" class="form-label">Vart bilden är tagen: (t.ex. plats, närmaste stad)</label>
-                    <InputText id="location" type="title" class="form-control :invalid" readonly="true" @bind-Value="@_stBild.Location"/>
-                </div>
-                <div class="mb-3">
-                    <label for="time" class="form-label">När är bilden tagen:</label>
-                    <InputDate id="time" class="form-control :invalid" readonly="true" @bind-Value="@_stBild.Time"/>
-                </div>
-                <div class="mb-3">
-                    <label for="isaccepted" class="form-check-label">Godkänd:</label>
-                    <InputCheckbox id="isaccepted" class="form-check-input" disabled="true" @bind-Value="@_stBild.IsAccepted"/>
-                </div>
-                <div class="align-top">
-                    <button type="button" class="btn btn-primary py-1 app-button" disabled="@_stBild.IsUsed" @onclick="OnAccept">Godkänn</button>
-                    <button type="button" class="btn btn-danger py-1 app-button" style="margin-left: 5px" disabled="@_stBild.IsUsed" @onclick="OnReject">Avvisa</button>
-                    <button type="button" class="btn btn-secondary py-1 app-button" style="margin-left: 5px" @onclick="OnCancel">Avbryt</button>
-                </div>
-            </CvEditForm>
+            <AppForm >
+                <Form>
+                    <MudField Variant="Variant.Text"
+                              Label="Rubrik">
+                        @_stBild.Title
+                        @_stBild.Name
+                    </MudField>
+                    <MudField Variant="Variant.Text"
+                              Label="Fotograf">
+                        @_stBild.Description
+                    </MudField>
+                    <MudField Variant="Variant.Text"
+                              Lines="3"
+                              MaxLength="300"
+                              Label="Beskrivning av bilden">
+                        @_stBild.AboutThePhotographer
+                    </MudField>
+                    <MudField Variant="Variant.Text"
+                              Lines="3"
+                              MaxLength="300"
+                              Label="Om dig">
+                        @_stBild.Location
+                    </MudField>
+                    <MudField Variant="Variant.Text"
+                              Label="Vart bilden är tagen">
+                        @_stBild.Time
+                    </MudField>
+                    <MudField Variant="Variant.Text"
+                              InputType="InputType.Date"
+                              Label="När bilden tagen:">
+                    </MudField>
+
+                </Form>
+                <Actions>
+                    <MudContainer Class="d-flex justify-center">
+                        <MudButton Disabled="_isPackaged" StartIcon="@Icons.Material.Filled.Check" Color="Color.Success" OnClick="OnAccept">Godkänn</MudButton>
+                        <MudButton Disabled="_isPackaged" StartIcon="@Icons.Material.Filled.Stop" Color="Color.Error" OnClick="OnReject">Avvisa</MudButton>
+                        <MudButton StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Inherit" OnClick="OnCancel">Avbryt</MudButton>
+                    </MudContainer>
+                </Actions>
+            </AppForm>
         }
-    </div>
-</div>
+    </Container>
+</AppContent>
+
 @if (_responseHandler.HasAlert)
 {
-    <div class="alert alert-danger">@_responseHandler.Message</div>
+    <AppAlert Severity="Severity.Error">
+        @_responseHandler.Message
+    </AppAlert>
 }
+
 @code {
 
+    private string PageTitle => _isPackaged ? "Visa ST-bild" : "Godkänn ST-bild";
+    private string PageIngress => _isPackaged ? "Visar skickad ST-bild" : "Granska bildinformation och godkänn eller avvisa genom att trycka på knapparna!";
     private StBildInfo? _stBild;
 
     private bool _isPackaged;
     private readonly ResponseHandler _responseHandler = new();
-    
+
     [Parameter]
     public Guid StbildId { get; set; }
-    
+
     [SupplyParameterFromQuery]
     public bool IsFromAcceptList { get; set; }
-    
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             var response = await StBildService.GetStBildAsync(StbildId);
-            _stBild = _responseHandler.CheckResponse(response) ?? this._stBild;
-            
+            _stBild = _responseHandler.CheckResponse(response) ?? _stBild;
+
             if (_stBild is not null)
                 _isPackaged = _stBild.IsUsed;
             StateHasChanged();
@@ -116,24 +108,24 @@
 
     public async Task OnAccept()
     {
-        if (_stBild is not null) 
+        if (_stBild is not null)
             await StBildService.SetAcceptStatusForStBild(_stBild.Id, true);
+        AppSnackBar.Alert("Bild godkänd.", Severity.Success);
         NavigateBack();
     }
+
     public async Task OnReject()
     {
-        if (_stBild is not null) 
+        if (_stBild is not null)
             await StBildService.SetAcceptStatusForStBild(_stBild.Id, false);
 
+        AppSnackBar.Alert("Bild avvisad.", Severity.Success);
         NavigateBack();
     }
 
     private void NavigateBack()
     {
-        if (IsFromAcceptList)
-            NavigationManager?.NavigateTo("/admin/st-bild/godkann");
-        else
-            NavigationManager?.NavigateTo("/admin/st-bild/hantera");
+        NavigationManager?.NavigateTo(IsFromAcceptList ? "/admin/st-bild/godkann" : "/admin/st-bild/hantera");
     }
 
 }

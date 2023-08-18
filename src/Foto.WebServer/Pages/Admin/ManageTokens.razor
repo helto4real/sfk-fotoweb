@@ -43,7 +43,7 @@
                 </tbody>
             </table>
             <h4 class="">Skapa token</h4>
-            <CvEditForm Model="@(this)" class="form-horizontal py-1" OnValidSubmit="@AddToken" style="max-width: 350px;" Context="authirzationContext">
+            <CvEditForm Model="@(this)" class="form-horizontal py-1" OnValidSubmit="@AddToken" style="max-width: 350px;" Context="authorizationContext">
                 <DataAnnotationsValidator/>
                 <div class="mb-3">
                     <label for="tokentype" class="form-label">Typ av token</label>
@@ -84,7 +84,7 @@
         StateHasChanged();
     }
 
-    private string TranslateUrlToken(UrlTokenType urlTokenUrlTokenType)
+    private static string TranslateUrlToken(UrlTokenType urlTokenUrlTokenType)
     {
         return urlTokenUrlTokenType switch
         {

@@ -1,0 +1,31 @@
+<MudText Align="Align.Center" Typo="Typo.h3">@Title</MudText>
+
+<MudContainer Class="mt-3" MaxWidth="MaxWidth.Small">
+    @if (Ingress is not null)
+    {
+        <MudText Align="Align.Center" Typo="Typo.body1">@Ingress</MudText>
+    }
+</MudContainer>
+
+<AppContainer MaxWidth="ContentMaxWidth" Class="@(ContentClass ?? "mt-3")">
+    @Container
+</AppContainer>
+
+@code {
+
+    [Parameter]
+    public MaxWidth ContentMaxWidth { get; set; }
+    
+    [Parameter]
+    public string? ContentClass {get; set;} 
+
+    [Parameter]
+    public RenderFragment? Title { get; set; }
+
+    [Parameter]
+    public RenderFragment? Ingress { get; set; }
+
+    [Parameter]
+    public RenderFragment? Container { get; set; }
+
+}

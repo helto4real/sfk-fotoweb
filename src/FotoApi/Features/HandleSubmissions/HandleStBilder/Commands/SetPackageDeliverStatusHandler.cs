@@ -1,5 +1,4 @@
-﻿using FotoApi.Api;
-using FotoApi.Features.HandleSubmissions.HandleStBilder.Dto;
+﻿using FotoApi.Features.HandleSubmissions.HandleStBilder.Dto;
 using FotoApi.Features.HandleSubmissions.HandleStBilder.Exceptions;
 using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 
@@ -9,7 +8,7 @@ public class SetPackageDeliverStatusHandler(PhotoServiceDbContext db) : IHandler
 {
     public async Task Handle(PackageStatusRequest request, CancellationToken ct = default)
     {
-        var stPackage = await db.StPackage.FindAsync(request.PackageId, ct);
+        var stPackage = await db.StPackage.FindAsync(new object?[] { request.PackageId, ct }, cancellationToken: ct);
         if (stPackage == null)
             throw new PackageNotFoundException(request.PackageId);
         stPackage.IsDelivered = request.Delivered;

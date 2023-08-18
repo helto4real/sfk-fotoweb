@@ -12,17 +12,17 @@ namespace Foto.Tests.Integration;
 [Collection("Integration tests collection")]
 public class IntegrationTestsBase : IAsyncDisposable
 {
-    private readonly TestContainerLifeTime _testContinerLifetime;
-    private FotoApplication _fotoApplication;
+    private readonly TestContainerLifeTime _testContainerLifetime;
+    private readonly FotoApplication _fotoApplication;
 
     internal FotoApplication App => _fotoApplication;
     
-    public IntegrationTestsBase(TestContainerLifeTime testContinerLifetime)
+    public IntegrationTestsBase(TestContainerLifeTime testContainerLifetime)
     {
-        _testContinerLifetime = testContinerLifetime;
+        _testContainerLifetime = testContainerLifetime;
 
-        _fotoApplication = new(testContinerLifetime.Host, testContinerLifetime.Port, testContinerLifetime.UserName,
-            testContinerLifetime.Password);
+        _fotoApplication = new(testContainerLifetime.Host, testContainerLifetime.Port, testContainerLifetime.UserName,
+            testContainerLifetime.Password);
     }
     public ValueTask DisposeAsync()
     {
@@ -55,7 +55,7 @@ public class IntegrationTestsBase : IAsyncDisposable
         
         await CreateUserAsync(email, null, email, roles: roles);
         var user = await userManager.FindByEmailAsync(email);
-        var member = new Member()
+        var member = new Member
         {
             OwnerReference = user!.Id,
             FirstName = "MemberFirstName",

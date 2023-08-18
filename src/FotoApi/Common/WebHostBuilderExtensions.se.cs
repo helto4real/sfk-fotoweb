@@ -20,7 +20,6 @@ using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.AspNetCore.Builder;
 using Oakton.Resources;
 using Serilog;
 using Shared.Security;
@@ -31,7 +30,7 @@ using Wolverine.Postgresql;
 
 namespace FotoApi.Common;
 
-internal static class WebHostBuilderExtensions_se
+internal static class WebHostBuilderExtensions
 {
     public static WebApplicationBuilder UseFotoApi(this WebApplicationBuilder builder, string connectionString, string messagingConnectionString)
     {

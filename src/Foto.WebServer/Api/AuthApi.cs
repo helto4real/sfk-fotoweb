@@ -5,6 +5,7 @@ using Foto.WebServer.Dto;
 using Foto.WebServer.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Foto.WebServer.Api;
@@ -38,18 +39,22 @@ public static class AuthApi
                 return Results.Unauthorized();
             }
             
-            var (authInfo, _) = await authService.RefreshAccessTokenAsync(refreshToken!, context.User!.Identity!.Name!);
+            var (authInfo, _) = await authService.RefreshAccessTokenAsync(refreshToken!, context.User.Identity!.Name!);
             if (authInfo is null)
             {
                 return Results.BadRequest("Invalid refresh token");
             }
             context.Response.Cookies.Append("RefreshTime", DateTime.Now.ToString(CultureInfo.InvariantCulture));
-            var userClaimsPrincipal = new UserClaimPrincipal(authInfo.UserName, authInfo.Roles, authInfo.RefreshToken );
+            var externalProvider = authResult.Properties.GetExternalProvider();
+
+            var userImage = IAuthService.GetImageUrlFromClaim(authResult.Principal);
+           
+            var userClaimsPrincipal = new UserClaimPrincipal(authInfo.UserName, authInfo.Roles, authInfo.RefreshToken, userImage);
 
             // Make sure we keep the status of external login in the new cookie
-            var externalProvider = authResult.Properties.GetExternalProvider();
             if (externalProvider is not null)
             {
+                
                 userClaimsPrincipal.AuthenticationProperties.SetExternalProvider(externalProvider);
             }
             
@@ -73,8 +78,8 @@ public static class AuthApi
             }
 
             var roles = user.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).ToList().AsReadOnly();
-            
-            var userClaimsPrincipal = new UserClaimPrincipal(user.Identity.Name, roles, refreshToken! );
+            var userImage = IAuthService.GetImageUrlFromClaim(authResult.Principal);
+            var userClaimsPrincipal = new UserClaimPrincipal(user.Identity.Name, roles, refreshToken!, userImage );
             // Make sure we keep the status of external login in the new cookie
             var externalProvider = authResult.Properties.GetExternalProvider();
             if (externalProvider is not null)
@@ -89,6 +94,39 @@ public static class AuthApi
             await context.SignOutAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme);
             return Results.Ok();
+        });
+        
+        group.MapPost("login", async Task<Results<Ok<AccountInfo>, 
+            BadRequest<ErrorDetail>>> (LoginUserInfo loginInfo, HttpContext context, IAuthService authService) =>
+        {
+            var result = await authService.LoginAsync(new LoginUserInfo
+            {
+                UserName = loginInfo.UserName,
+                Password = loginInfo.Password
+            });
+
+            var (login, error) = result;
+
+            if (login is null)
+            {
+                return TypedResults.BadRequest(error);
+            }
+
+            var userClaimsPrincipal = new UserClaimPrincipal(login.UserName, login.Roles, login.RefreshToken, null)
+                {
+                    AuthenticationProperties =
+                    {
+                        // Since we are successfully authenticated, we redirect the user to the home page.
+                        RedirectUri = "/"
+                    }
+                };
+
+
+            await Results.SignIn(userClaimsPrincipal,
+                userClaimsPrincipal.AuthenticationProperties,
+                CookieAuthenticationDefaults.AuthenticationScheme).ExecuteAsync(context);
+
+            return TypedResults.Ok(login);
         });
         
         // This is the endpoint used trigger the challenge for external login
@@ -130,7 +168,8 @@ public static class AuthApi
 
                 if (user is not null)
                 {
-                    var claimPrincipal = externalClaimsPrincipal.NewClaimsPrincipal(user.RefreshToken, user.Roles);
+                    var userImage = IAuthService.GetImageUrlFromClaim(authenticateResult.Principal);
+                    var claimPrincipal = externalClaimsPrincipal.NewClaimsPrincipal(user.RefreshToken, user.Roles, userImage);
                     await Results.SignIn(claimPrincipal,
                         externalClaimsPrincipal.AuthenticationProperties,
                         CookieAuthenticationDefaults.AuthenticationScheme).ExecuteAsync(context);
@@ -140,7 +179,7 @@ public static class AuthApi
                     // The user is not pre-registered, so we need to move them back to the pre-registration page
                     await context.SignOutAsync(AuthConstants.ExternalScheme);
                     return Results.Redirect(
-                        $@"/register/?token={Uri.EscapeDataString(urlToken ?? string.Empty)}&success=false");
+                        $@"/register/?token={Uri.EscapeDataString(urlToken)}&success=false");
                 }
             }
             // Delete the external cookie

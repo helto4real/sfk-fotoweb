@@ -1,0 +1,27 @@
+
+ .mud-icon-button:hover.disable-hover {
+    background-color: initial!important;
+     cursor: default!important; 
+}
+ 
+ .full-screen {
+     display: flex;
+     text-align: center;
+     height: 100vh;
+     width:100vw;
+ }
+ 
+ .full-screen-image {
+     margin: auto;
+     max-width: 95vw;
+     height: auto;
+     max-height:97vh;
+     width:auto;
+}
+ 
+.text-overflow-ellipsis
+{
+    overflow: hidden; 
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}

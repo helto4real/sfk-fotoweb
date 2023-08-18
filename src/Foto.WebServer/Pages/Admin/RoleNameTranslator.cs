@@ -1,4 +1,4 @@
-﻿namespace Foto.WebServer.Shared;
+﻿namespace Foto.WebServer.Pages.Admin;
 
 public static class RoleNameTranslator
 {

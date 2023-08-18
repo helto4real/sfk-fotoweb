@@ -21,7 +21,7 @@ public class LoginUserHandler(UserManager<User> userManager, ITokenService token
         user.RefreshTokenExpirationDate = expireTime;
         await userManager.UpdateAsync(user);
         var roles = (await userManager.GetRolesAsync(user)).AsReadOnly();
-        return (new UserAuthorizedResponse
+        return new UserAuthorizedResponse
         {
             UserName = request.UserName,
             FirstName = "FirstName",
@@ -31,6 +31,6 @@ public class LoginUserHandler(UserManager<User> userManager, ITokenService token
             RefreshToken = refreshToken,
             RefreshTokenExpiration = expireTime,
             Roles = roles
-        });
+        };
     }
 }

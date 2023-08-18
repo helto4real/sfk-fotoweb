@@ -1,10 +1,3 @@
-﻿namespace FotoApi.Infrastructure.Validation.Exceptions
-{
-    public abstract class BadRequestException : ApiException
-    {
-        protected BadRequestException(string message)
-            : base("Bad Request", message)
-        {
-        }
-    }
-}
+﻿namespace FotoApi.Infrastructure.Validation.Exceptions;
+
+public abstract class BadRequestException(string message) : ApiException("Bad Request", message);

@@ -10,7 +10,6 @@ public class AdminService : ServiceBase,IAdminService
 {
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
-    private readonly ILogger<AdminService> _logger;
     private readonly ISignInService _signInService;
 
     public AdminService(
@@ -21,7 +20,6 @@ public class AdminService : ServiceBase,IAdminService
     {
         _httpClient = httpClient;
         _signInService = signInService;
-        _logger = logger;
         _jsonOptions.Converters.Add(new JsonStringEnumConverter());
         httpClient.BaseAddress = new Uri(appSettings.Value.FotoApiUrl);
         httpClient.DefaultRequestHeaders.Add("User-Agent", "FotoWebbServer");
@@ -40,9 +38,8 @@ public class AdminService : ServiceBase,IAdminService
 
     public async ValueTask DeleteToken(Guid tokenId)
     {
-        var response =
-            await _signInService.RefreshTokenOnExpired(async () =>
-                await _httpClient.DeleteAsync($"api/admin/token/{tokenId}"));
+        await _signInService.RefreshTokenOnExpired(async () =>
+            await _httpClient.DeleteAsync($"api/admin/token/{tokenId}"));
     }
 
     public async Task<UrlToken?> AddTokenByTokenType(UrlTokenType tokenType)

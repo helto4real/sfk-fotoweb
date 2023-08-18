@@ -66,8 +66,7 @@ public class UserService : ServiceBase, IUserService
 
     public async Task SendPasswordResetEmail(string email)
     {
-        var response =
-            await _httpClient.PostAsJsonAsync("api/users/user/passwordreset/request", new EmailResetInfo(email));
+        await _httpClient.PostAsJsonAsync("api/users/user/passwordreset/request", new EmailResetInfo(email));
         // We do not handle response since we do not want to leak information about the user, we log on server-side instead
     }
 

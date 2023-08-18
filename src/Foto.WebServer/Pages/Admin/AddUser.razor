@@ -1,87 +1,103 @@
 ﻿@page "/admin/users/precreate"
 @layout MainLayout
-@using Foto.WebServer.Services
 @using FluentValidation
-@using Blazored.FluentValidation
+@using Foto.WebServer.Services
 @using Microsoft.AspNetCore.Authorization
+@using Severity = MudBlazor.Severity
 @inherits AuthorizedBasePage
 @attribute [Authorize(Roles = "Admin")]
-
 @inject IUserService UserService
-<div class="container d-flex flex-column justify-content-center align-items-center">
-    <div class="row row-cols-auto align-items-center">
-        <h2>Lägg till användare</h2>
-    </div>
-</div>
 
-<div class="container">
-    <div class="row g-3 mb-5 justify-content-center align-items-center">
-        <div class="col col-8" style="max-width: 350px;">
-            <EditForm Model="@NewUserModel" OnValidSubmit="@HandleValidSubmit" Context="authirzationContext">
-                <FluentValidationValidator/>
-                <div class="mb-3">
-                    <label for="email" class="form-label">E-post</label>
-                    <InputText id="email" type="email" class="form-control" @bind-Value="NewUserModel.Email"/>
-                    <ValidationMessage For="@(() => NewUserModel.Email)"/>
-                </div>
-                <div class="d-flex justify-content-between align-items-center mt-1">
-                    <button type="submit" class="btn btn-primary">Spara</button>
-                </div>
-            </EditForm>
-        </div>
-    </div>
-    @if (_preCreatedUserNames.Any())
-    {
-        <div class="row g-3 mb-5 justify-content-center align-items-center">
-            <div class="col col-8" style="max-width: 350px;">
-                <h5>Tillagda användare</h5>
-                <ul class="list-group">
-                    @foreach (var user in _preCreatedUserNames)
-                    {
-                        <li class="list-group-item">@user</li>
-                    }
-                </ul>
-            </div>    
-        </div>
-    }
-</div>
+<PageTitle>Lägg till användare</PageTitle>
+<AppContent ContentMaxWidth="MaxWidth.Small">
+    <Title>Lägg till användare</Title>
+    <Ingress>Lägg till nya användare som inte är medlemmar men ska ha tillgång till tjänsten</Ingress>
+    <Container>
+        <AppForm @bind-Disabled="@_disabled" @ref="_form" Model="_model" Validation="@(_validator.ValidateValue)" ValidationDelay="0">
+            <Form>
+                <AppTextField @bind-Value="@_model.Email"
+                              For="@(() => _model.Email)"
+                              Label="E-post"/>
+                <AppTextField @bind-Value="@_model.ConfirmEmail"
+                              For="@(() => _model.ConfirmEmail)"
+                              Label="Bekräfta e-post"/>
+            </Form>
+            <Actions>
+                <MudButton StartIcon="@Icons.Material.Filled.Save" OnClick="HandleValidSubmit" Variant="Variant.Text" Color="Color.Primary"
+                           Disabled="@(!IsValid())" Class="mr-auto">
+                    Lägg till
+                </MudButton>
+            </Actions>
+        </AppForm>
+    </Container>
+</AppContent>
+
 
 @if (_responseHandler.HasAlert)
 {
-    <div class="alert alert-danger">@_responseHandler.Message</div>
+    <AppAlert Severity="Severity.Error">@_responseHandler.Message</AppAlert>
 }
 
 @code {
-    private PreCreateUserModel NewUserModel { get; set; } = new();
+    private PreCreateUserModel _model = new();
     private readonly ResponseHandler _responseHandler = new();
-    private readonly List<string> _preCreatedUserNames = new();
-    
+    private readonly LoginOrCreateUserModelValidator _validator = new();
+    AppForm? _form;
+    private bool _disabled;
+
+    public bool IsValid()
+    {
+        return _validator.Validate(_model).IsValid && !_disabled;
+    }
+
+    private async Task<bool> IsFormValid()
+    {
+        if (_form is null)
+            return false;
+        await _form.Validate();
+        return _form.IsValid;
+    }
+
     private async Task HandleValidSubmit()
     {
-        var user = _responseHandler.CheckResponse(await UserService.PreCreateUserAsync(NewUserModel.Email));
-        if (user is not null)
+        if (!await IsFormValid()) return;
+        try
         {
-            _preCreatedUserNames.Add(user.UserName);
-            // We succeeded in creating a user, so we can clear the form and allow create a new one
-            NewUserModel = new();
+            _disabled = true;
+            var user = _responseHandler.CheckResponse(await UserService.PreCreateUserAsync(_model.Email));
+            if (user is not null)
+            {
+    // We succeeded in creating a user, so we can clear the form and allow create a new one
+                _model = new PreCreateUserModel();
+            }
+            StateHasChanged();
         }
-        StateHasChanged();
+        finally
+        {
+            _disabled = false;
+        }
     }
-    
+
     public class PreCreateUserModel
     {
         public string? Email { get; set; }
+        public string? ConfirmEmail { get; set; }
     }
-    
-    public class LoginOrCreateUserModelValidator : AbstractValidator<PreCreateUserModel> 
+
+    public class LoginOrCreateUserModelValidator : ValidatorBase<PreCreateUserModel>
     {
-        public LoginOrCreateUserModelValidator() 
+        public LoginOrCreateUserModelValidator()
         {
             RuleFor(x => x.Email)
                 .NotEmpty()
                 .WithMessage("E-post måste anges.")
                 .EmailAddress()
                 .WithMessage("Ange en giltig e-postadress.");
+
+            RuleFor(x => x.ConfirmEmail)
+                .Equal(x => x.Email)
+                .WithMessage("E-postadresserna måste matcha.");
         }
     }
+
 }

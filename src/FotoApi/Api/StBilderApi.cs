@@ -30,7 +30,7 @@ public static class StBilderApi
         {
             var response = await pipe.Pipe(showPackagedImages, handler.Handle, ct);
             return TypedResults.Ok(response);
-        }).RequireAuthorization("StBildAdministratiorPolicy");
+        }).RequireAuthorization("StBildAdministratorPolicy");
         
         group.MapDelete("/{id:guid}", async Task<Results<Ok, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
             (Guid id, DeleteStBildHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
@@ -39,7 +39,7 @@ public static class StBilderApi
             return TypedResults.Ok();
         });        
 
-        group.MapPut("/{id:guid}", async Task<Results<Ok, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
+        group.MapPut("/", async Task<Results<Ok, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
             (StBildRequest request, UpdateStBildHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
             await pipe.Pipe(request, handler.Handle, ct);
@@ -78,7 +78,7 @@ public static class StBilderApi
         
         group.MapPost("/package", async Task<Results<
             Ok, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
-            (PackageStBildResquest request, PackageStBilderHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
+            (PackageStBildRequest request, PackageStBilderHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
             await pipe.Pipe(new PackageStBilderRequest(request.Ids), handler.Handle, ct);
             return TypedResults.Ok();
@@ -90,7 +90,7 @@ public static class StBilderApi
         {
             var result = await pipe.Pipe(returnDelivered, handler.Handle, ct);
             return TypedResults.Ok(result);
-        }).RequireAuthorization("StBildAdministratiorPolicy");
+        }).RequireAuthorization("StBildAdministratorPolicy");
         
         group.MapPost("{stBildId:guid}/acceptstatus/{stBildAcceptStatus:bool}", async Task<Results<
             Ok, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
@@ -110,7 +110,7 @@ public static class StBilderApi
         {
             await pipe.Pipe(new PackageStatusRequest(id, true), handler.Handle, ct);
             return TypedResults.Ok();
-        }).RequireAuthorization("StBildAdministratiorPolicy");
+        }).RequireAuthorization("StBildAdministratorPolicy");
         
         return group;
     }

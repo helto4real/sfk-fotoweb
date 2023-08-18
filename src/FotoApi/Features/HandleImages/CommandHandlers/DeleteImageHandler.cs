@@ -13,7 +13,7 @@ public class DeleteImageHandler(PhotoServiceDbContext db, IPhotoStore photoStore
 {
     public async Task Handle(Guid id, CancellationToken ct)
     {
-        var imageInfo = await db.Images.FindAsync(id);
+        var imageInfo = await db.Images.FindAsync(new object?[] { id }, cancellationToken: ct);
         if (imageInfo == null)
             throw new ImageNotFoundException(id);
 

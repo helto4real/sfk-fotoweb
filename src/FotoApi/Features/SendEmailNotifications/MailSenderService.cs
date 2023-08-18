@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using MimeKit;
 
 namespace FotoApi.Features.SendEmailNotifications;
-public interface IMailSenderService : IHostedService { }
+public interface IMailSenderService : IHostedService;
 internal class MailSenderService(ILogger<MailSenderService> logger, IMailQueue mailQueue,
         IOptions<EmailSettings> emailSettings)
     : IMailSenderService
@@ -71,7 +71,7 @@ internal class MailSenderService(ILogger<MailSenderService> logger, IMailQueue m
     private async Task ConnectToSmtpServer()
     {
         logger.LogInformation("Connecting to SMTP server");
-        if (_smtpClient is not null) _smtpClient.Dispose();
+        _smtpClient?.Dispose();
         _smtpClient = new SmtpClient();
         await _smtpClient.ConnectAsync(_emailSettings.SmtpServer, _emailSettings.SmtpPort, _emailSettings.UseSsl,
             _combinedCancellationToken);

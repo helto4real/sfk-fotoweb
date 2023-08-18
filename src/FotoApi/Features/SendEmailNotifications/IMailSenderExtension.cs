@@ -1,6 +1,6 @@
 ﻿namespace FotoApi.Features.SendEmailNotifications;
 
-internal static class IMailSenderExtension
+internal static class MailSenderExtension
 {
     public static Task SendEmailConfirmationAsync(this IMailSender sender, string email, string urlToken,
         string photoWebUri, CancellationToken ct)

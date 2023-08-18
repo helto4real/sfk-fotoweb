@@ -1,4 +1,5 @@
-﻿namespace FotoApi.Features.HandleMembers.Dto;
+﻿// ReSharper disable UnusedAutoPropertyAccessor.Global
+namespace FotoApi.Features.HandleMembers.Dto;
 
 public record MemberListItemResponse
 {

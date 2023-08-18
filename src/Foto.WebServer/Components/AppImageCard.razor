@@ -1,0 +1,69 @@
+@using MudBlazor.Utilities
+
+<MudPaper Elevation="0" Outlined="false" MinWidth="@($"{MaxWidth}px")" MaxWidth="@($"{MaxWidth}px")">
+    <MudCard>
+        <MudCardMedia @onclick="ShowFullImage" Image="@Image" Height="@Height" Style="object-fit: contain"/>
+        <MudCardContent>
+            <MudText Class="text-overflow-ellipsis" Typo="Typo.body1">@Title</MudText>
+            <MudText Class="text-overflow-ellipsis" Style="color: var(--mud-palette-lines-inputs);" Typo="Typo.body2">@Description</MudText>
+        </MudCardContent>
+        @if (Actions is not null && !HideActions)
+        {
+            <MudCardActions Style="@BorderStyle">
+                @Actions
+            </MudCardActions>
+        }
+    </MudCard>
+</MudPaper>
+<MudDialog @bind-IsVisible="_imageVisible" Style="height: 100%" ClassContent="full-screen" Options="_viewImageOptions">
+    <DialogContent >
+        <MudImage Class="full-screen-image" Elevation="10" Fluid="true" @onclick="() => _imageVisible = false" ObjectFit="ObjectFit.ScaleDown" Src="@FullImage"/>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    private bool _imageVisible = false;
+
+    private DialogOptions _viewImageOptions =
+        new()
+        {
+            FullScreen = true,
+            CloseOnEscapeKey = true,
+            Position = DialogPosition.Center,
+            FullWidth = true,
+            NoHeader = true,
+            DisableBackdropClick = false
+        };
+
+    private static string BorderStyle => "border-top-width: thin; border-top-color: var(--mud-palette-action-disabled-background)";
+
+    [Parameter]
+    public int MaxWidth { get; set; } = 250;
+
+    [Parameter]
+    public int Height { get; set; } = 166;
+
+    [Parameter]
+    public string Image { get; set; } = default!;
+
+    [Parameter]
+    public string FullImage { get; set; } = default!;
+
+    [Parameter]
+    public string Title { get; set; } = default!;
+
+    [Parameter]
+    public string Description { get; set; } = default!;
+
+    [Parameter]
+    public bool HideActions { get; set; }
+    
+    [Parameter]
+    public RenderFragment? Actions { get; set; }
+
+    private void ShowFullImage()
+    {
+        _imageVisible = true;
+        StateHasChanged();
+    }
+}

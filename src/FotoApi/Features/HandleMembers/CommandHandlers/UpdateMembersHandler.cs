@@ -15,7 +15,7 @@ public class UpdateMembersHandler
 {
     public async Task<MemberResponse> Handle(MemberRequest request, CancellationToken ct = default)
     {
-        var member = await db.Members.FindAsync(request.Id, ct);
+        var member = await db.Members.FindAsync(new object?[] { request.Id, ct }, cancellationToken: ct);
         if (member is null) throw new MemberNotFoundException(request.Id);
         
         var user = await userManager.FindByIdAsync(member.OwnerReference);
@@ -23,7 +23,7 @@ public class UpdateMembersHandler
         if (user is null)
         {
             logger.LogError("Failed get user for member {Member} with owner reference {Reference}", member.Id, member.OwnerReference);
-            throw new MemberException("Systemfel: Användare finns inte för medlem, kotakta administratören.");
+            throw new MemberException("Systemfel: Användare finns inte för medlem, kontakta administratören.");
         }
 
         if (!currentUser.IsAdmin && currentUser.User!.UserName != user.UserName)
@@ -84,22 +84,22 @@ public class UpdateMembersHandler
             ZipCode = request.ZipCode,
             City = request.City,
             IsActive = member.IsActive,
-            Roles = request.Roles.Select(n => new RoleResponse(){Name = n.Name}).ToList()
+            Roles = request.Roles.Select(n => new RoleResponse {Name = n.Name}).ToList()
         };
     }
-    
-    async Task AddRolesToUser(UserManager<User> userManager, User user, List<RoleRequest> roles)
+
+    static async Task AddRolesToUser(UserManager<User> userManager, User user, List<RoleRequest> roles)
     {
         var currentRoles = await userManager.GetRolesAsync(user);
         var rolesToAdd = roles.Where(r => !currentRoles.Contains(r.Name)).ToList();
-        var rolesToDelete = currentRoles.Where(r => !roles.Select(r => r.Name).Contains(r)).ToList();
+        var rolesToDelete = currentRoles.Where(r => !roles.Select(n => n.Name).Contains(r)).ToList();
         
-        if (rolesToAdd.Any())
+        if (rolesToAdd.Count != 0)
         {
             var result = await userManager.AddToRolesAsync(user, rolesToAdd.Select(r => r.Name));
             if (!result.Succeeded) throw new UserException(result.Errors.Select(e => e.Description));
         }
-        if (rolesToDelete.Any())
+        if (rolesToDelete.Count != 0)
         {
             var result = await userManager.RemoveFromRolesAsync(user, rolesToDelete);
             if (!result.Succeeded) throw new UserException(result.Errors.Select(e => e.Description));

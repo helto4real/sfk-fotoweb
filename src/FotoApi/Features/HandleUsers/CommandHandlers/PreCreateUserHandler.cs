@@ -10,7 +10,7 @@ public class PreCreateUserHandler(UserManager<User> userManager,
     : IHandler<EmailRequest, UserResponse>
 {
     private readonly UserMapper _userMapper = new();
-    private static readonly string[] noRoles = Array.Empty<string>();
+    private static readonly string[] NoRoles = Array.Empty<string>();
 
     public async Task<UserResponse> Handle(EmailRequest request, CancellationToken ct)
     {
@@ -33,7 +33,7 @@ public class PreCreateUserHandler(UserManager<User> userManager,
         if (user is null)
             throw new UserNotFoundException(request.Email);
         logger.LogInformation("Precreated user {Email}", request.Email);
-        return _userMapper.ToUserResponse(user, noRoles);
+        return _userMapper.ToUserResponse(user, NoRoles);
     }
 }
 

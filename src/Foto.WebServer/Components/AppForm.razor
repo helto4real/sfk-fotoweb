@@ -1,0 +1,57 @@
+<MudPaper Style="padding: 0px 10px 5px;" Elevation="0" Outlined="true">
+    <MudForm @bind-Disabled="@Disabled" @ref="_form" id="@Id" Style="padding: 5px" Model="@Model" Validation="@Validation" ValidationDelay="@ValidationDelay">
+        @Form
+    </MudForm>
+    <MudContainer Class="d-flex">
+        @Actions
+    </MudContainer>
+</MudPaper>
+
+@code {
+    MudForm? _form;
+
+    [Parameter]
+    public object? Model { get; set; }
+
+    [Parameter]
+    public object Validation { get; set; } = default!;
+
+    [Parameter]
+    public int ValidationDelay { get; set; } = 300;
+
+    [Parameter]
+    public RenderFragment? Form { get; set; }
+
+    [Parameter]
+    public RenderFragment? Actions { get; set; }
+
+    [Parameter]
+    public string Id { get; set; } = "loginform";
+
+    public Task Validate()
+    {
+        return _form?.Validate() ?? Task.CompletedTask;
+    }
+
+    public bool IsValid => _form?.IsValid ?? false;
+
+    private bool _disabled;
+
+#pragma warning disable BL0007
+    [Parameter]
+    public bool Disabled
+    {
+        get => _disabled;
+        set
+        {
+            if (_disabled == value) return;
+            _disabled = value;
+            DisabledChanged.InvokeAsync(value);
+        }
+    }
+#pragma warning restore BL0007
+
+    [Parameter]
+    public EventCallback<bool> DisabledChanged { get; set; }
+
+}

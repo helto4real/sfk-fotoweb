@@ -7,7 +7,7 @@ public class DeleteTokenFromIdHandler(PhotoServiceDbContext db) : IHandler<Guid>
 {
     public async Task Handle(Guid id, CancellationToken ct)
     {
-        var urlToken = await db.UrlTokens.FindAsync(id);
+        var urlToken = await db.UrlTokens.FindAsync(new object?[] { id }, cancellationToken: ct);
         if (urlToken is null)
             throw new UrlTokenNotFoundException(id);
 

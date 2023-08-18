@@ -54,12 +54,10 @@ public class TestContext : IAsyncLifetime
         };
         var result = await userManager.CreateAsync(user);
         result.Succeeded.Should().BeTrue();
-        
-        if (isAdmin)
-        {
-            var addToRoleResult = await userManager.AddToRoleAsync(user, "Admin");
-            addToRoleResult.Succeeded.Should().BeTrue();
-        }
+
+        if (!isAdmin) return user;
+        var addToRoleResult = await userManager.AddToRoleAsync(user, "Admin");
+        addToRoleResult.Succeeded.Should().BeTrue();
         return user;
     }
     
@@ -79,8 +77,3 @@ public class TestContext : IAsyncLifetime
     }
 }
 
-// [CollectionDefinition("Fixture")]
-// public class TestFixtureColection : ICollectionFixture<TestContext>
-// {
-//
-// }

@@ -2,10 +2,4 @@
 
 namespace FotoApi.Features.HandleUsers.Exceptions;
 
-public sealed class NoUserWithTokenFoundException : NotFoundException
-{
-    public NoUserWithTokenFoundException()
-        : base($"The provider token is not valid!")
-    {
-    }
-}
+public sealed class NoUserWithTokenFoundException() : NotFoundException($"The provider token is not valid!");

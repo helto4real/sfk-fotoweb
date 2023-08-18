@@ -1,6 +1,7 @@
 using Serilog;
 using Serilog.Exceptions;
 using Serilog.Settings.Configuration;
+using Serilog.Sinks.Elasticsearch;
 
 namespace Foto.WebServer.Shared.Logging;
 
@@ -16,7 +17,7 @@ public static class SerilogExtensions
         builder.Host.UseSerilog((context, loggerConfiguration) =>
         {
             // https://github.com/serilog/serilog-settings-configuration
-            loggerConfiguration.ReadFrom.Configuration(context.Configuration, new ConfigurationReaderOptions(){SectionName = sectionName});
+            loggerConfiguration.ReadFrom.Configuration(context.Configuration, new ConfigurationReaderOptions {SectionName = sectionName});
 
             loggerConfiguration
                 .Enrich.WithProperty("Application", builder.Environment.ApplicationName)
@@ -34,7 +35,7 @@ public static class SerilogExtensions
             if (!string.IsNullOrEmpty(serilogOptions.ElasticSearchUrl))
             {
                 // https://github.com/serilog-contrib/serilog-sinks-elasticsearch
-                loggerConfiguration.WriteTo.Elasticsearch(new(new Uri(serilogOptions.ElasticSearchUrl))
+                loggerConfiguration.WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(serilogOptions.ElasticSearchUrl))
                 {
                     AutoRegisterTemplate = true,
                     IndexFormat = builder.Environment.ApplicationName

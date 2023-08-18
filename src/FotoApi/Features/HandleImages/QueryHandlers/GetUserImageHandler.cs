@@ -11,7 +11,7 @@ public class GetUserImageHandler(PhotoServiceDbContext db, CurrentUser currentUs
 
     public async Task<ImageResponse> Handle(Guid imageId, CancellationToken ct)
     {
-        return await db.Images.FindAsync(imageId) switch
+        return await db.Images.FindAsync(new object?[] { imageId }, cancellationToken: ct) switch
         {
             { } image when image.OwnerReference == imageId.ToString() || currentUser.IsAdmin =>
                 _mapper.ToImageResponse(image),

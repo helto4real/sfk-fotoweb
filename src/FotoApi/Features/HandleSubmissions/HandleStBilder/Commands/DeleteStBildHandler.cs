@@ -1,7 +1,9 @@
 ﻿using FotoApi.Abstractions;
+using FotoApi.Features.HandleImages.Dto;
 using FotoApi.Features.HandleImages.Exceptions;
 using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 using FotoApi.Infrastructure.Security.Authorization;
+using Wolverine;
 
 namespace FotoApi.Features.HandleSubmissions.HandleStBilder.Commands;
 
@@ -10,11 +12,11 @@ public record DeleteStBildRequest(Guid Id) : ICurrentUser
     public CurrentUser CurrentUser { get; set; } = default!;
 }
 
-public class DeleteStBildHandler(PhotoServiceDbContext db) : IHandler<DeleteStBildRequest>
+public class DeleteStBildHandler(PhotoServiceDbContext db, IMessageBus bus) : IHandler<DeleteStBildRequest>
 {
     public async Task Handle(DeleteStBildRequest request, CancellationToken ct)
     {
-        var imageInfo = await db.StBilder.FindAsync(request.Id);
+        var imageInfo = await db.StBilder.FindAsync(new object?[] { request.Id }, cancellationToken: ct);
         if (imageInfo == null)
             throw new ImageNotFoundException(request.Id);
 
@@ -25,5 +27,7 @@ public class DeleteStBildHandler(PhotoServiceDbContext db) : IHandler<DeleteStBi
 
         if (rowsAffected == 0)
             throw new ImageNotFoundException(request.Id);
+
+        await bus.PublishAsync(new DeleteImageCommandNotification(imageInfo.ImageReference));
     }
 }

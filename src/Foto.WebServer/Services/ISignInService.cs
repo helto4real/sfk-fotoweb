@@ -1,5 +1,8 @@
 ﻿using System.Net;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using Foto.WebServer.Authentication;
+using Foto.WebServer.Dto;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -12,6 +15,7 @@ public interface ISignInService
     Task<bool> ValidateAccessTokenAndRefreshIfNeedAsync(HttpClient httpClient);
 
     Task<bool> IsCurrentUserExternalAsync();
+    Task<(AccountInfo?, ErrorDetail?)> LoginAsync(LoginUserInfo loginUserInfo);
 }
 
 public class SignInService(
@@ -21,6 +25,8 @@ public class SignInService(
         NavigationManager? navigationManager)
     : ISignInService
 {
+    private readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
+    
     private readonly HttpContext _httpContext = accessor.HttpContext ??
                                                 throw new ArgumentNullException(nameof(accessor),
                                                     "No HttpContext available");
@@ -53,22 +59,32 @@ public class SignInService(
     {
         // Call the provided function to get the response
         var response = await func();
+        if (response.StatusCode != HttpStatusCode.Unauthorized) return response;
+        // The token is expired, try to refresh it and call the function again with the new token
+        await RefreshTokens();
+
+        // Retry call with the new token
+        response = await func();
+
         if (response.StatusCode == HttpStatusCode.Unauthorized)
-        {
-            // The token is expired, try to refresh it and call the function again with the new token
-            await RefreshTokens();
-
-            // Retry call with the new token
-            response = await func();
-
-            if (response.StatusCode == HttpStatusCode.Unauthorized)
-                // The refresh of token did work or user is not authorized for real 
-                SignOut();
-        }
+            // The refresh of token did work or user is not authorized for real 
+            SignOut();
 
         return response;
     }
 
+    public async Task<(AccountInfo?, ErrorDetail?)> LoginAsync(LoginUserInfo loginUserInfo)
+    {
+        const string apiAuthLogin = "/api/auth/login";
+        var requestPath = apiAuthLogin;
+        var result = await _jsRuntime.InvokeAsync<JsonArray>("login", requestPath, loginUserInfo);
+        if (result[0] is not null)
+        {
+            return (result[0].Deserialize<AccountInfo?>(_jsonOptions), null);
+        }
+        return (null, result[1].Deserialize<ErrorDetail?>(_jsonOptions));
+    }
+    
     /// <summary>
     ///     Refresh the tokens and sets the current context with the current principal updated with new token
     /// </summary>

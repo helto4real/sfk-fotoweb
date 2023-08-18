@@ -12,7 +12,7 @@ public class GetRolesHandler(RoleManager<Role> roleManager) : IEmptyRequestHandl
             orderby r.SortOrder
             select new RoleResponse
             {
-                Name = r.Name ?? string.Empty,
+                Name = r.Name ?? string.Empty
             }; 
         return await result.ToListAsync(cancellationToken);
     }

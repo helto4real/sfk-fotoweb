@@ -31,14 +31,18 @@ public class UpdateLoginInfoHandler(
 
         var passwordUpdated = await SetNewPasswordIfProvided(command, isExternalProvider, user);
 
-        if (emailUpdated)
-        {
-            // We send an notification to the old email address that someone has changed account information
-            await bus.PublishAsync(new AccountChangedNotification(oldEmail, user.UserName!));
+        if (!emailUpdated)
+            return new UpdateLoginInfoResponse
+            {
+                EmailUpdated = emailUpdated,
+                PasswordUpdated = passwordUpdated
+            };
+        
+        // We send an notification to the old email address that someone has changed account information
+        await bus.PublishAsync(new AccountChangedNotification(oldEmail, user.UserName!));
 
-            // We send an email that requires the user to confirm the new email address
-            await bus.PublishAsync(new EmailChangedNotification(command.NewEmail!, user.Id));
-        }
+        // We send an email that requires the user to confirm the new email address
+        await bus.PublishAsync(new EmailChangedNotification(command.NewEmail!, user.Id));
 
         return new UpdateLoginInfoResponse
         {
@@ -68,7 +72,7 @@ public class UpdateLoginInfoHandler(
         var passwordChangeResult = hasPassword switch
         {
             true => await userManager.ChangePasswordAsync(user, command.CurrentPassword ?? "", newPassword),
-            false => await userManager.AddPasswordAsync(user, newPassword),
+            false => await userManager.AddPasswordAsync(user, newPassword)
         };
         if (!passwordChangeResult.Succeeded)
             throw new UserException("Kunde inte ändra lösenordet, kontakta administratören för hjälp.");
@@ -83,7 +87,7 @@ public class UpdateLoginInfoHandler(
     {
         if (string.IsNullOrWhiteSpace(command.NewEmail)) return false;
 
-        var emailUpdated = false;
+        bool emailUpdated;
         var newEmail = command.NewEmail.Trim();
 
         var existingUserByEmail = await userManager.FindByEmailAsync(command.NewEmail);
@@ -99,7 +103,7 @@ public class UpdateLoginInfoHandler(
         {
             var currentPassword = command.CurrentPassword?.Trim() ??
                                   throw new UserNotAuthorizedException("Lösenord saknas");
-            if (!await userManager.CheckPasswordAsync(user, command.CurrentPassword))
+            if (!await userManager.CheckPasswordAsync(user, currentPassword))
             {
                 throw new UserNotAuthorizedException("Felaktigt lösenord");
             }

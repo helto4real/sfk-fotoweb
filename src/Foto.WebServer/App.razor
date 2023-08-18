@@ -1,5 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
-@if (isConnected)
+
+@if (_isConnected)
 {
     
 <CascadingValue Value="ConsentGiven">
@@ -10,12 +11,12 @@
                     <Authorizing>
                         <div class="d-flex justify-content-center">
                             <div class="spinner-border" role="status">
-                                <span class="visually-hidden">Loading...</span>
+                                <span class="visually-hidden">Authorizing...</span>
                             </div>
                         </div>
                     </Authorizing>
                     <NotAuthorized>
-                        @if (context?.User?.Identity is not null && context.User.Identity.IsAuthenticated)
+                        @if (context.User.Identity is not null && context.User.Identity.IsAuthenticated)
                         {
                             <div class="container d-flex flex-column justify-content-center align-items-center">
                                 <div class="row row-cols-auto align-items-center">
@@ -39,31 +40,30 @@
 }
 else
 {
-    <div class="d-flex justify-content-center">
+    <div class="d-flex justify-content-center" >
         <div class="spinner-border" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
 }
 
-
 @code {
-
+    // private bool _isDarkMode;
+    
     [Parameter]
     public bool ConsentGiven { get; set; }
 
     [Parameter]
     public HttpRequest? HttpRequest { get; set; }
     
-    private bool isConnected;
+    private bool _isConnected;
+
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
-        {
-            isConnected = true;
-            StateHasChanged();
-        }
+        if (!firstRender) return Task.CompletedTask;
+        _isConnected = true;
+        StateHasChanged();
         return Task.CompletedTask;
     }
 

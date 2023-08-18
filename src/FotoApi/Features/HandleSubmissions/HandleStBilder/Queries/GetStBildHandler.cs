@@ -19,14 +19,14 @@ public class GetStBildHandler(PhotoServiceDbContext db, IPolicyChecker policyChe
 
     public async Task<StBildResponse> Handle(GetStBildRequest request, CancellationToken ct)
     {
-        var stBild = await db.StBilder.FindAsync(request.Id);
+        var stBild = await db.StBilder.FindAsync(new object?[] { request.Id }, cancellationToken: ct);
 
         if (stBild is null)
             throw new StBildNotFoundException(request.Id);
-        var isStAdmin = await policyChecker.CompliesToPolicy("StBildAdministratiorPolicy");
+        var isStAdmin = await policyChecker.CompliesToPolicy("StBildAdministratorPolicy");
 
         if (!isStAdmin && stBild.OwnerReference != request.CurrentUser.Id)
-            throw new ForbiddenException("User not authorized to get stbild information for this id");
+            throw new UnAuthorizedException("User not authorized to get stbild information for this id");
 
         return _responseMapper.ToStBildResponse(stBild);
     }

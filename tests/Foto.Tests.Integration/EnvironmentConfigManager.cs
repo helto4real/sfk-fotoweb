@@ -10,6 +10,6 @@ public class EnvironmentConfigManager : IDisposable
     public void Dispose()
     {
         Environment.SetEnvironmentVariable("ConnectionStrings__FotoApi", string.Empty);
-        Environment.SetEnvironmentVariable("ConnectionStrings__Messaging", String.Empty);
+        Environment.SetEnvironmentVariable("ConnectionStrings__Messaging", string.Empty);
     }
 }

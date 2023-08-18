@@ -13,4 +13,5 @@ public interface IStBildService
     Task<ErrorDetail?> SetAcceptStatusForStBild(Guid stBildId, bool stBildIsAccepted);
     Task<(List<StBildPackageInfo>?, ErrorDetail?)> GetStBildPackagesAsync(bool returnDelivered);
     Task<ErrorDetail?> SetPackageStatusDelivered(Guid id);
+    Task<ErrorDetail?> DeleteStBildAsync(Guid stBildId);
 }

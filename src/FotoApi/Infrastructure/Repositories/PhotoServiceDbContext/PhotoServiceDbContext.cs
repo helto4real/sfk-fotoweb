@@ -5,12 +5,8 @@ using Image = FotoApi.Model.Image;
 
 namespace FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 
-public class PhotoServiceDbContext: IdentityDbContext<User, Role, string>
+public class PhotoServiceDbContext(DbContextOptions<PhotoServiceDbContext> options) : IdentityDbContext<User, Role, string>(options)
 {
-    public PhotoServiceDbContext(DbContextOptions<PhotoServiceDbContext> options) : base(options)
-    {
-        
-    }
     public virtual DbSet<Member> Members => Set<Member>();
     public virtual DbSet<UrlToken> UrlTokens => Set<UrlToken>();
     public virtual DbSet<Image> Images => Set<Image>();
@@ -108,7 +104,7 @@ public class PhotoServiceDbContext: IdentityDbContext<User, Role, string>
                     Name = "Admin",
                     NormalizedName = "ADMIN", 
                     Id = adminRoleId,
-                    ConcurrencyStamp = adminRoleId,
+                    ConcurrencyStamp = adminRoleId
                 });        
         
         builder.Entity<Role>()
@@ -118,7 +114,7 @@ public class PhotoServiceDbContext: IdentityDbContext<User, Role, string>
                     Name = "Member",
                     NormalizedName = "MEMBER", 
                     Id = Guid.NewGuid().ToString(),
-                    ConcurrencyStamp = Guid.NewGuid().ToString(),
+                    ConcurrencyStamp = Guid.NewGuid().ToString()
                 });
 
         builder.Entity<Role>()
@@ -128,7 +124,7 @@ public class PhotoServiceDbContext: IdentityDbContext<User, Role, string>
                     Name = "CompetitionAdministrator",
                     NormalizedName = "COMPETITIONADMINISTRATOR", 
                     Id = Guid.NewGuid().ToString(),
-                    ConcurrencyStamp = Guid.NewGuid().ToString(),
+                    ConcurrencyStamp = Guid.NewGuid().ToString()
                 });
       
         builder.Entity<Role>()
@@ -138,7 +134,7 @@ public class PhotoServiceDbContext: IdentityDbContext<User, Role, string>
                     Name = "StbildAdministrator",
                     NormalizedName = "STBILDADMINISTRATOR", 
                     Id = Guid.NewGuid().ToString(),
-                    ConcurrencyStamp = Guid.NewGuid().ToString(),
+                    ConcurrencyStamp = Guid.NewGuid().ToString()
                 });
         
         builder.Entity<IdentityUserRole<string>>()
@@ -156,9 +152,7 @@ public class PhotoServiceDbContext: IdentityDbContext<User, Role, string>
     {
         var entries = ChangeTracker
             .Entries()
-            .Where(e => e.Entity is TimeTrackedEntity && (
-                e.State == EntityState.Added
-                || e.State == EntityState.Modified));
+            .Where(e => e is { Entity: TimeTrackedEntity, State: EntityState.Added or EntityState.Modified });
 
         var utcTimeNow = DateTime.UtcNow;
         foreach (var entityEntry in entries)
@@ -174,13 +168,11 @@ public class PhotoServiceDbContext: IdentityDbContext<User, Role, string>
         return base.SaveChanges();
     }
 
-    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = new CancellationToken())
+    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = new())
     {
         var entries = ChangeTracker
             .Entries()
-            .Where(e => e.Entity is TimeTrackedEntity && (
-                e.State == EntityState.Added
-                || e.State == EntityState.Modified));
+            .Where(e => e is { Entity: TimeTrackedEntity, State: EntityState.Added or EntityState.Modified });
 
         var utcTimeNow = DateTime.UtcNow;
         foreach (var entityEntry in entries)

@@ -1,0 +1,162 @@
+@page "/login"
+@using FluentValidation
+@using Severity = MudBlazor.Severity
+@using Foto.WebServer.Services
+@using Foto.WebServer.Dto
+@inject ISignInService SignInService
+@inject IUserService UserService
+@inject NavigationManager NavigationManager
+
+@* @inject ExternalProviders ExternalProviders *@
+<PageTitle>Logga in</PageTitle>
+
+<AppContent ContentMaxWidth="MaxWidth.ExtraSmall">
+    <Title>Logga in</Title>
+    <Ingress>Här loggar du in på FotoWeb. Om din e-postadress som är registrerad hos oss är kopplad till ett Google konto kan du logga in med det genom att trycka på Google ikonen.</Ingress>
+
+    <Container>
+        <AppForm Id="loginform" Model="@_model" Validation="@(_validator.ValidateValue)" ValidationDelay="0">
+            <Form>
+                <AppTextField @bind-Value="@_model.UserName"
+                              For="@(() => _model.UserName)"
+                              Label="Användarnamn:"/>
+
+                <AppTextField @bind-Value="@_model.Password"
+                              For="@(() => _model.Password)"
+                              InputType="InputType.Password"
+                              Label="Lösenord:"/>
+                <MudButton Style="filter: invert(0.50)!important;" Size="Size.Small" ButtonType="ButtonType.Button" Variant="Variant.Text"
+                           OnClick="@(() => { EmailResetMessage = null; _emailModel.Email = string.Empty; _showPasswordReset = true; })">
+                    Glömt lösenord?
+                </MudButton>
+            </Form>
+            <Actions >
+                <MudButton Variant="Variant.Text" Color="Color.Primary" Class="m-0 mx-auto" OnClick="@(async () => await Submit())">Logga in</MudButton>
+            </Actions>
+        </AppForm>
+        @if (ErrorMessage is not null)
+        {
+            <AppAlert Class="mt-3" Severity="Severity.Error">@ErrorMessage</AppAlert>
+        }
+        <MudText Align="Align.Center" Typo="Typo.body1" Class="mt-6">
+            Logga in med Google
+        </MudText>
+        <MudContainer Class="d-flex justify-center">
+            <MudTooltip Class="mt-2" Text="Logga in med Google">
+                <MudIconButton Class="mt-3 mx-auto" Href="/api/auth/login/Google" Icon="@Icons.Custom.Brands.Google" Variant="Variant.Outlined" Color="Color.Primary" aria-label="github"></MudIconButton>
+            </MudTooltip>
+        </MudContainer>
+        <MudDialog @bind-IsVisible="_showPasswordReset" Options="_dialogOptions">
+            <TitleContent>
+                <MudText Typo="Typo.h6">
+                    <MudIcon Icon="@Icons.Material.Filled.Email" Class="mr-3"/> Skicka återställningslänk
+                </MudText>
+            </TitleContent>
+            <DialogContent>
+                <AppForm Model="@_emailModel" Validation="@(_emailValidator.ValidateValue)" ValidationDelay="0">
+                    <Form>
+                        <AppTextField AutoFocus="true" @bind-Value="@_emailModel.Email" For="@(() => _emailModel.Email)" Label="E-post"/>
+                    </Form>
+                </AppForm>
+                @if (EmailResetMessage is not null)
+                {
+                    <AppAlert Class="mt-3" Severity="Severity.Success">@EmailResetMessage</AppAlert>
+                }
+            </DialogContent>
+            <DialogActions>
+                <MudContainer Class="d-flex">
+                    <MudButton Variant="Variant.Filled" Disabled="@(EmailResetMessage is not null)" Color="Color.Primary" OnClick="SendPasswordResentMail" Class="align-self-start">Skicka</MudButton>
+                </MudContainer>
+            </DialogActions>
+        </MudDialog>
+    </Container>
+</AppContent>
+
+@code {
+    private readonly LoginFormValidator _validator = new();
+    private readonly EmailModelValidator _emailValidator = new();
+    private readonly LoginModel _model = new();
+    private readonly EmailModel _emailModel = new();
+    private string? ErrorMessage { get; set; }
+    public string? EmailResetMessage { get; set; }
+    private bool _showPasswordReset;
+
+    private readonly DialogOptions _dialogOptions = new()
+    {
+        FullWidth = true,
+        CloseOnEscapeKey = true,
+        CloseButton = true
+    };
+
+    public record LoginModel
+    {
+        public string UserName { get; set; } = default!;
+        public string Password { get; set; } = default!;
+        public string ConfirmPassword { get; set; } = default!;
+    }
+
+    public record EmailModel
+    {
+        public string Email { get; set; } = default!;
+    }
+
+    public class EmailModelValidator : ValidatorBase<EmailModel>
+    {
+        public EmailModelValidator()
+        {
+            RuleFor(x => x.Email)
+                .NotEmpty()
+                .WithMessage("E-postadress måste anges.")
+                .EmailAddress()
+                .WithMessage("Du måste ange giltig e-postadress.");
+        }
+    }
+
+    public class LoginFormValidator : ValidatorBase<LoginModel>
+    {
+        public LoginFormValidator()
+        {
+            RuleFor(x => x.UserName)
+                .NotEmpty()
+                .WithMessage("Användarnamn måste anges.")
+                .MaximumLength(25)
+                .WithMessage("Användarnamn får max vara 25 tecken")
+                .MinimumLength(5)
+                .WithMessage("Användarnamn måste vara minst 5 tecken");
+
+            RuleFor(x => x.Password)
+                .NotEmpty()
+                .WithMessage("Lösenord måste anges.")
+                .MaximumLength(32)
+                .MinimumLength(6)
+                .WithMessage("Lösenordet måste vara mellan 6 och 32 tecken.")
+                .Matches("^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z])(?=.*[^a-zA-Z\\d]).*$")
+                .WithMessage("Lösenordet måste innehålla små och stora bokstäver, siffror samt specialtecken.");
+        }
+    }
+
+    private async Task Submit()
+    {
+        var (user, error) = await SignInService.LoginAsync(new LoginUserInfo { UserName = _model.UserName, Password = _model.Password });
+    // var (user, error) = await AuthService.LoginAsync(new LoginUserInfo(){UserName = model.UserName!, Password = model.Password!});
+
+        if (user is null)
+        {
+            ErrorMessage = error?.StatusCode == 401 ? "Fel användarnamn eller lösenord." 
+                : "Okänt fel, prova igen senare. Om fel kvarstår kontakta support.";
+            return;
+        }
+    // await SignInService.LoginAsync(new LoginUserInfo() { UserName = model.UserName!, Password = model.Password });
+        NavigationManager?.NavigateTo("/", true);
+    }
+
+    private async Task SendPasswordResentMail()
+    {
+        if (await _emailValidator.ValidateAsync(_emailModel) is not { IsValid: true }) return;
+        await UserService.SendPasswordResetEmail(_emailModel.Email);
+        EmailResetMessage = "Återställningslänk skickad till angiven e-postadress. Kontrollera din inkorg (även skräpkorgen).";
+    }
+
+
+
+}

@@ -8,7 +8,7 @@ public static class OpenApiExtensions
     // Adds the JWT security scheme to the Open API description
     public static IEndpointConventionBuilder AddOpenApiSecurityRequirement(this IEndpointConventionBuilder builder)
     {
-        var scheme = new OpenApiSecurityScheme()
+        var scheme = new OpenApiSecurityScheme
         {
             Type = SecuritySchemeType.Http,
             Name = JwtBearerDefaults.AuthenticationScheme,

@@ -17,7 +17,7 @@ public class AdminServiceTests : IntegrationTestsBase
     {
         // Arrange
         var client = CreateClient("admin", true);
-        var options = Options.Create(new AppSettings() { FotoApiUrl = client.BaseAddress!.ToString() });
+        var options = Options.Create(new AppSettings { FotoApiUrl = client.BaseAddress!.ToString() });
         
         var adminService = new AdminService(
             client,

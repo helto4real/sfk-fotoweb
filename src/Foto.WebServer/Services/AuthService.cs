@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using Foto.WebServer.Dto;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
@@ -10,8 +9,6 @@ namespace Foto.WebServer.Services;
 public class AuthService : ServiceBase, IAuthService
 {
     private readonly IMemoryCache _cache;
-    private readonly IHttpContextAccessor _accessor;
-    private readonly IAuthorizationService _authService;
     private readonly ILogger<AuthService> _logger;
     private readonly HttpClient _httpClient;
 
@@ -25,25 +22,23 @@ public class AuthService : ServiceBase, IAuthService
     {
         _httpClient = httpClient;
         _cache = cache;
-        _accessor = accessor;
-        _authService = authService;
         _logger = logger;
 
         httpClient.BaseAddress = new Uri(appSettings.Value.FotoApiUrl);
         httpClient.DefaultRequestHeaders.Add("User-Agent", "FotoWebbServer");
     }
 
-    public async Task<(LoginInfo?, ErrorDetail?)> LoginAsync(LoginUserInfo loginInfo)
+    public async Task<(AccountInfo?, ErrorDetail?)> LoginAsync(LoginUserInfo loginInfo)
     {
         var response = await _httpClient.PostAsJsonAsync("/api/users/token", loginInfo);
         var result = await HandleResponse(response);
         if (result is not null)
         {
-            _logger.LogInformation("Login failed for user {UserName}", loginInfo.Username);
+            _logger.LogInformation("Login failed for user {UserName}", loginInfo.UserName);
             return (null, result);
         }
 
-        var loginInfoResponse = await response.Content.ReadFromJsonAsync<LoginInfo>();
+        var loginInfoResponse = await response.Content.ReadFromJsonAsync<AccountInfo>();
         if (loginInfoResponse is null)
             return (null,
                 new ErrorDetail
@@ -59,13 +54,13 @@ public class AuthService : ServiceBase, IAuthService
         return (loginInfoResponse, null);
     }
 
-    public async Task<LoginInfo?> GetOrRegisterUserAsync(string provider, ExternalUserInfo userInfo)
+    public async Task<AccountInfo?> GetOrRegisterUserAsync(string provider, ExternalUserInfo userInfo)
     {
         var response = await _httpClient.PostAsJsonAsync($"/api/users/token/{provider}", userInfo);
 
         if (!response.IsSuccessStatusCode) return null;
 
-        var result = await response.Content.ReadFromJsonAsync<LoginInfo>();
+        var result = await response.Content.ReadFromJsonAsync<AccountInfo>();
         var duration = result!.RefreshTokenExpiration - DateTime.UtcNow;
         _cache.Set(result.RefreshToken, result.Token, duration);
         return result;
@@ -103,7 +98,7 @@ public class AuthService : ServiceBase, IAuthService
             });
     }
 
-    public async Task<(LoginInfo?, ErrorDetail?)> RefreshAccessTokenAsync(string refreshToken, string userName)
+    public async Task<(AccountInfo?, ErrorDetail?)> RefreshAccessTokenAsync(string refreshToken, string userName)
     {
         var response = await _httpClient.PostAsJsonAsync("/api/users/token/refresh", new { refreshToken, userName });
         var result = await HandleResponse(response);
@@ -113,7 +108,7 @@ public class AuthService : ServiceBase, IAuthService
             return (null, result);
         }
 
-        var loginInfoResponse = await response.Content.ReadFromJsonAsync<LoginInfo>();
+        var loginInfoResponse = await response.Content.ReadFromJsonAsync<AccountInfo>();
         if (loginInfoResponse is null)
         {
             return (null,
@@ -131,16 +126,5 @@ public class AuthService : ServiceBase, IAuthService
         _cache.Set(loginInfoResponse.RefreshToken, loginInfoResponse.Token, duration);
         return (loginInfoResponse, null);
     }
-    
-    public async Task<bool> CompliesToPolicy(string policyName)
-    {
-        var authorizationRequirement = new OperationAuthorizationRequirement { Name = policyName };
-        
-        if (_accessor.HttpContext is null)
-            throw new InvalidOperationException("HttpContext is null");
-        
-        var result = await _authService.AuthorizeAsync(_accessor.HttpContext.User, policyName);
-        // var result = await authService.AuthorizeAsync(accessor.HttpContext.User, null, authorizationRequirement);
-        return result.Succeeded;
-    }
+   
 }

@@ -11,7 +11,7 @@ public class GetImageStreamHandler(PhotoServiceDbContext db, IPhotoStore photoSt
 {
     public async Task<FileStream> Handle(GetImageStreamQuery query, CancellationToken ct)
     {
-        var imageInfo = await db.Images.FindAsync(query.Id);
+        var imageInfo = await db.Images.FindAsync(new object?[] { query.Id }, cancellationToken: ct);
 
         if (imageInfo == null)
             throw new ImageNotFoundException(query.Id);
