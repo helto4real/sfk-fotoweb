@@ -1,84 +1,66 @@
 ﻿@page "/register"
 @using FluentValidation
+@using global::Shared.Validation
 @using Foto.WebServer.Authentication
 @using Foto.WebServer.Services
 @using Foto.WebServer.Dto
-@using global::Shared.Validation
+@using Severity = MudBlazor.Severity
 @inherits BasePage
 @layout MainLayout
 @inject ExternalProviders ExternalProviders
 @inject IAuthService AuthService
 
-<div class="row g-3 mb-1 justify-content-center align-items-center">
-    <div class="col col-8">
-        <h2 class="text-center">Registrera dig</h2>
-        <p class="text-center">
-            Registrera dig genom att ange din e-post och nytt lösen. Administratören måste ha registrerat din e-post för att
-            du skall kunna registrera dig som användare. Om din e-post är anknyten till ett google konto kan du registrera dig genom att trycka på
-            google knappen nedan. Då behöver du bara ange Google kontot när du loggar in i framtiden. Vill du byta din e-post till ditt Google konto,
-            kontakta administratören.".
-        </p>
-    </div>
-</div>
-<div class="row g-3 mb-1 justify-content-center align-items-center">
-    <div class="col col-8" style="max-width: 350px;">
-        <CvEditForm Model="@_model" class="form-horizontal py-5" OnValidSubmit="@CreateUser">
-            <FluentValidationValidator/>
-            <div class="form-group mt-1">
-                <label for="username" class="form-label">Användarnamn</label>
-                <InputText id="username" class="form-control" autocomplete="username" @bind-Value="_model.UserName" autofocus/>
-                <ValidationMessage class="text-danger" For="@(() => _model.UserName)"/>
-            </div>
-            <div class="form-group mt-1">
-                <label for="password" class="form-label">Lösenord</label>
-                <InputText id="password" type="password" class="form-control" autocomplete="new-password" @bind-Value="_model.Password"/>
-                <ValidationMessage class="text-danger" For="@(() => _model.Password)"/>
-            </div>
-            <div class="form-group mt-1">
-                <label for="confirmPassword">Bekräfta lösenord</label>
-                <InputText id="confirmPassword" type="password" class="form-control" @bind-Value="_model.ConfirmPassword"/>
-                <ValidationMessage class="text-danger" For="@(() => _model.ConfirmPassword)"/>
-            </div>
-            @* <div class="mb-3"> *@
-            @*     <label for="firstname" class="form-label">Förnamn</label> *@
-            @*     <InputText id="firstname" class="form-control" autocomplete="given-name" @bind-Value="_model.FirstName"/> *@
-            @*     <ValidationMessage For="@(() => _model.FirstName)"/> *@
-            @* </div> *@
-            @* <div class="mb-3"> *@
-            @*     <label for="lastname" class="form-label">Efternamn</label> *@
-            @*     <InputText id="lastname" class="form-control" autocomplete="family-name" @bind-Value="_model.LastName"/> *@
-            @*     <ValidationMessage For="@(() => _model.LastName)"/> *@
-            @* </div> *@
-            <div class="d-flex justify-content-start align-items-center">
-                <button type="submit" class="btn btn-primary" disabled="@_isSubmitting">
-                    Skapa användare
-                </button>
-                <div class="spinner-border spinner-border-sm ms-1" role="status" aria-hidden="true" style="display: @(_isSubmitting ? "block" : "none");">
-                    <span class="visually-hidden">Skapar användare ..</span>
-                </div>
-            </div>
-        </CvEditForm>
+<PageTitle>Registrera användare</PageTitle>
 
-        <h6>Skapa konto med ditt sociala konto:</h6>
-        @foreach (var provider in ExternalProviders.SocialProviders.Value)
-        {
-            <div class="col">
-                <a href="/api/auth/login/@provider?token=@EscapedToken">
-                    <button type="button" @onclick="SocialLoginClickCallback"
-                            class="btn btn-danger btn-lg btn-block bg-secondary border-dark ">
-                        <i
-                            class="@(GetClassFromProvider(provider))" disabled="@_isSubmitting">
-                        </i>
-                    </button>
-                </a>
-            </div>
-        }
-    </div>
-</div>
+<AppContent ContentMaxWidth="MaxWidth.Small" ContentClass="d-flex flex-column justify-content-center align-items-center mt-5">
+    <Title>Registrera användare</Title>
+    <Ingress>
+        Registrera dig genom att ange din e-post och nytt lösen. Administratören måste ha registrerat din e-post för att
+        du skall kunna registrera dig som användare. Om din e-post är knyten till ett google konto kan du registrera dig genom att trycka på
+        google knappen nedan. Då behöver du bara ange Google kontot när du loggar in i framtiden. Vill du byta din e-post till ditt Google konto,
+        kontakta administratören.
+    </Ingress>
+    <Container>
+        <AppForm @bind-Disabled="@_disabled" @ref="_form" Model="_model" Validation="@(_validator.ValidateValue)" ValidationDelay="0">
+            <Form>
+                <AppTextField
+                    Label="Användarnamn"
+                    For="@(() => _model.UserName)"
+                    @bind-Value="_model.UserName"/>
+
+                <AppTextField
+                    Label="Lösenord"
+                    For="@(() => _model.Password)"
+                    @bind-Value="_model.Password"/>
+
+                <AppTextField
+                    Label="Bekräfta lösenord"
+                    For="@(() => _model.ConfirmPassword)"
+                    @bind-Value="_model.ConfirmPassword"/>
+
+
+            </Form>
+            <Actions>
+                <MudButton StartIcon="@Icons.Material.Filled.Person" OnClick="CreateUser" Variant="Variant.Text" Color="Color.Primary"
+                           Disabled="@(!IsValid())">
+                    Skapa användare
+                </MudButton>
+            </Actions>
+        </AppForm>
+        <MudText Align="Align.Center" Typo="Typo.body1" Class="mt-6">
+            Skapa användare med ditt Google konto
+        </MudText>
+        <MudContainer Class="d-flex justify-center">
+            <MudTooltip Class="mt-2" Text="Logga in med Google">
+                <MudIconButton Class="mt-3 mx-auto" Href="@($"/api/auth/login/Google?token={EscapedToken}")" Icon="@Icons.Custom.Brands.Google" Variant="Variant.Outlined" Color="Color.Primary" aria-label="github"></MudIconButton>
+            </MudTooltip>
+        </MudContainer>
+    </Container>
+</AppContent>
 
 @if (_responseHandler.HasAlert)
 {
-    <div class="alert alert-danger">@_responseHandler.Message</div>
+    <AppAlert Severity="Severity.Error">@_responseHandler.Message</AppAlert>
 }
 
 @code {
@@ -99,7 +81,16 @@
     private readonly ResponseHandler _responseHandler = new();
 
     private readonly RegisterModel _model = new();
-    bool _isSubmitting;
+
+    private AppForm? _form;
+    private readonly RegisterModelValidator _validator = new();
+
+    private bool IsValid()
+    {
+        return _validator.Validate(_model).IsValid && !_disabled;
+    }
+
+    private bool _disabled;
 
     protected override void OnInitialized()
     {
@@ -110,36 +101,23 @@
         base.OnInitialized();
     }
 
-    private void SocialLoginClickCallback()
-    {
-        _isSubmitting = true;
-        StateHasChanged();
-    }
-
-    static string GetClassFromProvider(string provider)
-    {
-        return provider switch
-        {
-            "Google" => "bi bi-google",
-            "Facebook" => "bi bi-facebook",
-            "Twitter" => "bi bi-twitter",
-            "Microsoft" => "bi bi-microsoft",
-            _ => "bi bi-github"
-            };
-    }
-
     async Task CreateUser()
     {
-        _isSubmitting = true;
-        StateHasChanged();
+        _ = _form ?? throw new NullReferenceException("Form is null");
 
-        if (HasToken)
+        await _form.Validate();
+        if (!_form.IsValid)
+            return;
+
+        if (!HasToken) return;
+
+        var unEscapedToken = Uri.UnescapeDataString(Token);
+
+        try
         {
-            var unEscapedToken = Uri.UnescapeDataString(Token);
+            _disabled = true;
             var (registeredUser, errorRegisteredUser) = await AuthService.RegisterUserAsync(new NewUserInfo
             {
-                // FirstName = _model.FirstName!,
-                // LastName = _model.LastName!,
                 Email = _model.UserName!,
                 UserName = _model.UserName!,
                 Password = _model.Password!,
@@ -151,7 +129,6 @@
             }
             else
             {
-                _isSubmitting = false;
                 if (errorRegisteredUser!.Detail.Contains("not pre-registered"))
                 {
                     _responseHandler.Message = "Tyvärr så verkar inte din epostadress vara registrerat i systemet. Kontakta administratören för att få hjälp.";
@@ -163,6 +140,10 @@
                 StateHasChanged();
             }
         }
+        finally
+        {
+            _disabled = false;
+        }
     }
 
     public record RegisterModel
@@ -170,11 +151,9 @@
         public string? UserName { get; set; } = string.Empty;
         public string? Password { get; set; } = string.Empty;
         public string? ConfirmPassword { get; set; }
-        // public string? FirstName { get; set; }
-        // public string? LastName { get; set; }
     }
 
-    public class RegisterModelValidator : AbstractValidator<RegisterModel>
+    public class RegisterModelValidator : ValidatorBase<RegisterModel>
     {
         public RegisterModelValidator()
         {
@@ -189,12 +168,6 @@
                 .WithMessage("Du måste ange lösenordet två gånger.")
                 .Equal(x => x.Password)
                 .WithMessage("Lösenorden måste vara lika.");
-            // RuleFor(x => x.FirstName)
-            //     .NotEmpty()
-            //     .WithMessage("Förnamn måste anges.");
-            // RuleFor(x => x.LastName)
-            //     .NotEmpty()
-            //     .WithMessage("Efternamn måste anges.");
         }
     }
 

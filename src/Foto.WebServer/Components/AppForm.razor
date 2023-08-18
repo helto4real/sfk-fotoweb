@@ -1,4 +1,4 @@
-<MudPaper Style="padding-top: 0px; padding-bottom: 5px; padding-left: 10px; padding-right: 10px" Elevation="0" Outlined="true">
+<MudPaper Style="padding: 0px 10px 5px;" Elevation="0" Outlined="true">
     <MudForm @bind-Disabled="@Disabled" @ref="_form" id="@Id" Style="padding: 5px" Model="@Model" Validation="@Validation" ValidationDelay="@ValidationDelay">
         @Form
     </MudForm>
@@ -28,12 +28,16 @@
     [Parameter]
     public string Id { get; set; } = "loginform";
 
-    public Task Validate() => _form?.Validate() ?? Task.CompletedTask;
+    public Task Validate()
+    {
+        return _form?.Validate() ?? Task.CompletedTask;
+    }
 
     public bool IsValid => _form?.IsValid ?? false;
 
     private bool _disabled;
 
+#pragma warning disable BL0007
     [Parameter]
     public bool Disabled
     {
@@ -45,6 +49,7 @@
             DisabledChanged.InvokeAsync(value);
         }
     }
+#pragma warning restore BL0007
 
     [Parameter]
     public EventCallback<bool> DisabledChanged { get; set; }

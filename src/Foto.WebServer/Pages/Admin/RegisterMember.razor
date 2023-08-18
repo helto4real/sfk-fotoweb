@@ -18,7 +18,7 @@
     <Title>Registrera medlem</Title>
     <Ingress>Registrera ny medlem</Ingress>
     <Container>
-        <AppForm @bind-Disabled="@Disabled" @ref="_form" Model="_member" Validation="@(_validator.ValidateValue)" ValidationDelay="0">
+        <AppForm @bind-Disabled="@_disabled" @ref="_form" Model="_member" Validation="@(_validator.ValidateValue)" ValidationDelay="0">
             <Form>
                 <AppTextField @bind-Value="@_member.FirstName"
                               For="@(() => _member.FirstName)"
@@ -74,13 +74,11 @@
     
     private AppForm? _form;
 
-    private bool Disabled { get; set; }
+    private bool _disabled;
 
     private string RegisterSaveButtonName => MemberId == Guid.Empty ? "Registrera" : "Spara";
-    public bool IsValid()
-    {
-        return _validator.Validate(_member).IsValid;
-    }
+
+    public bool IsValid() => _validator.Validate(_member).IsValid;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -117,7 +115,7 @@
             if (!_form.IsValid)
                 return;
             
-            Disabled = true;
+            _disabled = true;
             if (MemberId == Guid.Empty)
             {
                 var result = await MemberService.CreateMemberAsync(
@@ -166,7 +164,7 @@
         }
         finally
         {
-            Disabled = false;
+            _disabled = false;
         }
     }
 
@@ -174,7 +172,7 @@
     {
         try
         {
-            Disabled = true;
+            _disabled = true;
             var result = await MemberService.DeactivateMemberByIdAsync(_member.Id);
             if (_responseHandler.CheckResponse(result))
             {
@@ -183,7 +181,7 @@
         }
         finally
         {
-            Disabled = false;
+            _disabled = false;
         }
 
         StateHasChanged();
@@ -193,7 +191,7 @@
     {
         try
         {
-            Disabled = true;
+            _disabled = true;
             var result = await MemberService.ActivateMemberByIdAsync(_member.Id);
             if (_responseHandler.CheckResponse(result))
             {
@@ -202,7 +200,7 @@
         }
         finally
         {
-            Disabled = false;
+            _disabled = false;
         }
         StateHasChanged();
     }

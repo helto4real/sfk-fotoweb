@@ -32,7 +32,6 @@
       <AdditionalFiles Include="Pages\User\RegisterUser.razor" />
       <AdditionalFiles Include="Shared\Footer.razor" />
       <AdditionalFiles Include="Shared\MainLayout.razor" />
-      <AdditionalFiles Include="Shared\NavMenu.razor" />
     </ItemGroup>
 
     <ItemGroup>
@@ -55,14 +54,5 @@
     <ItemGroup>
       <ProjectReference Include="..\Shared\Shared.csproj" />
     </ItemGroup>
-
-
-
-    <ItemGroup>
-      <Compile Remove="Authentication\UserRoles.cs" />
-      <Compile Remove="Dto\TokenInfo.cs" />
-    </ItemGroup>
-
-
     
 </Project>

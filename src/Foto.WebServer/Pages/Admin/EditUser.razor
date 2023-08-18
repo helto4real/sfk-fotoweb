@@ -15,54 +15,38 @@
         <h2>Redigera användare</h2>
     </div>
 </div>
+<PageTitle>Lista användare</PageTitle>
+<AppContent ContentMaxWidth="MaxWidth.Small">
+    <Title>Lista användare</Title>
+    <Ingress>Här visas alla användare i systemet. Medlemsinformation hanteras under menyn "Medlemmar"</Ingress>
+    <Container>
+        <AppForm @bind-Disabled="@_disabled" @ref="_form" Model="User" >
+            <Form>
+                <AppTextField @bind-Value="@User.Username"
+                              For="@(() => User.Username)"
+                              Label="Förnamn"/>
+                <MudText Typo="Typo.h6">Roller</MudText>
+                    @foreach (var role in _roles)
+                    {
+                            <MudCheckBox T="bool"  Checked="@(User.Roles.Any(r => r == role.Name))"
+                                         CheckedChanged="b => OnRoleSelectChangedAsync(role.Name, b)" Label="@(RoleNameTranslator.GetRoleName(role.Name))"/>
+                    }
+            </Form>
+            <Actions>
+                <MudButton StartIcon="@Icons.Material.Filled.Save" OnClick="HandleValidSubmit" Variant="Variant.Text" 
+                           Color="Color.Primary">Spara</MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.Cancel" OnClick="OnCancel" Variant="Variant.Text" 
+                           Color="Color.Surface">Spara</MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.Delete" OnClick="OnDeleteUser" Variant="Variant.Text" Color="Color.Error" 
+                           Class="mr-auto">Radera</MudButton>
+            </Actions>
+        </AppForm>
+    </Container>
+</AppContent>
 
-@if (User is not null)
+@if (_responseHandler.HasAlert)
 {
-    <div class="container">
-        <div class="row g-3 mb-5 justify-content-center align-items-center">
-            <div class="col col-8" style="max-width: 350px;">
-                <EditForm Model="@User" OnValidSubmit="@HandleValidSubmit" Context="authorizationContext">
-                    <DataAnnotationsValidator/>
-                    <ValidationSummary/>
-
-                    <div class="form-group mt-1">
-                        <label for="username">Username:</label>
-                        <InputText id="username" class="form-control" @bind-Value="@User.Username"/>
-                        <ValidationMessage class="text-danger" For="@(() => User.Username)"/>
-                    </div>
-                    <div class="form-group mt-1">
-                        <label>Roller:</label>
-                        @if (_roles.Count > 0)
-                        {
-                            @foreach (var role in _roles)
-                            {
-                                <div>
-                                    @if (User?.Roles?.Any(r => r == role.Name) ?? false)
-                                    {
-                                        <input class="form-check-input" type="checkbox" id="@role.Name" checked @onchange="eventArgs => { OnRoleSelectChangedAsync(role.Name, eventArgs); }"/>
-                                    }
-                                    else
-                                    {
-                                        <input class="form-check-input" type="checkbox" id="@role.Name" unchecked @onchange="eventArgs => { OnRoleSelectChangedAsync(role.Name, eventArgs); }"/>
-                                    }
-                                    <label style="margin-left: 8px">@RoleNameTranslator.GetRoleName(role.Name)</label>
-                                </div>
-                            }
-                        }
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mt-1">
-                        <button type="submit" class="btn btn-primary app-button">Spara</button>
-                        <button type="button" class="btn btn-secondary app-button" @onclick="OnCancel">Avbryt</button>
-                        <button type="button" class="btn btn-danger app-button" @onclick="OnDeleteUser">Ta bort</button>
-                    </div>
-                </EditForm>
-            </div>
-        </div>
-    </div>
-}
-else
-{
-    <div class="alert alert-danger">@(_responseHandler.Message)</div>
+    <AppAlert Severity="Severity.Error">@_responseHandler.Message</AppAlert>
 }
 
 @code
@@ -70,10 +54,15 @@ else
     [Parameter]
     public string UserName { get; set; } = string.Empty;
 
-    private UserInfo? User { get; set; } = new();
+    private AppForm? _form;
+    private UserInfo User { get; set; } = new();
     private IReadOnlyCollection<RoleInfo> _roles = new List<RoleInfo>();
     private readonly ResponseHandler _responseHandler = new();
-
+    private bool _disabled;
+    
+    
+    // public bool IsValid() => _validator.Validate(_member).IsValid;
+    
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -96,15 +85,12 @@ else
 
     private async Task HandleValidSubmit()
     {
-        if (User is not null)
-        {
-            var result = await UserService.UpdateUserAsync(User);
-            if (!_responseHandler.CheckResponse(result))
-                return;
+        var result = await UserService.UpdateUserAsync(User);
+        if (!_responseHandler.CheckResponse(result))
+            return;
 
-            // Navigate back to the newUser list page
-            NavigationManager?.NavigateTo("/admin/users/list");
-        }
+        // Navigate back to the newUser list page
+        NavigationManager?.NavigateTo("/admin/users/list");
     }
 
     private async Task OnDeleteUser()
@@ -125,14 +111,12 @@ else
         NavigationManager!.NavigateTo("/admin/users/list");
     }
 
-    private void OnRoleSelectChangedAsync(string role, ChangeEventArgs arg)
+    private void OnRoleSelectChangedAsync(string role, bool? isChecked)
     {
-        if (arg.Value is not bool value) return;
-
-        User?.Roles?.RemoveAll(r => r == role);
-        if (value)
+        User.Roles.RemoveAll(r => r == role);
+        if (isChecked ?? false)
         {
-            User?.Roles?.Add(role);
+            User.Roles.Add(role);
         }
     }
 

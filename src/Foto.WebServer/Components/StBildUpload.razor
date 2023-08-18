@@ -1,10 +1,8 @@
 ﻿@using FluentValidation
-@using System.Globalization
-@using System.Text.Json.Serialization
-@using FluentValidation.Results
 @using Foto.WebServer.Dto
 @using Foto.WebServer.Services
 @using Severity = MudBlazor.Severity
+@using System.Text.Json.Serialization
 @inject AppSnackBar AppSnackBar
 @inject IImageService ImageService
 @inject NavigationManager NavigationManager
@@ -81,7 +79,6 @@
 
 @code {
     string? _alertMessage;
-    private bool _showSuccessMessage;
     private StBildUploadModel _model = new();
     private List<ImageItem> _uploadedImages = new();
     private bool _showProgressBar = false;
@@ -101,7 +98,7 @@
         try
         {
             _showProgressBar = true;
-            // The time needs to be in UTC format. 
+    // The time needs to be in UTC format. 
             _model.Time = _model.Time.ToUniversalTime();
             var (imageItem, error) = await ImageService.UploadImageWithMetadata(_model.ImageFile, _model.Title, _model, "st-bild");
             await Task.Delay(3000);
@@ -130,16 +127,13 @@
         }
     }
 
-    private bool _clearInputFileSelector;
-
     public class StBildUploadModel
     {
         private string? _imageName;
-        private long _imageSize;
         IBrowserFile? _imageFile;
 
         public string ImageName => _imageName ?? string.Empty;
-        public long ImageSize => _imageSize;
+        public long ImageSize { get; private set; }
 
         public string Title { get; set; } = default!;
         public string Name { get; set; } = default!;
@@ -158,13 +152,13 @@
                 {
                     _imageFile = value;
                     _imageName = value.Name;
-                    _imageSize = value.Size;
+                    ImageSize = value.Size;
                 }
                 else
                 {
                     _imageFile = null;
                     _imageName = null;
-                    _imageSize = 0;
+                    ImageSize = 0;
                 }
             }
         }
@@ -211,4 +205,5 @@
                 .WithMessage("Tidpunkt kan inte vara framåt i tiden");
         }
     }
+
 }
