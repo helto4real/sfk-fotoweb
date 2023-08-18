@@ -47,10 +47,10 @@
                 
             </Form>
             <Actions>
-                <MudButton StartIcon="@Icons.Material.Filled.Save" OnClick="HandleValidSubmit" Variant="Variant.Text" Color="Color.Primary" 
-                                           Disabled="@(!IsValid())" >Spara</MudButton>
-                <MudButton StartIcon="@Icons.Material.Filled.Cancel" OnClick="OnCancel" Variant="Variant.Text" Color="Color.Surface" 
-                                            Class="mr-auto">Avbryt</MudButton>
+                <AppButton StartIcon="@Icons.Material.Filled.Save" OnClick="HandleValidSubmit" Color="Color.Primary" 
+                                           Disabled="@(!IsValid())" >Spara</AppButton>
+                <AppButton StartIcon="@Icons.Material.Filled.Cancel" OnClick="OnCancel" Color="Color.Surface" 
+                                            Class="mr-auto">Avbryt</AppButton>
             </Actions>
         </AppForm>
     </Container>

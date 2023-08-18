@@ -75,9 +75,9 @@
                 </Form>
                 <Actions>
                     <MudContainer Class="d-flex">
-                    <MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.Save" Color="Color.Primary" Disabled="@(!IsValid || _isDisabled || _isReadOnly)" Class="" OnClick="@(async () => await HandleValidSubmit())">Spara</MudButton>
-                    <MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Surface" Disabled="@(_showProgressBar || _isDisabled)" Class="" OnClick="OnCancel">Avbryt</MudButton>
-                    <MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" Disabled="@(!IsValid || _isDisabled || _isReadOnly)" Class="ml-auto" OnClick="@(async () => await HandleDeleteStBild())">Radera</MudButton>
+                    <AppButton StartIcon="@Icons.Material.Filled.Save" Color="Color.Primary" Disabled="@(!IsValid || _isDisabled || _isReadOnly)" Class="" OnClick="@(async () => await HandleValidSubmit())">Spara</AppButton>
+                    <AppButton StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Surface" Disabled="@(_showProgressBar || _isDisabled)" Class="" OnClick="OnCancel">Avbryt</AppButton>
+                    <AppButton StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" Disabled="@(!IsValid || _isDisabled || _isReadOnly)" Class="ml-auto" OnClick="@(async () => await HandleDeleteStBild())">Radera</AppButton>
                     </MudContainer>
                 </Actions>
             </AppForm>

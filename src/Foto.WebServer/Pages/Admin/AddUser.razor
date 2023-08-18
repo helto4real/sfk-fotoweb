@@ -23,10 +23,10 @@
                               Label="Bekräfta e-post"/>
             </Form>
             <Actions>
-                <MudButton StartIcon="@Icons.Material.Filled.Save" OnClick="HandleValidSubmit" Variant="Variant.Text" Color="Color.Primary"
+                <AppButton StartIcon="@Icons.Material.Filled.Save" OnClick="HandleValidSubmit" Color="Color.Primary"
                            Disabled="@(!IsValid())" Class="mr-auto">
                     Lägg till
-                </MudButton>
+                </AppButton>
             </Actions>
         </AppForm>
     </Container>

@@ -17,8 +17,8 @@
     <Container>
         @if (_stBilder.Any())
         {
-            <MudButton Class="align-self-center" Variant="Variant.Text" StartIcon="@Icons.Material.Filled.FolderZip" 
-                       Disabled="@(!CanPackage)" Color="Color.Primary" OnClick="OnPackageStBilder">Paketera ST-bilder nedan</MudButton>
+            <AppButton Class="align-self-center" StartIcon="@Icons.Material.Filled.FolderZip" 
+                       Disabled="@(!CanPackage)" Color="Color.Primary" OnClick="OnPackageStBilder">Paketera ST-bilder nedan</AppButton>
             <MudGrid Class="align-self-center mt-4" Spacing="3" Justify="Justify.Center">
                 @foreach (var stBild in _stBilder)
                 {

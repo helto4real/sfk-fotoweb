@@ -25,13 +25,13 @@
                               For="@(() => _model.Password)"
                               InputType="InputType.Password"
                               Label="Lösenord:"/>
-                <MudButton Style="filter: invert(0.50)!important;" Size="Size.Small" ButtonType="ButtonType.Button" Variant="Variant.Text"
+                <AppButton Style="filter: invert(0.50)!important;" Size="Size.Small" ButtonType="ButtonType.Button"
                            OnClick="@(() => { EmailResetMessage = null; _emailModel.Email = string.Empty; _showPasswordReset = true; })">
                     Glömt lösenord?
-                </MudButton>
+                </AppButton>
             </Form>
             <Actions >
-                <MudButton Variant="Variant.Text" Color="Color.Primary" Class="m-0 mx-auto" OnClick="@(async () => await Submit())">Logga in</MudButton>
+                <AppButton Color="Color.Primary" Class="m-0 mx-auto" OnClick="@(async () => await Submit())">Logga in</AppButton>
             </Actions>
         </AppForm>
         @if (ErrorMessage is not null)
@@ -65,7 +65,7 @@
             </DialogContent>
             <DialogActions>
                 <MudContainer Class="d-flex">
-                    <MudButton Variant="Variant.Filled" Disabled="@(EmailResetMessage is not null)" Color="Color.Primary" OnClick="SendPasswordResentMail" Class="align-self-start">Skicka</MudButton>
+                    <AppButton StartIcon="@Icons.Material.Filled.Send" Disabled="@(EmailResetMessage is not null)" Color="Color.Primary" OnClick="SendPasswordResentMail" Class="align-self-start">Skicka</AppButton>
                 </MudContainer>
             </DialogActions>
         </MudDialog>

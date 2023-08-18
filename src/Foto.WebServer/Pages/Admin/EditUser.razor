@@ -10,15 +10,10 @@
 @inject IAdminService AdminService
 @inject IJSRuntime JsRuntime
 
-<div class="container d-flex flex-column justify-content-center align-items-center">
-    <div class="row row-cols-auto align-items-center">
-        <h2>Redigera användare</h2>
-    </div>
-</div>
-<PageTitle>Lista användare</PageTitle>
+<PageTitle>Redigera användare</PageTitle>
 <AppContent ContentMaxWidth="MaxWidth.Small">
-    <Title>Lista användare</Title>
-    <Ingress>Här visas alla användare i systemet. Medlemsinformation hanteras under menyn "Medlemmar"</Ingress>
+    <Title>Redigera användare</Title>
+    <Ingress>Redigera användarinformation. Medlemsinformation hanteras under menyn "Medlemmar"</Ingress>
     <Container>
         <AppForm @bind-Disabled="@_disabled" @ref="_form" Model="User" >
             <Form>
@@ -33,12 +28,12 @@
                     }
             </Form>
             <Actions>
-                <MudButton StartIcon="@Icons.Material.Filled.Save" OnClick="HandleValidSubmit" Variant="Variant.Text" 
-                           Color="Color.Primary">Spara</MudButton>
-                <MudButton StartIcon="@Icons.Material.Filled.Cancel" OnClick="OnCancel" Variant="Variant.Text" 
-                           Color="Color.Surface">Spara</MudButton>
-                <MudButton StartIcon="@Icons.Material.Filled.Delete" OnClick="OnDeleteUser" Variant="Variant.Text" Color="Color.Error" 
-                           Class="mr-auto">Radera</MudButton>
+                <AppButton StartIcon="@Icons.Material.Filled.Save" OnClick="HandleValidSubmit" 
+                           Color="Color.Primary">Spara</AppButton>
+                <AppButton StartIcon="@Icons.Material.Filled.Cancel" OnClick="OnCancel" 
+                           Color="Color.Surface">Spara</AppButton>
+                <AppButton StartIcon="@Icons.Material.Filled.Delete" OnClick="OnDeleteUser" Color="Color.Error" 
+                           Class="mr-auto">Radera</AppButton>
             </Actions>
         </AppForm>
     </Container>

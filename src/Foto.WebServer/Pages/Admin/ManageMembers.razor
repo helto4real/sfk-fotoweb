@@ -31,14 +31,14 @@
                     <MudText>@context.Email</MudText>
                 </MudTd>
                 <MudTd DataLabel="Bild">
-                    <MudButton Href="@GetMemberEditLink(context.Id)" Variant="Variant.Text" Color="Color.Primary">Redigera</MudButton>
+                    <AppButton Href="@GetMemberEditLink(context.Id)" Color="Color.Primary">Redigera</AppButton>
                 </MudTd>
             </RowTemplate>
             <PagerContent>
                 <MudTablePager RowsPerPageString="Visa:" PageSizeOptions="new[] { 10, 25, 50, 100, int.MaxValue }" HorizontalAlignment="HorizontalAlignment.Left" HidePageNumber="true" HidePagination="false" HideRowsPerPage="false"/>
             </PagerContent>
         </MudTable>
-        <MudButton Class="mr-auto" Href="@("/admin/members/register")" Variant="@Variant.Text" Color="Color.Primary">Registrera ny medlem</MudButton>
+        <AppButton Class="mr-auto" Href="@("/admin/members/register")" Color="Color.Primary">Registrera ny medlem</AppButton>
     </Container>
 </AppContent>
 

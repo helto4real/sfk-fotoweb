@@ -49,8 +49,8 @@
                     }
             </Form>
             <Actions>
-                <MudButton StartIcon="@Icons.Material.Filled.Save" OnClick="HandleValidSubmit" Variant="Variant.Text" Color="Color.Primary" 
-                           Disabled="@(!IsValid())" Class="mr-auto">@RegisterSaveButtonName</MudButton>
+                <AppButton StartIcon="@Icons.Material.Filled.Save" OnClick="HandleValidSubmit" Color="Color.Primary" 
+                           Disabled="@(!IsValid())" Class="mr-auto">@RegisterSaveButtonName</AppButton>
             </Actions>
         </AppForm>
     </Container>

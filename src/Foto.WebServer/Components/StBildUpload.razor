@@ -48,22 +48,21 @@
                 <MudText Align="Align.Left" Class="flex-auto my-auto ml-2" Typo="Typo.body1">@_model.ImageName</MudText>
                 <MudFileUpload Accept=".jpg, .jpeg" T="IBrowserFile" For="@(() => _model.ImageFile)" @bind-Files="_model.ImageFile">
                     <ButtonTemplate>
-                        <MudButton HtmlTag="label"
-                                   Variant="Variant.Text"
+                        <AppButton HtmlTag="label"
                                    Color="Color.Primary"
                                    Class="my-3 mr-2"
                                    StartIcon="@Icons.Material.Filled.Image"
                                    for="@context">
                             Välj bild
-                        </MudButton>
+                        </AppButton>
                     </ButtonTemplate>
                 </MudFileUpload>
             </div>
         </MudPaper>
     </Form>
     <Actions >
-        <MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.Save" Color="Color.Primary" Disabled="@(!IsValid)" Class="ml-auto mr-2" OnClick="@(async () => await HandleValidSubmit())">Spara</MudButton>
-        <MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Surface" Disabled="@(_showProgressBar)" Class="mr-auto ml-2" OnClick="@(() => NavigationManager.NavigateTo("/"))">Avbryt</MudButton>
+        <AppButton StartIcon="@Icons.Material.Filled.Save" Color="Color.Primary" Disabled="@(!IsValid)" Class="ml-auto mr-2" OnClick="@(async () => await HandleValidSubmit())">Spara</AppButton>
+        <AppButton StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Surface" Disabled="@(_showProgressBar)" Class="mr-auto ml-2" OnClick="@(() => NavigationManager.NavigateTo("/"))">Avbryt</AppButton>
     </Actions>
 </AppForm>
 
