@@ -11,7 +11,7 @@ namespace Foto.WebServer.Services;
 
 public interface ISignInService
 {
-    Task<HttpResponseMessage> RefreshTokenOnExpired(Func<Task<HttpResponseMessage>> func);
+    Task<HttpResponseMessage> RefreshTokenOnExpired(Func<Task<HttpResponseMessage>> func, bool doNotSignOutOnUnauthorized = false);
     Task<bool> ValidateAccessTokenAndRefreshIfNeedAsync(HttpClient httpClient);
 
     Task<bool> IsCurrentUserExternalAsync();
@@ -55,7 +55,7 @@ public class SignInService(
         return response.IsSuccessStatusCode;
     }
 
-    public async Task<HttpResponseMessage> RefreshTokenOnExpired(Func<Task<HttpResponseMessage>> func)
+    public async Task<HttpResponseMessage> RefreshTokenOnExpired(Func<Task<HttpResponseMessage>> func, bool doNotSignOutOnUnauthorized = false)
     {
         // Call the provided function to get the response
         var response = await func();
@@ -66,7 +66,7 @@ public class SignInService(
         // Retry call with the new token
         response = await func();
 
-        if (response.StatusCode == HttpStatusCode.Unauthorized)
+        if (response.StatusCode == HttpStatusCode.Unauthorized && !doNotSignOutOnUnauthorized)
             // The refresh of token did work or user is not authorized for real 
             SignOut();
 

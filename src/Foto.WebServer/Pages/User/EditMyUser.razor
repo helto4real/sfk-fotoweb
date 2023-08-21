@@ -20,9 +20,10 @@
                 @if (!_isExternal)
                 {   
                     <AppTextField 
-                        Label="Nuvarande lösenord" 
+                        Label="Ange nuvarande lösenord för att ändra kontouppgifter" 
                         For="@(() => _loginInfo.CurrentPassword)" 
-                        @bind-Value="_loginInfo.CurrentPassword"/>
+                        @bind-Value="_loginInfo.CurrentPassword"
+                        HelperText="Du måste ange lösenord för att ändra kontouppgifter"/>
                     
                     <AppTextField 
                         Label="Nytt lösenord" 
@@ -71,9 +72,9 @@
     private UserInfo? _user;
     private bool _isExternal;
     private bool _showEmailVerification;
-    private readonly UpdateLoginInfoValidator _validator = new();
+    private UpdateLoginInfoValidator _validator = new(false);
     private AppForm? _form;
-    
+
     public bool IsValid()
     {
         if (string.IsNullOrWhiteSpace(_loginInfo.NewEmail) &&
@@ -98,6 +99,7 @@
                 };
             }
             _isExternal = await SignInService.IsCurrentUserExternalAsync();
+            _validator = new(_isExternal);
             StateHasChanged();
         }
         await base.OnAfterRenderAsync(firstRender);

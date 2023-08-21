@@ -59,7 +59,7 @@ public class UserService : ServiceBase, IUserService
         loginInfo.IsUserExternal = await _signInService.IsCurrentUserExternalAsync();
         var response =
             await _signInService.RefreshTokenOnExpired(async () =>
-                await _httpClient.PutAsJsonAsync("api/users/logininfo", loginInfo));
+                await _httpClient.PutAsJsonAsync("api/users/logininfo", loginInfo), true);
         var result = await HandleResponse(response);
         return result;
     }

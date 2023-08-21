@@ -24,8 +24,9 @@ public record UpdateLoginInfo
 
 public class UpdateLoginInfoValidator : ValidatorBase<UpdateLoginInfo>
 {
-    public UpdateLoginInfoValidator()
+    public UpdateLoginInfoValidator(bool isExternal)
     {
+        
         When(x => !string.IsNullOrWhiteSpace(x.NewPassword), () =>
         {
             RuleFor(x => x.CurrentPassword).NotEmpty().WithMessage("Password is required");
@@ -47,6 +48,13 @@ public class UpdateLoginInfoValidator : ValidatorBase<UpdateLoginInfo>
         When(x => !string.IsNullOrWhiteSpace(x.NewEmail),
             () =>
             {
+                if (!isExternal)
+                {
+                    RuleFor(x => x.CurrentPassword)
+                        .NotEmpty()
+                        .WithMessage("Du måste ange lösenordet för att ändra dina uppgifter.");
+                }
+
                 RuleFor(x => x.NewEmail).EmailAddress().WithMessage("E-post måste vara en giltig e-postadress");
                 RuleFor(x => x.ConfirmNewEmail).Equal(x => x.NewEmail)
                     .WithMessage("E-postadresserna måste matcha.");
