@@ -48,6 +48,7 @@ internal static class WebHostBuilderExtensions
 
     public static WebApplication AddFotoApi(this WebApplication app)
     {
+        app.UseOutputCache();
         // Add middleware to handle exceptions and return a JSON response
         app.UseMiddleware<ExceptionHandlingMiddleware>();
         // Add Serilog requests logging
@@ -147,6 +148,8 @@ internal static class WebHostBuilderExtensions
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.Configure<SwaggerGeneratorOptions>(o => o.InferSecuritySchemes = true);
+
+        builder.Services.AddOutputCache();
         
         // Configure rate limiting
         builder.Services.AddRateLimiting();

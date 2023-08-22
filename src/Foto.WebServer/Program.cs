@@ -20,6 +20,7 @@ builder.Services.Configure<JsonOptions>(o =>
 
 var appSettingSection = builder.Configuration.GetSection("AppSettings");
 builder.Services.Configure<AppSettings>(appSettingSection);
+builder.Services.Configure<HostOptions>(o => o.ServicesStartConcurrently = true);
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {

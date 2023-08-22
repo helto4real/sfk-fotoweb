@@ -58,7 +58,7 @@ public static class AdminApi
         {
             var response = await pipe.Pipe(handler.Handle, ct);
             return TypedResults.Ok(response);
-        });
+        }).CacheOutput(x => x.Expire(TimeSpan.FromMinutes(20)));
        
         return group;
     }
