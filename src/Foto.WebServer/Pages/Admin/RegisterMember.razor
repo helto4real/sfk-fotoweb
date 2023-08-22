@@ -50,7 +50,9 @@
             </Form>
             <Actions>
                 <AppButton StartIcon="@Icons.Material.Filled.Save" OnClick="HandleValidSubmit" Color="Color.Primary" 
-                           Disabled="@(!IsValid())" Class="mr-auto">@RegisterSaveButtonName</AppButton>
+                           Disabled="@(!IsValid())">@RegisterSaveButtonName</AppButton>
+                <AppButton StartIcon="@Icons.Material.Filled.Cancel" OnClick="@(()=>NavigationManager?.NavigateTo("/admin/members/manage"))" Color="Color.Surface" 
+                           Disabled="@(!IsValid())" Class="mr-auto">Avbryt</AppButton>
             </Actions>
         </AppForm>
     </Container>
