@@ -30,7 +30,7 @@ internal static class PhotoImagesApi
         // Validate the parameters
         //
         group.MapGet("user",
-            async Task<Results<Ok<List<ImageResponse>>, BadRequest<ErrorDetail>>>
+            async Task<Results<Ok<IReadOnlyCollection<ImageResponse>>, BadRequest<ErrorDetail>>>
                 (GetAllImagesForUserHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
             {
                 var result = await pipe.Pipe(handler.Handle, ct);

@@ -1,4 +1,5 @@
-﻿using FotoApi.Infrastructure.Security.Authorization.Dto;
+﻿using System.Collections.ObjectModel;
+using FotoApi.Infrastructure.Security.Authorization.Dto;
 
 namespace FotoApi.Features.HandleMembers.Dto;
 
@@ -13,7 +14,7 @@ public record MemberResponse
     public string? Address { get; set; }
     public string? ZipCode { get; set; }
     public string? City { get; set; }
-    public List<RoleResponse> Roles { get; set; } = new(); 
+    public IReadOnlyCollection<RoleResponse> Roles { get; set; } = ReadOnlyCollection<RoleResponse>.Empty; 
     public bool IsActive { get; set; }
 }
 

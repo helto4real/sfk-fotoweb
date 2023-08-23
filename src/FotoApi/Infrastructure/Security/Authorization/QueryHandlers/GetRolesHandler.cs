@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Identity;
 
 namespace FotoApi.Infrastructure.Security.Authorization.QueryHandlers;
 
-public class GetRolesHandler(RoleManager<Role> roleManager) : IEmptyRequestHandler<List<RoleResponse>>
+public class GetRolesHandler(RoleManager<Role> roleManager) : IEmptyRequestHandler<IReadOnlyCollection<RoleResponse>>
 {
-    public async Task<List<RoleResponse>> Handle(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyCollection<RoleResponse>> Handle(CancellationToken cancellationToken = default)
     {
         var result = from r in roleManager.Roles
             orderby r.SortOrder

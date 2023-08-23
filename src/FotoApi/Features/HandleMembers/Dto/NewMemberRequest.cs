@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using System.Collections.ObjectModel;
+using FluentValidation;
 using FotoApi.Infrastructure.Security.Authorization.Dto;
 using Shared.Validation;
 
@@ -13,7 +14,7 @@ public record NewMemberRequest
     public string? Address { get; set; }
     public string? ZipCode { get; set; }
     public string? City { get; set; }
-    public List<RoleRequest> Roles { get; set; } = new();
+    public IReadOnlyCollection<RoleRequest> Roles { get; set; } = ReadOnlyCollection<RoleRequest>.Empty;
 }
 
 public class NewMemberRequestValidator : AbstractValidator<NewMemberRequest>

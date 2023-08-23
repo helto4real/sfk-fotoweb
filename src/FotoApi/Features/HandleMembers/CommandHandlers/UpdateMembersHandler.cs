@@ -88,7 +88,7 @@ public class UpdateMembersHandler
         };
     }
 
-    static async Task AddRolesToUser(UserManager<User> userManager, User user, List<RoleRequest> roles)
+    static async Task AddRolesToUser(UserManager<User> userManager, User user, IReadOnlyCollection<RoleRequest> roles)
     {
         var currentRoles = await userManager.GetRolesAsync(user);
         var rolesToAdd = roles.Where(r => !currentRoles.Contains(r.Name)).ToList();

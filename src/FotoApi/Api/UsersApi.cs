@@ -25,7 +25,7 @@ public static class UsersApi
         var authMapper = new LoginMapper();
 
         // Get all users
-        group.MapGet("/", async Task<Results<Ok<List<UserResponse>>, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>>
+        group.MapGet("/", async Task<Results<Ok<IReadOnlyCollection<UserResponse>>, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>>
             (GetUsersHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
             var result = await pipe.Pipe(handler.Handle, ct);

@@ -3,9 +3,9 @@ using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 
 namespace FotoApi.Features.HandleSubmissions.HandleStBilder.Queries;
 
-public class GetStBildPackagesHandler(PhotoServiceDbContext db) : IHandler<bool, List<StBildPackageResponse>>
+public class GetStBildPackagesHandler(PhotoServiceDbContext db) : IHandler<bool, IReadOnlyCollection<StBildPackageResponse>>
 {
-    public async Task<List<StBildPackageResponse>> Handle(bool returnDelivered, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyCollection<StBildPackageResponse>> Handle(bool returnDelivered, CancellationToken cancellationToken = default)
     {
         var packagesQuery = returnDelivered switch
         {

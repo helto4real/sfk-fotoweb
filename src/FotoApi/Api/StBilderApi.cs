@@ -25,7 +25,7 @@ public static class StBilderApi
         // Rate limit all of the APIs
         group.RequirePerUserRateLimit();
 
-        group.MapGet("/{showPackagedImages:bool}", async Task<Results<Ok<List<StBildResponse>>, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
+        group.MapGet("/{showPackagedImages:bool}", async Task<Results<Ok<IReadOnlyCollection<StBildResponse>>, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
             (bool showPackagedImages, GetAllStBilderHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
             var response = await pipe.Pipe(showPackagedImages, handler.Handle, ct);
@@ -53,7 +53,7 @@ public static class StBilderApi
             return TypedResults.Ok(result);
         });        
         
-        group.MapGet("user/{showPackagedImages:bool}", async Task<Results<Ok<List<StBildResponse>>, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
+        group.MapGet("user/{showPackagedImages:bool}", async Task<Results<Ok<IReadOnlyCollection<StBildResponse>>, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
             (bool showPackagedImages, GetAllStBilderForCurrentUserHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
             var result =await pipe.Pipe(new GetAllStBilderForCurrentUserRequest(showPackagedImages), handler.Handle, ct);
@@ -69,7 +69,7 @@ public static class StBilderApi
             return TypedResults.Ok();
         });
         
-        group.MapGet("/packageble", async Task<Results<Ok<List<StBildResponse>>, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
+        group.MapGet("/packageble", async Task<Results<Ok<IReadOnlyCollection<StBildResponse>>, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
             (GetAllPackageStBilderQueryHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
             var result = await pipe.Pipe(handler.Handle, ct);
@@ -85,7 +85,7 @@ public static class StBilderApi
         });
 
         group.MapGet("/packages/{returnDelivered:bool}", async Task<Results<
-            Ok<List<StBildPackageResponse>>, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
+            Ok<IReadOnlyCollection<StBildPackageResponse>>, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>> 
             (bool returnDelivered, GetStBildPackagesHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
             var result = await pipe.Pipe(returnDelivered, handler.Handle, ct);

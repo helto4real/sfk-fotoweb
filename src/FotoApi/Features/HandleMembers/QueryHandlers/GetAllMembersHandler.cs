@@ -3,9 +3,9 @@ using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 
 namespace FotoApi.Features.HandleMembers.QueryHandlers;
 
-public class GetAllMembersHandler(PhotoServiceDbContext db) : IEmptyRequestHandler<List<MemberListItemResponse>>
+public class GetAllMembersHandler(PhotoServiceDbContext db) : IEmptyRequestHandler<IReadOnlyCollection<MemberListItemResponse>>
 {
-    public async Task<List<MemberListItemResponse>> Handle(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyCollection<MemberListItemResponse>> Handle(CancellationToken cancellationToken = default)
     {
         var members = from member in db.Members
             join user in db.Users

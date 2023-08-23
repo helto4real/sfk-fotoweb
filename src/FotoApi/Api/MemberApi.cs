@@ -22,7 +22,7 @@ public static class MemberApi
         // Rate limit all of the APIs
         group.RequirePerUserRateLimit();
 
-        group.MapGet("/", async Task<Results<Ok<List<MemberListItemResponse>>, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>>
+        group.MapGet("/", async Task<Results<Ok<IReadOnlyCollection<MemberListItemResponse>>, BadRequest<ErrorDetail>, NotFound<ErrorDetail>>>
             (GetAllMembersHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
             var response = await pipe.Pipe( handler.Handle, ct);

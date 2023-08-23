@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using System.Collections.ObjectModel;
+using FluentValidation;
 using FotoApi.Infrastructure.Security.Authorization.Dto;
 using Shared.Validation;
 // ReSharper disable UnusedAutoPropertyAccessor.Global
@@ -16,7 +17,7 @@ public record MemberRequest
     public string? Address { get; set; }
     public string? ZipCode { get; set; }
     public string? City { get; set; }
-    public List<RoleRequest> Roles { get; set; } = new();
+    public IReadOnlyCollection<RoleRequest> Roles { get; set; } = ReadOnlyCollection<RoleRequest>.Empty;
 }
 
 public class MemberRequestValidator : AbstractValidator<MemberRequest>

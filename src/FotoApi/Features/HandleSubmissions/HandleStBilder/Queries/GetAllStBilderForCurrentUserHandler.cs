@@ -11,11 +11,11 @@ public record GetAllStBilderForCurrentUserRequest(bool ShowPackagedImages) : ICu
 }
 
 public class GetAllStBilderForCurrentUserHandler
-    (PhotoServiceDbContext db) : IHandler<GetAllStBilderForCurrentUserRequest, List<StBildResponse>>
+    (PhotoServiceDbContext db) : IHandler<GetAllStBilderForCurrentUserRequest, IReadOnlyCollection<StBildResponse>>
 {
     private readonly StBildResponseMapper _responseMapper = new();
 
-    public async Task<List<StBildResponse>> Handle(GetAllStBilderForCurrentUserRequest request, CancellationToken ct)
+    public async Task<IReadOnlyCollection<StBildResponse>> Handle(GetAllStBilderForCurrentUserRequest request, CancellationToken ct)
     {
         return request.ShowPackagedImages
             ? await db.StBilder

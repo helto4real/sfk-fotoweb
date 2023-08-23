@@ -3,9 +3,9 @@ using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 
 namespace FotoApi.Features.HandleUrlTokens.QueryHandlers;
 
-public class GetValidUrlTokensHandler(PhotoServiceDbContext db) : IEmptyRequestHandler<List<UrlTokenResponse>>
+public class GetValidUrlTokensHandler(PhotoServiceDbContext db) : IEmptyRequestHandler<IReadOnlyCollection<UrlTokenResponse>>
 {
-    public async Task<List<UrlTokenResponse>> Handle(
+    public async Task<IReadOnlyCollection<UrlTokenResponse>> Handle(
         CancellationToken cancellationToken)
     {
         var tokens = await db.UrlTokens

@@ -46,14 +46,14 @@ public static class AdminApi
             return TypedResults.Ok(response);
         });
         
-        group.MapGet("token/valid-tokens", async Task<Results<Ok<List<UrlTokenResponse>>, BadRequest<ErrorDetail>>> 
+        group.MapGet("token/valid-tokens", async Task<Results<Ok<IReadOnlyCollection<UrlTokenResponse>>, BadRequest<ErrorDetail>>> 
             (GetValidUrlTokensHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
             var response = await pipe.Pipe(handler.Handle, ct);
             return TypedResults.Ok(response);
         });
         
-        group.MapGet("/roles", async Task<Results<Ok<List<RoleResponse>>, BadRequest<ErrorDetail>>> 
+        group.MapGet("/roles", async Task<Results<Ok<IReadOnlyCollection<RoleResponse>>, BadRequest<ErrorDetail>>> 
             (GetRolesHandler handler, FotoAppPipeline pipe, CancellationToken ct) =>
         {
             var response = await pipe.Pipe(handler.Handle, ct);

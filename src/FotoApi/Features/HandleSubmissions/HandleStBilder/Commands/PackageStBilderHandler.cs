@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace FotoApi.Features.HandleSubmissions.HandleStBilder.Commands;
 
-public record PackageStBilderRequest(List<Guid> StBildIds) : ICurrentUser
+public record PackageStBilderRequest(IReadOnlyCollection<Guid> StBildIds) : ICurrentUser
 {
     public CurrentUser CurrentUser { get; set; } = default!;
 }
@@ -32,7 +32,7 @@ public class PackageStBilderHandler(
         return Task.CompletedTask;
     }
 
-    public async Task PackageStBilder(List<Guid> stBildIds, CurrentUser owner, IServiceScope scope)
+    public async Task PackageStBilder(IReadOnlyCollection<Guid> stBildIds, CurrentUser owner, IServiceScope scope)
     {
         await SemaphoreSlim.WaitAsync();
         try

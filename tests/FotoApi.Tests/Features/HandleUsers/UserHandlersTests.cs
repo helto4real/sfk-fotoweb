@@ -32,12 +32,14 @@ public class UsersHandlersTests : IAsyncLifetime
         // ASSERT
         // We already have default admin user in the database
         result.Should().HaveCount(3);
-        result[1].UserName.Should().Be("theadmin");
-        result[1].Roles.Should().Contain("Admin");
-        result[1].Email.Should().Be("theadmin@domain.com");
-        result[2].UserName.Should().Be("user");
-        result[2].Roles.Should().NotContain("Admin");
-        result[2].Email.Should().Be("user@domain.com");
+        var admin = result.Single(x => x.UserName == "theadmin");
+        admin.UserName.Should().Be("theadmin");
+        admin.Roles.Should().Contain("Admin");
+        admin.Email.Should().Be("theadmin@domain.com");
+        var user = result.Single(x => x.UserName == "user");
+        user.UserName.Should().Be("user");
+        user.Roles.Should().NotContain("Admin");
+        user.Email.Should().Be("user@domain.com");
     }
     [Fact]
     public async Task GetUserFromUserNameShouldReturnUser()

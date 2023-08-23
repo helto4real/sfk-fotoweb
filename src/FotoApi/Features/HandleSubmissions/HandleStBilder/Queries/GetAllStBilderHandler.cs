@@ -3,11 +3,11 @@ using FotoApi.Infrastructure.Repositories.PhotoServiceDbContext;
 
 namespace FotoApi.Features.HandleSubmissions.HandleStBilder.Queries;
 
-public class GetAllStBilderHandler(PhotoServiceDbContext db) : IHandler<bool, List<StBildResponse>>
+public class GetAllStBilderHandler(PhotoServiceDbContext db) : IHandler<bool, IReadOnlyCollection<StBildResponse>>
 {
     private readonly StBildResponseMapper _responseMapper = new();
 
-    public async Task<List<StBildResponse>> Handle(bool showPackagedImages, CancellationToken ct)
+    public async Task<IReadOnlyCollection<StBildResponse>> Handle(bool showPackagedImages, CancellationToken ct)
     {
         return showPackagedImages
             ? await db.StBilder
