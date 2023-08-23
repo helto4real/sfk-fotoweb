@@ -93,7 +93,7 @@ public static class AuthApi
         {
             await context.SignOutAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme);
-            return Results.Ok();
+            return Results.Redirect("/login");
         });
         
         group.MapPost("login", async Task<Results<Ok<AccountInfo>, 

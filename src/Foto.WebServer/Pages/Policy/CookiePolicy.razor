@@ -1,26 +1,46 @@
 ﻿@page "/cookiepolicy"
+@inject NavigationManager NavigationManager
 
-<div class="container d-flex flex-column justify-content-center align-items-center">
-    <div class="row row-cols-auto align-items-center">
-        <div>
-            <h2>OM COOKIES</h2>
-            <p>
-                En cookie är små textfiler som sparas på din dator (eller mobil/läsplatta) för att förbättra din användning och upplevelse av en webbplats. Svensk lag kräver att vi informerar om vilka cookies vi använder, deras syfte samt hur cookies kan undvikas. Lagen säger också att du som besökare måste ge samtycke till att cookies används.
-            </p>
-            <h2>SÅ ANVÄNDER VI COOKIES</h2>
-            <p>
-                Denna webbplats innehåller tre typer av cookies:
-                <ul style="margin-left: 2em;">
-                    <li >Sessionscookies används för att underlätta när du går från en sida till en annan. Dessa cookies raderas när du stänger webbläsaren.</li>
-                    <li >Cookies för godkännande av cookies.</li>
-                    <li>Cookies för säkerhet skyddar dig och webbplatsen från angrepp</li>
-                </ul>
-            </p>
-            <h2>HUR KAN JAG NEKA ATT COOKIES SPARAS?</h2>
-            <p>
-                Vill du inte att din dator tar emot och lagrar cookies kan du ställa in så att den automatiskt nekar till lagring av cookies, eller informerar varje gång en webbplats begär att få lagra en cookie. Genom webbläsaren kan också tidigare lagrade cookies raderas.Varje typ av webbläsare tillhandahåller dessa funktioner på olika sätt, se din webbläsares hjälpsidor för mer information.
-                Läs mer om cookies på Post- och Telestyrelsens hemsida <a href="https://www.pts.se/cookies" target="_blank">https://www.pts.se/cookies</a>
-            </p>
-        </div>
-    </div>
-</div>
+<PageTitle>Cookiepolicy</PageTitle>
+
+<AppContent ContentMaxWidth="MaxWidth.Small">
+    <Title>Cookiepolicy</Title>
+    <Ingress>Vår behandling av cookies och personuppgifter.</Ingress>
+    <Container>
+
+        <MudText Typo="Typo.h6">Om cookies</MudText>
+        <p>
+            <MudText Typo="Typo.body2">En cookie är små textfiler som sparas på din dator (eller mobil/läsplatta) för att förbättra 
+                din användning och upplevelse av en webbplats. Svensk lag kräver att vi informerar om vilka cookies vi använder, 
+                deras syfte samt hur cookies kan undvikas. Lagen säger också att du som besökare måste ge samtycke till att cookies används.</MudText>
+        </p>
+        <br/>
+        <MudText Typo="Typo.h6">Så använder vi cookies</MudText>
+        <p>
+            <MudText Typo="Typo.body2">En cookie är små textfiler som sparas på din dator (eller mobil/läsplatta) för att förbättra din</MudText>
+            <ul class="mud-typography mud-typography-body2"  style="margin-left: 2em; list-style-type: disc;">
+                <li >Sessionscookies används för att underlätta när du går från en sida till en annan. Dessa cookies raderas när du stänger webbläsaren.</li>
+                <li >Cookies för godkännande av cookies.</li>
+                <li>Cookies för säkerhet skyddar dig och webbplatsen från angrepp</li>
+            </ul>
+        </p>
+        <br/>
+        <MudText Typo="Typo.h6">HUR KAN JAG NEKA ATT COOKIES SPARAS?</MudText>
+        <p>
+            <MudText Typo="Typo.body2">
+                Vill du inte att din dator tar emot och lagrar cookies kan du ställa in så att den automatiskt nekar till lagring av cookies, eller informerar varje gång en webbplats begär att få lagra en cookie. Genom webbläsaren kan också tidigare lagrade cookies raderas.
+                Varje typ av webbläsare tillhandahåller dessa funktioner på olika sätt, se din webbläsares hjälpsidor för mer information.
+                Läs mer om cookies på Post- och Telestyrelsens hemsida <MudLink Href="https://www.pts.se/cookies" Target="_blank">Post- och Telestyrelsens hemsida</MudLink> 
+            </MudText>
+        </p>
+        <br/>
+        <MudText Typo="Typo.h6">Hur lagrar SFK mina personuppgifter?</MudText>
+        <p>
+            <MudText Typo="Typo.body2">
+                Du kan läsa hur vi hanterar dina personuppgifter i vår <MudLink Href="http://sundsvallsfotoklubb.se/klubbinformation/personuppgiftspolicy" Target="_blank">personuppgiftspolicy</MudLink>.
+            </MudText>
+        </p>
+        <br/>
+        <MudButton Color="Color.Primary" OnClick="@(() => NavigationManager?.NavigateTo("/login", true))" StartIcon="@Icons.Material.Filled.ThumbUp">Jag förstår!</MudButton>
+    </Container>
+</AppContent>

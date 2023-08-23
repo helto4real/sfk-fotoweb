@@ -7,24 +7,24 @@
 @inject IUserService UserService
 @inject NavigationManager NavigationManager
 
-@* @inject ExternalProviders ExternalProviders *@
 <PageTitle>Logga in</PageTitle>
 
 <AppContent ContentMaxWidth="MaxWidth.ExtraSmall">
     <Title>Logga in</Title>
     <Ingress>Här loggar du in på FotoWeb. Om din e-postadress som är registrerad hos oss är kopplad till ett Google konto kan du logga in med det genom att trycka på Google ikonen.</Ingress>
-
     <Container>
         <AppForm Id="loginform" Model="@_model" Validation="@(_validator.ValidateValue)" ValidationDelay="0">
             <Form>
                 <AppTextField @bind-Value="@_model.UserName"
                               For="@(() => _model.UserName)"
-                              Label="Användarnamn:"/>
+                              Label="Användarnamn:"
+                              autocomplete="username"/>
 
                 <AppTextField @bind-Value="@_model.Password"
                               For="@(() => _model.Password)"
                               InputType="InputType.Password"
-                              Label="Lösenord:"/>
+                              Label="Lösenord:"
+                              autocomplete="password"/>
                 <AppButton Style="filter: invert(0.50)!important;" Size="Size.Small" ButtonType="ButtonType.Button"
                            OnClick="@(() => { EmailResetMessage = null; _emailModel.Email = string.Empty; _showPasswordReset = true; })">
                     Glömt lösenord?
@@ -92,7 +92,6 @@
     {
         public string UserName { get; set; } = default!;
         public string Password { get; set; } = default!;
-        public string ConfirmPassword { get; set; } = default!;
     }
 
     public record EmailModel
@@ -138,7 +137,6 @@
     private async Task Submit()
     {
         var (user, error) = await SignInService.LoginAsync(new LoginUserInfo { UserName = _model.UserName, Password = _model.Password });
-    // var (user, error) = await AuthService.LoginAsync(new LoginUserInfo(){UserName = model.UserName!, Password = model.Password!});
 
         if (user is null)
         {
@@ -146,7 +144,6 @@
                 : "Okänt fel, prova igen senare. Om fel kvarstår kontakta support.";
             return;
         }
-    // await SignInService.LoginAsync(new LoginUserInfo() { UserName = model.UserName!, Password = model.Password });
         NavigationManager?.NavigateTo("/", true);
     }
 
@@ -156,7 +153,4 @@
         await UserService.SendPasswordResetEmail(_emailModel.Email);
         EmailResetMessage = "Återställningslänk skickad till angiven e-postadress. Kontrollera din inkorg (även skräpkorgen).";
     }
-
-
-
 }

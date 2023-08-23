@@ -9,7 +9,7 @@ namespace Foto.WebServer.Authentication;
 /// </summary>
 public class RefreshTokenMiddleware(RequestDelegate next, ILogger<RefreshTokenMiddleware> logger)
 {
-    private static readonly string[] ExcludedPaths = { "/login", "/register", "/confirm-email", "/password-reset", "/signalr", "/_framework", "/_blazor", "/api/auth" };
+    private static readonly string[] ExcludedPaths = { "/login", "/register", "/confirm-email", "/cookie", "/password-reset", "/signalr", "/_framework", "/_blazor", "/api/auth" };
 
     public async Task Invoke(HttpContext context, IAuthService authService)
     {

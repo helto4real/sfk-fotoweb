@@ -8,10 +8,10 @@
 <MudSnackbarProvider/>
 <MudLayout>
     <MudAppBar Elevation="0">
-        
-        <MudImage Src="logo.jpg" Width="40" Height="40" />
+
+        <MudImage Src="logo.jpg" Width="40" Height="40"/>
         <MudText Class="ml-2" Typo="Typo.h6">SFK Fotowebb</MudText>
-        
+
         <MudSpacer/>
         <MudIconButton Href="mailto:webmaster@sundsvallsfotoklubb.se" Icon="@Icons.Material.Filled.Mail" Variant="Variant.Text" Color="Color.Inherit" aria-label="github"></MudIconButton>
         @if (_userAuthenticated)
@@ -20,11 +20,11 @@
                 <ActivatorContent>
                     @if (_userImageUrl is not null)
                     {
-                        <MudAvatar Size="Size.Small" Image="@_userImageUrl" />
+                        <MudAvatar Size="Size.Small" Image="@_userImageUrl"/>
                     }
                     else
                     {
-                        <MudIcon Icon="@Icons.Material.Filled.Person"  Color="Color.Inherit" />
+                        <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Inherit"/>
                     }
                 </ActivatorContent>
                 <ChildContent>
@@ -33,34 +33,39 @@
                 </ChildContent>
             </MudMenu>
         }
-        <MudIconButton  Icon="@ModeButtonIcon" Variant="Variant.Text" Color="Color.Inherit" OnClick="ToggleDarkMode" ></MudIconButton>
+        <MudIconButton Icon="@ModeButtonIcon" Variant="Variant.Text" Color="Color.Inherit" OnClick="ToggleDarkMode"></MudIconButton>
     </MudAppBar>
-    
-    <MudDrawer @bind-Open="@_drawerOpen" ClipMode="DrawerClipMode.Docked" >
+
+    <MudDrawer @bind-Open="@_drawerOpen" ClipMode="DrawerClipMode.Docked">
         <AppMenu/>
     </MudDrawer>
     <MudMainContent >
         <MudToolBar DisableGutters="true" Style="position: fixed;">
-            <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" OnClick="@(() => DrawerToggle())" Class="ml-3" />
+            <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" OnClick="@(() => DrawerToggle())" Class="ml-3"/>
         </MudToolBar>
-        <MudContainer Style="margin-top: 15px"  MaxWidth="MaxWidth.Large">
+        <MudContainer Style="margin-top: 15px" MaxWidth="MaxWidth.Large">
             @Body
         </MudContainer>
     </MudMainContent>
 </MudLayout>
 
-@* <BSModal @ref="@_acceptCookieModal" MarginTop="Margins.Auto" DataId="acceptCookieModal"> *@
-@*     <Header>Cookies och GDPR</Header> *@
-@*     <Content>Vi använder cookies för att ge dig bästa möjliga upplevelse. För att kunna fortsätta att använda siten behöver du acceptera  *@
-@*         att vi lagrar cookies genom att trycka på knappen "Jag förstår".</Content> *@
-@*     <Footer Context="cookiemodal"> *@
-@*         <a href="/cookie/consent"> <BSButton  Color="BSColor.Primary">Jag förstår</BSButton></a> *@
-@*         <a href="/cookiepolicy" target="_blank"><BSButton  Color="BSColor.Secondary">Läs mer...</BSButton></a> *@
-@*     </Footer> *@
-@* </BSModal> *@
-@* <footer class="fixed-bottom"> *@
-@*     <Footer /> *@
-@* </footer> *@
+<MudDialog @bind-IsVisible="_showCookieConsent" Options="_dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Cookie" Class="mr-3"/>Cookies och GDPR
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        Vi använder cookies för att ge dig bästa möjliga upplevelse. För att kunna fortsätta att använda webbplatsen behöver du acceptera
+        att vi lagrar cookies genom att trycka på knappen "Jag förstår".
+    </DialogContent>
+    <DialogActions>
+        <MudContainer Class="d-flex">
+            <AppButton OnClick="OnConsent" StartIcon="@Icons.Material.Filled.ThumbUp" Color="Color.Primary" Class="align-self-start">Jag förstår</AppButton>
+            <AppButton Href="/cookiepolicy" StartIcon="@Icons.Material.Filled.Book" Color="Color.Primary" Class="align-self-start">Läs mer...</AppButton>
+        </MudContainer>
+    </DialogActions>
+</MudDialog>
 
 @code
 {
@@ -68,8 +73,18 @@
     bool _isDarkMode;
     string? _userImageUrl;
     private bool _userAuthenticated;
+    private bool _showCookieConsent;
 
     string ModeButtonIcon => _isDarkMode ? Icons.Material.Filled.WbSunny : Icons.Material.Filled.Brightness2;
+
+    private readonly DialogOptions _dialogOptions = new()
+    {
+        FullWidth = true,
+        CloseOnEscapeKey = true,
+        CloseButton = true
+    };
+
+
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
@@ -90,20 +105,19 @@
 
         await base.OnInitializedAsync();
     }
-    
+
     private async Task ToggleDarkMode()
     {
         _isDarkMode = !_isDarkMode;
-        // Todo: Move to some utility class
+    // Todo: Move to some utility class
         await JsRuntime.InvokeVoidAsync("setDarkMode", _isDarkMode);
-
     }
-    
+
     void Logout()
     {
-        NavigationManager?.NavigateTo("/signout", true);
+        NavigationManager?.NavigateTo("/api/auth/signout", true);
     }
-    
+
     [CascadingParameter]
     public bool ConsentGiven { get; set; }
 
@@ -127,29 +141,29 @@
             {
                 _userAuthenticated = false;
             }
-            
+            string? id = null;
+
+            if (NavigationManager is not null)
+                id = NavigationManager.ToBaseRelativePath(NavigationManager.Uri).Split('/').LastOrDefault();
+
+            if (!_showCookieConsent && !ConsentGiven && id != "cookiepolicy")
+            {
+                _showCookieConsent = true;
+                _drawerOpen = false;
+                shouldRefresh = true;
+            }
+
             if (shouldRefresh)
             {
                 StateHasChanged();
             }
-            
         }
-        string? id = null;
-        
-        if (NavigationManager is not null)
-            id = NavigationManager.ToBaseRelativePath(NavigationManager.Uri).Split('/').LastOrDefault();
-        
-        // if (!ConsentGiven && id != "cookiepolicy")
-        // {
-        //     await ShowAcceptCookieModal();
-        // }
+
         await base.OnAfterRenderAsync(firstRender);
     }
-    // private async Task ShowAcceptCookieModal()
-    // {
-    //     // if (_acceptCookieModal is null)
-    //     //     throw new NullReferenceException("Accept cookie modal is null");
-    //     // await _acceptCookieModal.ShowAsync();
-    // }
 
+    private void OnConsent()
+    {
+        NavigationManager?.NavigateTo("/cookie/consent", true);
+    }
 }

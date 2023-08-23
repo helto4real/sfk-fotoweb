@@ -2,7 +2,6 @@
 
 @if (_isConnected)
 {
-    
 <CascadingValue Value="ConsentGiven">
     <CascadingAuthenticationState>
         <Router AppAssembly="@typeof(App).Assembly">
@@ -48,8 +47,6 @@ else
 }
 
 @code {
-    // private bool _isDarkMode;
-    
     [Parameter]
     public bool ConsentGiven { get; set; }
 
